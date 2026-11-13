@@ -203,6 +203,16 @@ Everything the launcher shows comes from real sources: the games on this PC, TML
 
 ---
 
+## Community project
+
+The goal is one shared project instead of many separate forks. Improvements, fixes and features are welcome as pull requests and issues here ([CONTRIBUTING.md](CONTRIBUTING.md)). Forks are allowed by the AGPL-3.0, but please contribute back, and do not publish a fork under the TM Horizon name or logo: name and logo are not part of the code licence. Questions and ideas: [Discussions](https://github.com/cheatoskar/tm-horizon/discussions); bugs: [Issues](https://github.com/cheatoskar/tm-horizon/issues).
+
+## For mod developers
+
+TM Horizon already runs on its own hub, with versioned releases, update checks and a review step. Mods can be showcased in the launcher and, later, published through TM Horizon. Help with porting or building cross-over mods for the older games (Nations ESWC, Sunrise, Original) is welcome, with the original author's permission.
+
+Public access for other authors is planned. It needs coordination with the community and TMX first, and there is no date. Mod authors who want in are invited to open an issue or a discussion.
+
 ## Credits
 
 - Built with [Tauri](https://tauri.app), [React](https://react.dev), [Vite](https://vite.dev) and [Astro](https://astro.build); icons from [Lucide](https://lucide.dev).
