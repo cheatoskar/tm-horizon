@@ -19,12 +19,11 @@ const dropPreviewArt = {
 };
 
 const locales = ["en", "de", "pl", "fr"];
-// /mods and /servers redirects exist in every language
+// /mods redirects exist in every language (/servers is the live server list)
 const redirects = {};
 for (const l of locales) {
   const p = l === "en" ? "" : `/${l}`;
   redirects[`${p}/mods`] = `${p}/discover/mods/`;
-  redirects[`${p}/servers`] = `${p}/discover/servers/`;
 }
 // English names for the legal pages (the pages keep their German names in every language)
 Object.assign(redirects, { "/imprint": "/impressum/", "/privacy": "/datenschutz/", "/terms": "/nutzungsbedingungen/" });

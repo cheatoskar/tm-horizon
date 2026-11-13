@@ -3,9 +3,13 @@
 //!
 //! - Pinned: DXVK 3.1.1, archive SHA-256 checked, else nothing is written. Only
 //!   `dxvk-3.1.1/x32/d3d9.dll` is read out of the archive (own minimal ustar reader, bounds checked).
-//! - Refused (nothing written): game running, folder protected / not writable, a `d3d9.dll` is already
-//!   there (TM Vibrant Shaders or the Sunrise repack's proxy load the system d3d9 by full path, DXVK
-//!   cannot sit behind them), a `dxvk.conf` that I did not write.
+//! - Refused (nothing written): game running, folder protected, a `d3d9.dll` is already there (TM Vibrant
+//!   Shaders or the Sunrise repack's proxy load the system d3d9 by full path, DXVK cannot sit behind them),
+//!   a `dxvk.conf` that I did not write.
+//! - A game folder only an administrator may write (TMNF/TMUF default to `C:\Program Files (x86)`): the
+//!   normal path answers `needAdmin`; "Install with admin rights" stages the two verified files in the
+//!   launcher's data folder and copies exactly them with one UAC prompt (`elevate.rs`), then checks their
+//!   hashes from the normal side. Off works the same way (elevated `del` of my unchanged files only).
 //! - Every written file is recorded in `dxvk-journal.json` (launcher data folder) with its SHA-256 and
 //!   what was there before (always nothing, because existing files are refused). Off removes a file only
 //!   while its hash still matches.
@@ -212,20 +216,33 @@ pub fn status(dir: &Path, data: &Path, game: &str) -> Status {
     Status::Foreign
 }
 
-/// Why DXVK cannot be written into `dir` (nothing is touched). `Ok` = free to write.
-pub fn check_apply(dir: &Path, data: &Path, game: &str) -> Result<(), String> {
+/// How DXVK can be written into a folder.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Mode {
+    /// The user can write the folder.
+    Direct,
+    /// Only an administrator can: one UAC prompt for the copy (`elevate.rs`).
+    Admin,
+}
+
+/// Whether the user can write `dir`: Direct, Admin (access denied) or an error code.
+pub fn write_mode(dir: &Path) -> Result<Mode, String> {
+    match crate::elevate::writable(dir) {
+        Ok(true) => Ok(Mode::Direct),
+        Ok(false) => Ok(Mode::Admin),
+        Err(e) => Err(format!("notWritable:{e}")),
+    }
+}
+
+/// Why DXVK cannot be written into `dir` (nothing is touched), else how. The checks that need no write
+/// access come first, so an existing d3d9.dll (TMVS) is named even in a Program Files folder.
+pub fn check_apply(dir: &Path, data: &Path, game: &str) -> Result<Mode, String> {
     if crate::fsx::blocked(dir) || crate::fsx::blocked(&dir.join(DLL)) || crate::fsx::blocked(&dir.join(CONF)) {
         return Err("blocked".into());
     }
     if !crate::fsx::is_dir(dir) {
         return Err("notInstalled".into());
-    }
-    let probe = dir.join(".tmhub-dxvk-probe");
-    match std::fs::OpenOptions::new().write(true).create_new(true).open(&probe) {
-        Ok(_) => {
-            let _ = std::fs::remove_file(&probe);
-        }
-        Err(e) => return Err(format!("notWritable:{e}")),
     }
     if status(dir, data, game) == Status::On {
         return Err("alreadyOn".into());
@@ -236,14 +253,16 @@ pub fn check_apply(dir: &Path, data: &Path, game: &str) -> Result<(), String> {
     if crate::fsx::exists(&dir.join(CONF)) {
         return Err("foreignConf".into());
     }
-    Ok(())
+    write_mode(dir)
 }
 
 // ------------------------------------------------------------------ apply / undo
 
 /// Writes `d3d9.dll` (the bytes of the verified DXVK dll) and `dxvk.conf`, journal first.
 pub fn apply_in(dir: &Path, data: &Path, game: &str, dll: &[u8]) -> Result<Vec<FileRec>, String> {
-    check_apply(dir, data, game)?;
+    if check_apply(dir, data, game)? == Mode::Admin {
+        return Err("needAdmin".into());
+    }
     let files = vec![
         FileRec { path: dir.join(DLL).to_string_lossy().into(), sha256: sha256_hex(dll), before: "nothing".into() },
         FileRec { path: dir.join(CONF).to_string_lossy().into(), sha256: sha256_hex(CONF_TEXT.as_bytes()), before: "nothing".into() },
@@ -301,6 +320,100 @@ pub fn undo_in(dir: &Path, data: &Path, game: &str) -> Result<Report, String> {
     Ok(rep)
 }
 
+// ------------------------------------------------------------------ with admin rights
+
+/// The journal entry for `files` in `dir` (older open entries of the folder are closed). Returns its id.
+fn journal_open(data: &Path, game: &str, dir: &Path, files: &[FileRec]) -> Result<String, String> {
+    let mut j = load_journal(data);
+    for e in j.entries.iter_mut().filter(|e| e.game == game && !e.undone && same_dir(&e.dir, dir)) {
+        e.undone = true;
+    }
+    let id = crate::fsx::stamp();
+    j.entries.push(Entry { id: id.clone(), time: crate::fsx::now_iso(), game: game.into(), dir: dir.to_string_lossy().into(), version: VERSION.into(), files: files.to_vec(), undone: false });
+    save_journal(data, &j)?;
+    Ok(id)
+}
+
+fn journal_close(data: &Path, id: &str) {
+    let mut j = load_journal(data);
+    if let Some(en) = j.entries.iter_mut().find(|x| x.id == id) {
+        en.undone = true;
+    }
+    let _ = save_journal(data, &j);
+}
+
+/// The elevated step: `elevate::run` in the app, a plain copy in tests.
+pub type Elevated<'a> = &'a dyn Fn(&[crate::elevate::Op]) -> Result<(), String>;
+
+/// Like `apply_in` for a folder only an administrator can write: the two files are staged under
+/// `<data>\dxvk\stage\<time>\`, `elevated` copies them (one UAC prompt), then both hashes are checked from
+/// here. Cancelled: journal entry closed, nothing changed. A file that did not arrive intact: `verify`;
+/// whatever arrived intact stays journaled so Off can remove it.
+pub fn apply_admin(dir: &Path, data: &Path, game: &str, dll: &[u8], elevated: Elevated) -> Result<Vec<FileRec>, String> {
+    check_apply(dir, data, game)?;
+    let stage = data.join("dxvk").join("stage").join(crate::fsx::stamp());
+    let (s_dll, s_conf) = (stage.join(DLL), stage.join(CONF));
+    let files = vec![
+        FileRec { path: dir.join(DLL).to_string_lossy().into(), sha256: sha256_hex(dll), before: "nothing".into() },
+        FileRec { path: dir.join(CONF).to_string_lossy().into(), sha256: sha256_hex(CONF_TEXT.as_bytes()), before: "nothing".into() },
+    ];
+    let r = (|| {
+        crate::fsx::write(&s_dll, dll)?;
+        crate::fsx::write(&s_conf, CONF_TEXT.as_bytes())?;
+        // The staged copies sit in a user folder: checked again right before the step.
+        if sha_of_file(&s_dll).as_deref() != Some(files[0].sha256.as_str()) || sha_of_file(&s_conf).as_deref() != Some(files[1].sha256.as_str()) {
+            return Err("verify".to_string());
+        }
+        let id = journal_open(data, game, dir, &files)?;
+        let ops = [crate::elevate::Op::Copy { from: s_dll.clone(), to: dir.join(DLL) }, crate::elevate::Op::Copy { from: s_conf.clone(), to: dir.join(CONF) }];
+        let ran = elevated(&ops);
+        let intact: Vec<bool> = files.iter().map(|f| sha_of_file(Path::new(&f.path)).as_deref() == Some(f.sha256.as_str())).collect();
+        if ran.is_ok() && intact.iter().all(|x| *x) {
+            return Ok(files.clone());
+        }
+        if !intact.iter().any(|x| *x) {
+            journal_close(data, &id);
+        }
+        match ran {
+            Err(e) if !intact.iter().any(|x| *x) => Err(e),
+            _ => Err("verify".into()),
+        }
+    })();
+    let _ = std::fs::remove_dir_all(&stage);
+    r
+}
+
+/// Like `undo_in` for a folder only an administrator can write: my unchanged files are deleted in one
+/// elevated step, then checked from here. Cancelled or not gone: the journal stays as it was.
+pub fn undo_admin(dir: &Path, data: &Path, game: &str, elevated: Elevated) -> Result<Report, String> {
+    let j = load_journal(data);
+    let Some(e) = j.entries.iter().rev().find(|e| e.game == game && !e.undone && same_dir(&e.dir, dir)).cloned() else { return Err("nothingToUndo".into()) };
+    let mut rep = Report::default();
+    let mut del = vec![];
+    for f in &e.files {
+        let p = PathBuf::from(&f.path);
+        let name = p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        match sha_of_file(&p) {
+            None => {}
+            Some(h) if h == f.sha256 => {
+                crate::fsx::check(&p)?;
+                del.push(p);
+                rep.removed.push(name);
+            }
+            Some(_) => rep.kept.push(name),
+        }
+    }
+    if !del.is_empty() {
+        let ops: Vec<crate::elevate::Op> = del.iter().cloned().map(crate::elevate::Op::Delete).collect();
+        elevated(&ops)?;
+        if del.iter().any(|p| crate::fsx::exists(p)) {
+            return Err("verify".into());
+        }
+    }
+    journal_close(data, &e.id);
+    Ok(rep)
+}
+
 // ------------------------------------------------------------------ commands
 
 #[derive(Debug, Clone, Serialize)]
@@ -311,6 +424,8 @@ pub struct DxState {
     pub dir: Option<String>,
     pub status: Status,
     pub version: &'static str,
+    /// The game folder needs admin rights to write (Program Files).
+    pub admin: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -321,6 +436,8 @@ pub struct DxPlan {
     pub conf: &'static str,
     pub version: &'static str,
     pub cached: bool,
+    /// Writing needs one UAC prompt.
+    pub admin: bool,
 }
 
 fn dir_of(st: &crate::state::AppState, game: &str) -> Result<PathBuf, String> {
@@ -371,7 +488,7 @@ fn ensure_stopped(st: &crate::state::AppState, game: &str) -> Result<(), String>
 pub async fn dxvk_state(app: tauri::AppHandle, game_id: String) -> DxState {
     crate::bg::run(move || -> DxState {
         let st = tauri::Manager::state::<crate::state::AppState>(&app);
-        let mut o = DxState { supported: false, reason: None, dir: None, status: Status::Off, version: VERSION };
+        let mut o = DxState { supported: false, reason: None, dir: None, status: Status::Off, version: VERSION, admin: false };
         #[cfg(not(windows))]
         {
             let _ = (&st, &game_id);
@@ -384,6 +501,7 @@ pub async fn dxvk_state(app: tauri::AppHandle, game_id: String) -> DxState {
                 Ok(d) => {
                     o.supported = true;
                     o.status = status(&d, &st.data_dir, &game_id);
+                    o.admin = write_mode(&d) == Ok(Mode::Admin);
                     o.dir = Some(d.to_string_lossy().into());
                 }
                 Err(e) => o.reason = Some(e),
@@ -407,48 +525,58 @@ pub async fn dxvk_plan(app: tauri::AppHandle, game_id: String) -> Result<DxPlan,
         {
             let dir = dir_of(&st, &game_id)?;
             ensure_stopped(&st, &game_id)?;
-            check_apply(&dir, &st.data_dir, &game_id)?;
-            Ok(DxPlan { dir: dir.to_string_lossy().into(), files: vec![DLL.into(), CONF.into()], conf: CONF_TEXT, version: VERSION, cached: cached(&st.data_dir) })
+            let mode = check_apply(&dir, &st.data_dir, &game_id)?;
+            Ok(DxPlan { dir: dir.to_string_lossy().into(), files: vec![DLL.into(), CONF.into()], conf: CONF_TEXT, version: VERSION, cached: cached(&st.data_dir), admin: mode == Mode::Admin })
         }
     })
     .await
 }
 
 #[tauri::command]
-pub async fn dxvk_on(app: tauri::AppHandle, game_id: String) -> Result<Vec<FileRec>, String> {
+pub async fn dxvk_on(app: tauri::AppHandle, game_id: String, admin: Option<bool>) -> Result<Vec<FileRec>, String> {
     crate::bg::run(move || -> Result<Vec<FileRec>, String> {
         let st = tauri::Manager::state::<crate::state::AppState>(&app);
         #[cfg(not(windows))]
         {
-            let _ = (&st, &game_id);
+            let _ = (&st, &game_id, admin);
             Err("unsupported".into())
         }
         #[cfg(windows)]
         {
             let dir = dir_of(&st, &game_id)?;
             ensure_stopped(&st, &game_id)?;
-            check_apply(&dir, &st.data_dir, &game_id)?;
+            let mode = check_apply(&dir, &st.data_dir, &game_id)?;
+            if mode == Mode::Admin && admin != Some(true) {
+                return Err("needAdmin".into());
+            }
             let dll = dll_from_archive(&archive(&st.data_dir)?)?;
-            apply_in(&dir, &st.data_dir, &game_id, &dll)
+            match mode {
+                Mode::Direct => apply_in(&dir, &st.data_dir, &game_id, &dll),
+                Mode::Admin => apply_admin(&dir, &st.data_dir, &game_id, &dll, &crate::elevate::run),
+            }
         }
     })
     .await
 }
 
 #[tauri::command]
-pub async fn dxvk_off(app: tauri::AppHandle, game_id: String) -> Result<Report, String> {
+pub async fn dxvk_off(app: tauri::AppHandle, game_id: String, admin: Option<bool>) -> Result<Report, String> {
     crate::bg::run(move || -> Result<Report, String> {
         let st = tauri::Manager::state::<crate::state::AppState>(&app);
         #[cfg(not(windows))]
         {
-            let _ = (&st, &game_id);
+            let _ = (&st, &game_id, admin);
             Err("unsupported".into())
         }
         #[cfg(windows)]
         {
             let dir = dir_of(&st, &game_id)?;
             ensure_stopped(&st, &game_id)?;
-            undo_in(&dir, &st.data_dir, &game_id)
+            match (write_mode(&dir)?, admin == Some(true)) {
+                (Mode::Direct, _) => undo_in(&dir, &st.data_dir, &game_id),
+                (Mode::Admin, true) => undo_admin(&dir, &st.data_dir, &game_id, &crate::elevate::run),
+                (Mode::Admin, false) => Err("needAdmin".into()),
+            }
         }
     })
     .await
@@ -635,7 +763,7 @@ mod tests {
         std::fs::set_permissions(&e.game, std::fs::Permissions::from_mode(0o755)).unwrap();
         // root ignores the mode bits
         if let Err(c) = r {
-            assert!(c.starts_with("notWritable"));
+            assert_eq!(c, "needAdmin");
         }
     }
 
@@ -646,6 +774,86 @@ mod tests {
         assert!(load_journal(&e.data).entries.is_empty());
         apply_in(&e.game, &e.data, "tmnf", b"DXVK32").unwrap();
         assert_eq!(status(&e.game, &e.data, "tmnf"), Status::On);
+    }
+
+    /// Stand-in for the UAC step: does the copies and deletes itself.
+    fn fake_elevated(ops: &[crate::elevate::Op]) -> Result<(), String> {
+        crate::elevate::cmd_params(ops)?;
+        for op in ops {
+            match op {
+                crate::elevate::Op::Copy { from, to } => {
+                    std::fs::copy(from, to).map_err(|e| e.to_string())?;
+                }
+                crate::elevate::Op::Delete(p) => std::fs::remove_file(p).map_err(|e| e.to_string())?,
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn admin_apply_stages_copies_verifies_and_undoes() {
+        let e = env();
+        let f = apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &fake_elevated).unwrap();
+        assert_eq!(f.len(), 2);
+        assert_eq!(std::fs::read(e.game.join(DLL)).unwrap(), b"DXVK32");
+        assert_eq!(status(&e.game, &e.data, "tmuf"), Status::On);
+        assert_eq!(std::fs::read_dir(e.data.join("dxvk").join("stage")).map(|d| d.count()).unwrap_or(0), 0, "stage cleaned up");
+        let r = undo_admin(&e.game, &e.data, "tmuf", &fake_elevated).unwrap();
+        assert_eq!(r.removed, vec!["d3d9.dll", "dxvk.conf"]);
+        assert_eq!(status(&e.game, &e.data, "tmuf"), Status::Off);
+        assert_eq!(undo_admin(&e.game, &e.data, "tmuf", &fake_elevated).unwrap_err(), "nothingToUndo");
+    }
+
+    #[test]
+    fn admin_cancelled_changes_nothing() {
+        let e = env();
+        let cancel = |_: &[crate::elevate::Op]| -> Result<(), String> { Err("cancelled".into()) };
+        assert_eq!(apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &cancel).unwrap_err(), "cancelled");
+        assert!(!e.game.join(DLL).exists() && !e.game.join(CONF).exists());
+        assert!(load_journal(&e.data).entries.iter().all(|x| x.undone), "no open entry");
+        assert_eq!(status(&e.game, &e.data, "tmuf"), Status::Off);
+        // Switched on, then a cancelled Off: still on, journal still open.
+        apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &fake_elevated).unwrap();
+        assert_eq!(undo_admin(&e.game, &e.data, "tmuf", &cancel).unwrap_err(), "cancelled");
+        assert_eq!(status(&e.game, &e.data, "tmuf"), Status::On);
+        assert!(undo_admin(&e.game, &e.data, "tmuf", &fake_elevated).is_ok());
+    }
+
+    #[test]
+    fn admin_copy_that_does_not_verify() {
+        let e = env();
+        // The step "succeeds" but other bytes arrive: refused, nothing of it counts as mine.
+        let bad = |ops: &[crate::elevate::Op]| -> Result<(), String> {
+            for op in ops {
+                if let crate::elevate::Op::Copy { to, .. } = op {
+                    std::fs::write(to, b"tampered").unwrap();
+                }
+            }
+            Ok(())
+        };
+        assert_eq!(apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &bad).unwrap_err(), "verify");
+        assert_eq!(status(&e.game, &e.data, "tmuf"), Status::Foreign);
+        // Only the dll arrives: it stays journaled, so Off can remove it.
+        let e = env();
+        let half = |ops: &[crate::elevate::Op]| -> Result<(), String> {
+            if let crate::elevate::Op::Copy { from, to } = &ops[0] {
+                std::fs::copy(from, to).unwrap();
+            }
+            Err("failed:1".into())
+        };
+        assert_eq!(apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &half).unwrap_err(), "verify");
+        let r = undo_admin(&e.game, &e.data, "tmuf", &fake_elevated).unwrap();
+        assert_eq!(r.removed, vec!["d3d9.dll"]);
+        assert!(!e.game.join(DLL).exists());
+    }
+
+    #[test]
+    fn existing_dll_is_named_before_write_access() {
+        let e = env();
+        std::fs::write(e.game.join(DLL), b"TMVS").unwrap();
+        assert_eq!(apply_admin(&e.game, &e.data, "tmuf", b"DXVK32", &fake_elevated).unwrap_err(), "foreignDll");
+        assert_eq!(std::fs::read(e.game.join(DLL)).unwrap(), b"TMVS");
+        assert_eq!(check_apply(&crate::fsx::eswc_protected_dir(), &e.data, "tmn-eswc").unwrap_err(), "blocked");
     }
 
     /// Real download, hash check and extraction. Run with TMHUB_NET_TESTS=1.

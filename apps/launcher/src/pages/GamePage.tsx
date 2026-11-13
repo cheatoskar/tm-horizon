@@ -23,7 +23,7 @@ import { LiveServers } from '../ui/LiveServers';
 import { qGameOf } from '../data/serverQuery';
 import { HealthCheckCard } from '../ui/HealthCheck';
 import { HistoryCard } from '../ui/History';
-import { PerfPanel } from '../ui/PerfPanel';
+import { GpuSyncTip, PerfPanel } from '../ui/PerfPanel';
 import { gameSeconds, usePlaytime, useFormatTime } from '../ui/Playtime';
 import { CommandLine, GameModsSection, InstallationsCard } from '../ui/GameMods';
 import { ModUpdates } from '../ui/ModUpdates';
@@ -239,6 +239,25 @@ function EswcPanel({ g }: { g: GameView }) {
   );
 }
 
+/** Forever: start through TmForeverLauncher.exe (its menu with the settings) or the game exe directly.
+ * Same choice as ESWC's; a TMLoader profile always starts through TMLoader. Backend: launch.rs `use_launcher`. */
+function ForeverStartOptions({ g }: { g: GameView }) {
+  const t = useT();
+  const [on, setOn] = useState(() => !!backend.info?.().settings.useLauncher?.[g.id]);
+  useEffect(() => { setOn(!!backend.info?.().settings.useLauncher?.[g.id]); }, [g.id]);
+  if (!isNative || !backend.saveSettings || !g.install?.launcher) return null;
+  const flip = async () => { await backend.saveSettings!({ useLauncher: { [g.id]: !on } }); setOn(!on); };
+  return (
+    <section className="panel start-options">
+      <SectionHead title={t('eswc.startOptions')} />
+      <div className="setrow" title={t('v052.launcherTip')}>
+        <div className="grow"><b>{t('v052.launcher')}</b><div className="dim small">{t('v052.launcherTip')}</div></div>
+        <Toggle on={on} label={t('v052.launcher')} onChange={flip} />
+      </div>
+    </section>
+  );
+}
+
 /** "Open <label>" buttons for the installed mods that have a companion page (TMLoader profile mods, proxy-DLL mods),
  * shown at the end of the Mods section. */
 function GameCompanions({ g, profile }: { g: GameView; profile: Profile | null }) {
@@ -285,6 +304,7 @@ export function GamePage({ id }: { id: string }) {
 
       <div className="game-grid">
         <div className="col">
+          {g.installed && <GpuSyncTip game={g.id} />}
           {g.installed && <SuggestionsCard g={g} />}
           {g.family === 'console' && <ConsoleCard g={g} />}
           {g.family === 'classic' && <ClassicCard g={g} />}
@@ -332,6 +352,7 @@ export function GamePage({ id }: { id: string }) {
         </div>
         <div className="col side">
           {g.family === 'eswc' && <EswcPanel g={g} />}
+          {g.family === 'forever' && g.installed && <ForeverStartOptions g={g} />}
           {isNative && <LinuxGameSetupCard game={g.id} />}
           {g.installed && g.family !== 'console' && <InstallationsCard g={g} />}
           {g.installed && <InstallInfoPanel g={g} profile={profile} />}

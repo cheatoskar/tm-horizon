@@ -1462,9 +1462,11 @@ mod tests {
         walk_cached(d.path(), &mut second);
         assert_eq!(second.len(), 2);
         // Autosaves rewritten in place are seen without a directory change.
+        std::thread::sleep(std::time::Duration::from_millis(30)); // coarse directory timestamps on Linux
         put(&d.path().join("Autosaves").join("me_A01.Replay.Gbx"), b"1");
         let mut third = vec![];
         walk_cached(d.path(), &mut third);
+        std::thread::sleep(std::time::Duration::from_millis(30));
         std::fs::write(d.path().join("Autosaves").join("me_A01.Replay.Gbx"), b"12345").unwrap();
         let mut fourth = vec![];
         walk_cached(d.path(), &mut fourth);
@@ -1598,6 +1600,7 @@ mod tests {
         let (parsed, hits) = parse_missing(&cache, &listed(d.path()), 2, false, None, None);
         assert_eq!((parsed, hits), (0, 2));
         // A changed file (new size) is parsed again, the other stays a hit.
+        std::thread::sleep(std::time::Duration::from_millis(30)); // same size: only the time differs
         put(&a, &replay_sample_run("me", "Me", "Stadium", "uidA", 39000));
         let l = listed(d.path());
         let (parsed, hits) = parse_missing(&cache, &l, 2, false, None, None);

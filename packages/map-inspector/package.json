@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/map-inspector",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Map inspector core from 100tmx.com/tools/map-inspector: .Gbx map reading, route blocks, block list, build order and the 3D/top-down map views. Shared by the website and the launcher.",
   "license": "AGPL-3.0-only",

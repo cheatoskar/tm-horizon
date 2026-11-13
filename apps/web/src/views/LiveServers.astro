@@ -1,0 +1,153 @@
+---
+// Live server list: GET <hub>/v1/servers (the hub asks every server directly on its game port every 90 s),
+// fetched in the browser on load and then every 60 s. Names and maps are written with textContent only.
+// Docs: docs/hub/live-servers.md. The hub address is PUBLIC_HUB_URL at build time.
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const hub = String(import.meta.env.PUBLIC_HUB_URL ?? '').replace(/\/?$/, '/');
+const hubOn = !!import.meta.env.PUBLIC_HUB_URL;
+const keys = ['summary', 'all', 'colServer', 'colMap', 'colPlayers', 'colPing', 'join', 'guide', 'offline', 'unknown', 'empty', 'error', 'loading', 'updated', 'spectators', 'password', 'copy', 'hubOff'];
+const msg = Object.fromEntries(keys.map((k) => [k, t(lang, 'live.' + k)]));
+const games = [['all', t(lang, 'live.all')], ['tmnf', 'Nations Forever'], ['tmuf', 'United Forever'], ['eswc', 'Nations ESWC']];
+---
+<Layout title={t(lang, 'live.title')} desc={t(lang, 'live.desc')} lang={lang}>
+  <div class="phead">
+    <div><h1>{t(lang, 'live.title')}</h1><p class="lead">{t(lang, 'live.lead')}</p></div>
+    <a class="btn" href={lh(lang, '/add-server/')}><Icon name="server" />{t(lang, 'live.add')}</a>
+  </div>
+  <div class="ls" id="ls" data-hub={hub} data-on={hubOn ? '1' : ''}>
+    <div class="ls-bar">
+      <div class="ls-tabs" role="group" aria-label={t(lang, 'live.all')}>
+        {games.map(([id, label], i) => <button type="button" class="ls-tab" data-game={id} aria-pressed={i === 0 ? 'true' : 'false'}>{label}</button>)}
+      </div>
+      <input id="ls-q" type="search" placeholder={t(lang, 'live.search')} aria-label={t(lang, 'live.search')} autocomplete="off" />
+    </div>
+    <p class="muted" id="ls-sum" role="status" aria-live="polite">{hubOn ? msg.loading : msg.hubOff}</p>
+    <div class="ls-head" aria-hidden="true"><span>{msg.colServer}</span><span>{msg.colMap}</span><span class="r">{msg.colPlayers}</span><span class="r">{msg.colPing}</span><span></span></div>
+    <div class="ls-list" id="ls-list"></div>
+  </div>
+  <style>
+    .ls { display: grid; gap: 12px; }
+    .ls-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .ls-tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--surface); box-shadow: 0 0 0 1px var(--line-soft); flex-wrap: wrap; }
+    .ls-tab { border: 0; border-radius: 9px; padding: 0 14px; height: 34px; background: none; color: var(--muted); font: 600 14px var(--body); cursor: pointer; }
+    .ls-tab[aria-pressed='true'] { background: var(--surface-3); color: var(--text); }
+    #ls-q { height: 40px; min-width: min(280px, 100%); padding: 0 12px; border-radius: 12px; border: 0; background: var(--surface-2); color: var(--text); font: 500 15px var(--body); }
+    .ls-head, .ls-row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) 90px 70px 120px; gap: 12px; align-items: center; padding: 0 16px; }
+    .ls-head { font: 650 13px var(--body); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .ls-row { min-height: 58px; border-radius: 14px; background: var(--surface); box-shadow: 0 0 0 1px var(--line-soft); padding-top: 8px; padding-bottom: 8px; }
+    .ls-list { display: grid; gap: 8px; }
+    .ls-row.off { opacity: .6; }
+    .ls-name { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ls-sub, .ls-map { color: var(--muted); font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ls-map { color: var(--text-2); font-size: 14.5px; }
+    .ls .r { text-align: right; }
+    .ls-act { display: flex; justify-content: flex-end; }
+    .ls-act .btn { height: 36px; }
+    .ls-guide { font-size: 13px; color: var(--text-2); text-align: right; }
+    .ls-badges { display: flex; gap: 6px; margin-top: 2px; }
+    .ls-badge { font: 600 11.5px/1 var(--body); padding: 3px 7px; border-radius: 999px; background: var(--chip); color: var(--chip-ink); }
+    .ls-badge.warn { background: var(--surface-3); color: var(--muted); }
+    .ls-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 8px; }
+    .ls-dot.on { background: #3ecf6e; }
+    @media (max-width: 760px) {
+      .ls-head { display: none; }
+      .ls-row { grid-template-columns: 1fr auto; row-gap: 4px; }
+      .ls-row .ls-map { grid-column: 1; }
+      .ls-row .r { grid-column: 2; grid-row: 1; }
+      .ls-row .ls-ping { display: none; }
+      .ls-act { grid-column: 1 / -1; justify-content: flex-start; }
+      .ls-guide { text-align: left; }
+    }
+  </style>
+  <script is:inline define:vars={{ msg }}>
+    (function () {
+      var root = document.getElementById('ls');
+      var hub = root.dataset.hub;
+      var sum = document.getElementById('ls-sum');
+      var list = document.getElementById('ls-list');
+      var qEl = document.getElementById('ls-q');
+      var game = 'all';
+      var data = [];
+      var GAME_LABEL = { tmnf: 'Nations', tmuf: 'United', eswc: 'ESWC', tms: 'Sunrise', tmo: 'Original' };
+      var LOGIN = /^[A-Za-z0-9_.\-]{1,64}$/;
+      var fill = function (s, v) { return s.replace(/\{(\w+)\}/g, function (_, k) { return v[k] == null ? '' : v[k]; }); };
+      var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+      function row(s) {
+        var r = el('div', 'ls-row' + (s.state === 'online' ? '' : ' off'));
+        var a = el('div');
+        var n = el('div', 'ls-name');
+        n.appendChild(el('span', 'ls-dot' + (s.state === 'online' ? ' on' : '')));
+        n.appendChild(document.createTextNode(s.name));
+        a.appendChild(n);
+        var badges = el('div', 'ls-badges');
+        badges.appendChild(el('span', 'ls-badge', GAME_LABEL[s.game] || s.game));
+        if (s.state === 'unknown') badges.appendChild(el('span', 'ls-badge warn', msg.unknown));
+        else if (s.state === 'offline') badges.appendChild(el('span', 'ls-badge warn', msg.offline));
+        a.appendChild(badges);
+        var sub = [s.state === 'online' ? s.mode : null, s.country, s.state === 'online' && s.password ? msg.password : null];
+        a.appendChild(el('div', 'ls-sub', sub.filter(Boolean).join(' · ')));
+        r.appendChild(a);
+        r.appendChild(el('div', 'ls-map', s.state === 'online' ? (s.map || '') : ''));
+        var p = el('div', 'r', s.state === 'online' && s.players != null ? s.players + ' / ' + s.maxPlayers : '');
+        if (s.state === 'online' && s.spectators) p.title = fill(msg.spectators, { n: s.spectators });
+        r.appendChild(p);
+        r.appendChild(el('div', 'r ls-ping', s.state === 'online' && s.pingMs != null ? s.pingMs + ' ms' : ''));
+        var act = el('div', 'ls-act');
+        if ((s.game === 'tmnf' || s.game === 'tmuf') && s.login && LOGIN.test(s.login)) {
+          var j = el('a', 'btn primary', msg.join);
+          j.href = 'tmtp://#join=' + s.login;
+          act.appendChild(j);
+        } else if (s.game === 'eswc' && s.login) {
+          act.appendChild(el('span', 'ls-guide', fill(msg.guide, { login: s.login })));
+        } else if (s.address) {
+          var c = el('button', 'btn', msg.copy);
+          c.type = 'button';
+          c.addEventListener('click', function () { if (navigator.clipboard) navigator.clipboard.writeText(s.address); });
+          act.appendChild(c);
+        }
+        r.appendChild(act);
+        return r;
+      }
+
+      function render() {
+        var q = qEl.value.trim().toLowerCase();
+        var rows = data.filter(function (s) {
+          // United players can join Nations servers, so that tab lists both (the badge tells them apart)
+          if (game !== 'all' && s.game !== game && !(game === 'tmuf' && s.game === 'tmnf')) return false;
+          return !q || (s.name + ' ' + (s.map || '') + ' ' + (s.login || '')).toLowerCase().indexOf(q) >= 0;
+        });
+        list.textContent = '';
+        rows.forEach(function (s) { list.appendChild(row(s)); });
+        if (!rows.length) list.appendChild(el('p', 'muted', msg.empty));
+      }
+
+      function totals(time) {
+        var on = data.filter(function (s) { return s.state === 'online'; });
+        var pl = on.reduce(function (n, s) { return n + (s.players || 0); }, 0);
+        sum.textContent = fill(msg.summary, { servers: on.length, players: pl }) + ' · ' + fill(msg.updated, { time: time });
+      }
+
+      function load() {
+        fetch(hub + 'v1/servers', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).then(function (j) {
+          data = Array.isArray(j) ? j : [];
+          totals(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          render();
+        }).catch(function () { sum.textContent = msg.error; });
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll('.ls-tab'), function (b) {
+        b.addEventListener('click', function () {
+          game = b.dataset.game;
+          Array.prototype.forEach.call(document.querySelectorAll('.ls-tab'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+          render();
+        });
+      });
+      qEl.addEventListener('input', render);
+      if (root.dataset.on) { load(); setInterval(function () { if (!document.hidden) load(); }, 60000); }
+    })();
+  </script>
+</Layout>

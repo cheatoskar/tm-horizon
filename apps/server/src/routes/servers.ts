@@ -24,11 +24,11 @@ export function serverRoutes(app: FastifyInstance, ctx: Ctx, probe: Probe = tcpP
     reply.header('access-control-allow-headers', 'content-type, x-csrf-token');
     reply.header('access-control-max-age', '86400');
   };
-  for (const url of ['/v1/servers', '/v1/servers/check', '/v1/servers/:id/claim-code', '/v1/servers/:id/claim', '/v1/me', '/v1/config']) app.options(url, async (req, reply) => { cors(req, reply); return reply.code(204).send(); });
+  for (const url of ['/v1/servers', '/v1/servers/check', '/v1/servers/:id/claim-code', '/v1/servers/:id/claim', '/v1/me', '/v1/config', '/auth/logout']) app.options(url, async (req, reply) => { cors(req, reply); return reply.code(204).send(); });
   // GET /v1/me (login state) and the answers of the server calls carry the same headers.
   app.addHook('onSend', async (req, reply) => {
     const path = req.url.split('?')[0]!;
-    if (webOrigin && req.headers.origin === webOrigin && (path === '/v1/me' || path === '/v1/config' || path.startsWith('/v1/servers'))) cors(req, reply);
+    if (webOrigin && req.headers.origin === webOrigin && (path === '/v1/me' || path === '/v1/config' || path === '/auth/logout' || path.startsWith('/v1/servers'))) cors(req, reply);
   });
 
   route(app, {
@@ -82,9 +82,10 @@ export function serverRoutes(app: FastifyInstance, ctx: Ctx, probe: Probe = tcpP
     return r;
   });
 
-  route(app, { method: 'GET', url: '/v1/servers', summary: 'Approved game servers with their last announcement', tags: ['servers'], auth: 'none' }, async (_req, { reply }) => {
+  route(app, { method: 'GET', url: '/v1/servers', summary: 'Live game server list (direct queries every 90 s, announcements), most players first; ?game=tmnf|tmuf|eswc|tms|tmo', tags: ['servers'], auth: 'none', query: z.object({ game: z.enum(SERVER_GAMES).optional() }) }, async (_req, { query, reply }) => {
     reply.header('cache-control', 'public, max-age=60');
-    return publicServers(ctx);
+    reply.header('access-control-allow-origin', '*'); // public data; the website's own origin gets the credentialed variant from the onSend hook
+    return publicServers(ctx, { game: query.game });
   });
 
   route(app, {

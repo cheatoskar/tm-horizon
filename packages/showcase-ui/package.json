@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/showcase-ui",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Renders mod showcase pages (declarative blocks, packages/shared/src/showcase.ts): the same React components in the launcher, the portal preview and, as static markup, the website. Also the README renderer (readme.ts, ReadmeView, readme.css) shared by launcher, portal and website.",
   "license": "AGPL-3.0-only",

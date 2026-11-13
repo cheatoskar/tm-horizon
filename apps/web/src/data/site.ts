@@ -1,5 +1,4 @@
 import site from './site.json';
-import { sampleEvents } from './events';
 import { gameById, byOrder, gameName, cover } from './games';
 import { isPre, tmName } from '../lib/fmt';
 import { webImg } from "@tm-hub/shared/extimg";
@@ -15,13 +14,18 @@ export const catalog = data.catalog as any[];
 /** Showcase pages of mods ({ mod, showcase }), from the catalog (packages/catalog/showcases). */
 export const showcases = (data.showcases ?? []) as { mod: string; showcase: unknown }[];
 export const sources = data.sources as Record<string, any>;
-export const servers = (data.servers ?? []) as any[];
-export const events = ((data.events ?? sampleEvents) as any[]).slice().sort((a, b) => a.start.localeCompare(b.start));
-export const eventsSample = !data.events || data.sources.events.sample;
+export const servers = ((data.servers ?? []) as any[]).filter((s) => !s.sample);
+export const events = ((data.events ?? []) as any[]).filter((e) => !e.sample).slice().sort((a, b) => a.start.localeCompare(b.start));
 export const modById = (id: string) => mods.find((m) => m.id === id);
 export const playersOnline = servers.filter((s) => !s.sample).reduce((n, s) => n + s.players, 0);
 /** Servers with live player counts (ManiaPlanet master server, trackmania.io); community servers only have a reachability dot. */
 export const isCommunity = (s: any) => s.source === 'community';
+/** Games the hub's live list (GET /v1/servers, polled directly) covers. Static servers of these games, and community entries, are not counted again next to it. */
+export const HUB_LIVE_GAMES = ['tmnf', 'tmuf', 'eswc', 'tms', 'tmo'];
+const baseServers = servers.filter((s) => !s.sample && !isCommunity(s) && !HUB_LIVE_GAMES.includes(s.game));
+/** Home page numbers from the build-time data (ManiaPlanet, TM2020); the hub's online servers and players are added in the browser. */
+export const baseServerCount = baseServers.length;
+export const basePlayers = baseServers.reduce((n, s) => n + s.players, 0);
 /** Discord server directory (packages/api communities.json); null when the api data was not built. */
 export const directory = ((data.communities ?? null) as any[] | null)?.length ? (data.communities as any[]) : null;
 export const liveServers = servers.filter((s) => !s.sample && !isCommunity(s));
@@ -243,7 +247,6 @@ export function serverItems(lang: Lang = 'en'): Item[] {
         ...(s.mode ? [{ label: s.mode, icon: 'flag' }] : []),
         ...(known ? gameChips([g!]) : [{ label: t(lang, 'chip.titlePack'), icon: 'package' }]),
         ...(community && s.language ? [{ label: String(s.language).toUpperCase(), icon: 'languages' }] : []),
-        ...(s.sample ? [{ label: t(lang, 'chip.sample'), tone: 'sample' }] : []),
       ],
     };
   });

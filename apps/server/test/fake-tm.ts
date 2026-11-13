@@ -6,16 +6,16 @@ import { buildMessage, type Variant } from '../src/services/tmquery.ts';
 const u32 = (n: number) => { const b = Buffer.alloc(4); b.writeUInt32LE(n >>> 0); return b; };
 const text = (s: string) => { const b = Buffer.from(s, 'utf8'); return Buffer.concat([u32(b.length), b]); };
 
-export interface FakeInfo { name?: string; comment?: string; players?: number; max?: number; map?: string; password?: boolean; mode?: number }
+export interface FakeInfo { name?: string; comment?: string; players?: number; max?: number; map?: string; password?: boolean; mode?: number; pack?: string; spectators?: number }
 
 /** Server info bytes (the part after the subtype 6 header) as the parser reads them. */
 export function infoBytes(v: Variant, o: FakeInfo = {}): Buffer {
   const forever = v === 'forever';
   const parts: Buffer[] = [
     Buffer.from([forever ? 0x2d : 0x09, 1, 0, 0, 127]), Buffer.from([0x2e, 0x09]), text('LIVE-TEST'), text('#SRV#' + (o.password ? 'p' : '')), text(''),
-    Buffer.from([o.players ?? 3, o.max ?? 40, 0, 10, 0]), text(o.name ?? '$o$f00Fake $fffServer'),
+    Buffer.from([o.players ?? 3, o.max ?? 40, o.spectators ?? 0, 10, 0]), text(o.name ?? '$o$f00Fake $fffServer'),
   ];
-  if (forever) parts.push(text('Stadium'));
+  if (forever) parts.push(text(o.pack ?? 'Stadium'));
   parts.push(u32(0), text(o.comment ?? 'a comment'), Buffer.from([o.mode ?? 1]), u32(180000), Buffer.from([1]), u32(1), text(o.map ?? 'A01-Race'));
   parts.push(forever ? Buffer.concat([u32(1000), Buffer.from([1, 0, 0])]) : Buffer.concat([u32(0), u32(1000), u32(2000)]));
   return Buffer.concat(parts);

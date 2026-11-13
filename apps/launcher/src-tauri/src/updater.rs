@@ -184,10 +184,11 @@ pub fn relaunch_after(w: When) -> bool {
     w != When::Close
 }
 
-/// The first running game process (any TrackMania game, TMLoader included), if any.
+/// The first running game process (any TrackMania game), if any. TMLoader alone does not count: its tray icon
+/// stays open after the game closed, and the launcher's own update touches nothing of TMLoader.
 pub fn game_running(running: &[String]) -> Option<String> {
     let games: Vec<String> = ["tmnf", "tmuf", "tmn-eswc", "tm-sunrise", "tm-original", "tm-2003", "tm2020", "tm2-stadium", "tm-turbo"].iter().map(|g| g.to_string()).collect();
-    let procs = crate::history::processes_for(&games);
+    let procs: Vec<String> = crate::history::processes_for(&games).into_iter().filter(|p| p != "tmloader.exe").collect();
     running.iter().find(|r| procs.iter().any(|p| p.eq_ignore_ascii_case(r))).cloned()
 }
 
@@ -432,7 +433,7 @@ mod tests {
     #[test]
     fn running_games_block_the_install() {
         assert_eq!(game_running(&["explorer.exe".into(), "TmForever.exe".into()]).as_deref(), Some("TmForever.exe"));
-        assert_eq!(game_running(&["TMLoader.exe".into()]).as_deref(), Some("TMLoader.exe"));
+        assert_eq!(game_running(&["TMLoader.exe".into()]), None, "TMLoader alone is not a game");
         assert_eq!(game_running(&["explorer.exe".into(), "tm-horizon.exe".into()]), None);
     }
 

@@ -14,6 +14,7 @@ import { t, lh, unprefix, langs, langNames, locales, type Lang } from '../i18n';
 interface Props { title: string; desc?: string; flush?: boolean; lang?: Lang }
 const { title, desc, flush = false, lang = 'en' } = Astro.props;
 const L = (p: string) => lh(lang, p);
+const hubUrl = String(import.meta.env.PUBLIC_HUB_URL ?? '').replace(/\/?$/, '/').replace(/^\/$/, ''); // hub api, build-time
 const portalUrl = String(import.meta.env.PUBLIC_PORTAL_URL ?? '').replace(/\/?$/, '/').replace(/^\/$/, ''); // developer portal (login), build-time
 const base = unprefix(Astro.url.pathname); // path without the language prefix
 const on = (p: string) => base.startsWith(p);
@@ -33,22 +34,26 @@ const js = {
     <meta name="color-scheme" content="dark light" />
     {langs.map((l) => <link rel="alternate" hreflang={l} href={lh(l, base)} />)}
     <link rel="alternate" hreflang="x-default" href={base} />
-    <link rel="icon" type="image/png" href="/img/brand/icon-64.png" />
-    <link rel="apple-touch-icon" href="/img/brand/icon-180.png" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script is:inline>
+      // Signed-in header: show the cached state before paint (filled by the script after the header).
+      try { if (sessionStorage.getItem('tmh.me')) document.documentElement.classList.add('tmh-in'); } catch (e) {}
       try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
-      // Language: English pages go to the saved choice, else to the browser language when it is de, pl or fr.
+      // Language: on an unprefixed page, a first-time visitor whose browser prefers de, pl or fr is sent once to the same page in that language.
+      // The choice is stored (tmh.lang) so it never loops; blocked storage counts as "chose English". Every page exists in every language.
       (function () {
         try {
-          if (document.documentElement.lang !== 'en') return;
-          var pick = null, known = { en: 1, de: 1, pl: 1, fr: 1 };
-          try { pick = localStorage.getItem('lang'); } catch (e) {}
-          if (!known[pick]) {
-            pick = null;
-            var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
-            for (var i = 0; i < list.length; i++) { var c = String(list[i] || '').slice(0, 2).toLowerCase(); if (known[c]) { pick = c; break; } }
+          if (document.documentElement.lang !== 'en' || localStorage.getItem('tmh.lang')) return;
+          var known = { de: 1, pl: 1, fr: 1 }, list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+          for (var i = 0; i < list.length; i++) {
+            var c = String(list[i] || '').slice(0, 2).toLowerCase();
+            if (c === 'en') return;
+            if (known[c]) { localStorage.setItem('tmh.lang', c); location.replace('/' + c + location.pathname + location.search + location.hash); return; }
           }
-          if (pick && pick !== 'en') location.replace('/' + pick + location.pathname + location.search + location.hash);
         } catch (e) {}
       })();
     </script>
@@ -87,7 +92,7 @@ const js = {
               <a href={L('/games/')}><Icon name="gamepad-2" />{t(lang, 'nav.allGames')}</a>
             </div>
           </details>
-          <a class={`nav-link ${on('/discover/servers') ? 'on' : ''}`} href={L('/discover/servers/')}><Icon name="server" />{t(lang, 'nav.servers')}</a>
+          <a class={`nav-link ${on('/servers') || on('/discover/servers') ? 'on' : ''}`} href={L('/servers/')}><Icon name="server" />{t(lang, 'nav.servers')}</a>
           <a class={`nav-link ${on('/events') ? 'on' : ''}`} href={L('/events/')}><Icon name="calendar-days" />{t(lang, 'nav.events')}</a>
           <a class={`nav-link ${on('/dev') ? 'on' : ''}`} href={L('/dev/')}><Icon name="code" />{t(lang, 'nav.dev')}</a>
           <a class={`nav-link ${on('/launcher') || on('/download') ? 'on' : ''}`} href={L('/download/')}><Icon name="download" />{t(lang, 'nav.download')}</a>
@@ -95,6 +100,14 @@ const js = {
 
         <div class="top-end">
           <a class="btn primary signin" href={portalUrl ? `${portalUrl}login` : L('/authors/#sign-in')}><Icon name="log-in" /> <span>{t(lang, 'nav.signIn')}</span></a>
+          <a class="icon-btn disc-btn" href="https://discord.gg/2Kq3SJDjvM" target="_blank" rel="noopener" aria-label="Discord" title="Discord"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
+          <details class="dd acct-dd" data-dd data-acct>
+            <summary class="acct-btn"><span class="acct-av" aria-hidden="true"></span><span class="acct-name"></span><Icon name="chevron-down" size={16} class="chev" /></summary>
+            <div class="menu right">
+              <a href={portalUrl || L('/authors/')}><Icon name="layout-dashboard" />{t(lang, 'nav.portal')}</a>
+              <button type="button" data-signout><Icon name="log-out" />{t(lang, 'nav.signOut')}</button>
+            </div>
+          </details>
           <details class="dd lang-dd" data-dd>
             <summary class="icon-btn lang-btn" aria-label={t(lang, 'lang.label')} title={t(lang, 'lang.label')}><Icon name="languages" /><span class="lang-code">{lang.toUpperCase()}</span></summary>
             <div class="menu right">
@@ -133,6 +146,36 @@ const js = {
         </div>
       </div>
     </header>
+    {hubUrl && (
+      <script is:inline define:vars={{ hub: hubUrl }}>
+        // Ask the hub who is signed in; cache {name, avatar} for this tab so later pages show it at once. Any failure = signed out.
+        (function () {
+          var root = document.documentElement, box = document.querySelector('[data-acct]');
+          if (!box) return;
+          function show(u) {
+            if (!u) { root.classList.remove('tmh-in'); return; }
+            box.querySelector('.acct-name').textContent = u.name;
+            var av = box.querySelector('.acct-av'); av.textContent = '';
+            if (u.avatar && /^https:\/\//.test(u.avatar)) { var im = document.createElement('img'); im.src = u.avatar; im.alt = ''; im.referrerPolicy = 'no-referrer'; av.appendChild(im); }
+            else av.textContent = (u.name || '?').charAt(0).toUpperCase();
+            root.classList.add('tmh-in');
+          }
+          var cached = null;
+          try { cached = JSON.parse(sessionStorage.getItem('tmh.me') || 'null'); } catch (e) {}
+          if (cached) show(cached);
+          fetch(hub + 'v1/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var u = d && d.user ? { name: d.user.name, avatar: d.user.avatar || null } : null;
+            try { if (u) sessionStorage.setItem('tmh.me', JSON.stringify(u)); else sessionStorage.removeItem('tmh.me'); } catch (e) {}
+            show(u);
+          }).catch(function () { try { sessionStorage.removeItem('tmh.me'); } catch (e) {} show(null); });
+          box.querySelector('[data-signout]').addEventListener('click', function () {
+            fetch(hub + 'v1/me', { credentials: 'include' }).then(function (r) { return r.json(); }).then(function (d) {
+              return fetch(hub + 'auth/logout', { method: 'POST', credentials: 'include', headers: { 'x-csrf-token': d.csrf || '' } });
+            }).catch(function () {}).then(function () { try { sessionStorage.removeItem('tmh.me'); } catch (e) {} location.reload(); });
+          });
+        })();
+      </script>
+    )}
 
     <main id="main" class={flush ? 'flush' : 'wrap page'}><slot /></main>
 
@@ -141,7 +184,6 @@ const js = {
         <div class="foot-brand">
           <a class="brand" href={L('/')}><img class="brand-word dark" src="/img/brand/wordmark-transparent.png" alt="TM Horizon" width="164" height="36" /><img class="brand-word light" src="/img/brand/wordmark-light-transparent.png" alt="" width="164" height="36" /></a>
           <p>{t(lang, 'foot.tagline')}</p>
-          <p class="proto-note"><Icon name="flask-conical" size={15} /> <span set:html={t(lang, 'foot.proto', { badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} /></p>
         </div>
         <div>
           <h4>{t(lang, 'nav.discover')}</h4>
@@ -166,6 +208,7 @@ const js = {
           <a href={L('/impressum/')}>{t(lang, 'legal.imprint')}</a>
           <a href={L('/datenschutz/')}>{t(lang, 'legal.privacy')}</a>
           <a href={L('/nutzungsbedingungen/')}>{t(lang, 'legal.terms')}</a>
+          <a class="foot-disc" href="https://discord.gg/2Kq3SJDjvM" target="_blank" rel="noopener" aria-label="Discord"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg> Discord</a>
         </nav>
         <p>{t(lang, 'foot.legal')}</p>
       </div>
@@ -176,7 +219,7 @@ const js = {
         // language: remember the choice (the links go to the same page in the other language)
         document.querySelectorAll('[data-lang-set]').forEach(function (a) {
           a.addEventListener('click', function () {
-            try { localStorage.setItem('lang', a.dataset.langSet); } catch (e) {}
+            try { localStorage.setItem('tmh.lang', a.dataset.langSet); } catch (e) {}
             a.href = a.getAttribute('href').split('#')[0] + location.search + location.hash;
           });
         });

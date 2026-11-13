@@ -7,6 +7,8 @@ import { route } from '../http/route.ts';
 import { gameEnum, projectTypeSchema } from '../services/projects.ts';
 import { acceptDiscovered, acceptWithTopics, decideDiscovered, discoverGithub, discoveredCounts, listDiscovered, publicGithubProjects } from '../services/discover-github.ts';
 import { rebuildIndex } from '../services/hubindex.ts';
+import { bulkDecide, curateWaiting, summarize } from '../services/discover-curate.ts';
+import { toDiscovered } from '../services/discover-github.ts';
 import { HttpError, parseJson } from '../util.ts';
 
 const repoParam = z.object({ owner: z.string().max(40), name: z.string().max(100) });
@@ -36,6 +38,16 @@ export function discoverRoutes(app: FastifyInstance, ctx: Ctx) {
       return { ok: true };
     });
   }
+  route(app, { method: 'GET', url: '/v1/admin/discovered-curation', summary: 'Waiting repositories sorted into approve / reject / pending with a reason (from the cached GitHub facts)', tags: ['admin'], auth: 'admin' }, async () => {
+    const curated = await curateWaiting(ctx);
+    const sum = summarize(curated, 0);
+    return {
+      counts: Object.fromEntries((['approve', 'reject', 'pending'] as const).map((b) => [b, { n: sum[b].n, codes: sum[b].codes }])),
+      items: curated.map(({ row, decision }) => ({ ...toDiscovered(row), bucket: decision.bucket, code: decision.code, reason: decision.reason, openplanet: decision.openplanet, openplanetPage: decision.opPage })),
+    };
+  });
+  route(app, { method: 'POST', url: '/v1/admin/discovered/bulk', summary: 'Accept or hide the given waiting repositories in one go (the portal filter)', tags: ['admin'], auth: 'admin',
+    body: z.object({ repos: z.array(z.string().max(140)).min(1).max(1000), action: z.enum(['accept', 'hide']) }) }, async (req, { body }) => bulkDecide(ctx, body.repos, body.action, req.auth.user!.id));
   route(app, { method: 'POST', url: '/v1/admin/discovered/accept-with-topics', summary: 'Accept every waiting repository that has at least one matching TrackMania topic', tags: ['admin'], auth: 'admin' }, async (req) =>
     acceptWithTopics(ctx, req.auth.user!.id));
   route(app, { method: 'POST', url: '/v1/admin/discovered/run', summary: 'Search GitHub now (needs DISCOVER_GITHUB=1)', tags: ['admin'], auth: 'admin', rateLimit: { max: 2, timeWindow: '10 minutes' } }, async () => {

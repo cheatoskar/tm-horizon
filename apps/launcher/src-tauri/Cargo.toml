@@ -1,6 +1,6 @@
 [package]
 name = "tm-hub"
-version = "0.5.1"
+version = "0.5.2"
 description = "TM Horizon: one launcher for every TrackMania"
 edition = "2021"
 license = "AGPL-3.0-only"
@@ -44,6 +44,9 @@ getrandom = "0.3"
 igd-next = { version = "0.18", default-features = false, features = ["io_sync"] }
 # Media page: small JPEG previews of screenshots (BMP/PNG/JPG/WebP/TGA), made off the main thread (thumbs.rs).
 image = { version = "0.25", default-features = false, features = ["bmp", "jpeg", "png", "webp", "tga", "ico"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"

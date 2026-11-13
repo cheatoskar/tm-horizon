@@ -33,7 +33,7 @@ Diese Datei selbst wird nirgends angezeigt.
 | `[7]` (Server-Logs Website und Hub, Anwendungs-Log) | Datenschutz 3 und 4 | **7** passt zu `apps/server/deploy/logrotate-tm-hub` (`rotate 7`, täglich). Wenn du die Logrotation änderst, hier mitändern. Das **Anwendungs-Log** (journald, `journalctl -u tm-hub`) hat heute **keine** Frist: auf dem Server `MaxRetentionSec=7day` in `/etc/systemd/journald.conf` setzen, sonst stimmt die Zeile nicht. |
 | `[3]` (Protokoll der Moderation) | Datenschutz 4 | Vorschlag 3 Jahre (Verjährungsfrist für Ansprüche). Der Hub löscht das Protokoll heute **nicht** automatisch; du musst es von Hand bereinigen oder einen Löschjob einplanen. |
 | `[1]` (Meldungen) | Datenschutz 4 | Vorschlag 1 Jahr nach Abschluss. Auch hier löscht der Hub heute nicht von selbst. |
-| `[30]` (Datensicherung) | Datenschutz 4 | **30** passt zu `apps/server/deploy/backup.sh` („Keep 30 days of dumps“). Beim Ändern des Skripts mitändern. |
+| ~~`[30]`~~ (Datensicherung) | Datenschutz 4 | **Erledigt (2026-11-12): 14 Tage**, passend zur Produktion (`apps/server/deploy/prod/backup-prod.sh`, `KEEP_DAYS=14`, plus Lifecycle-Regel des Buckets, `docs/hub/production.md`). Beim Ändern des Skripts mitändern. |
 | `[prüfen: ob der Deinstaller diese Ordner entfernt …]` | Datenschutz 5.9 | Einmal den Launcher installieren und deinstallieren und nachsehen, ob `%APPDATA%` / `%LOCALAPPDATA%` des Launchers (inkl. `EmbeddedWeb`) bleiben. Dann den Satz ersetzen, z. B. „Beim Deinstallieren bleiben diese Daten; du kannst den Ordner `…` von Hand löschen.“ |
 | `[später auch im Portal unter „Account“]` | Datenschutz 6 | streichen, solange das Portal keinen „Konto löschen“-Knopf hat (heute: keiner). |
 | `[Datenschutzaufsichtsbehörde des Bundeslandes: Name, Anschrift, Website]` | Datenschutz 6 | die Landesbehörde für **deinen Wohnsitz** (nicht für IMPREGO). Liste aller Behörden: Datenschutzkonferenz, `datenschutzkonferenz-online.de` › Datenschutzaufsichtsbehörden. Name, Postanschrift und Website eintragen. |
@@ -59,4 +59,4 @@ Was eine Anwältin, ein Anwalt oder ein Generator wie eRecht24 / Dr. Schwenke an
 7. **Drittlandübermittlung:** Data Privacy Framework für Discord, GitHub, Google; Auftragsverarbeitung mit Oracle.
 8. **Cookies und localStorage:** Sitzungs-Cookie und gespeicherte Sprache/Farbschema ohne Einwilligung nach § 25 Abs. 2 Nr. 2 TDDDG – passt das?
 9. **Englische Fassung:** Hinweis „deutsche Fassung ist verbindlich“ ausreichend?
-10. **Löschfristen** praktisch umgesetzt: logrotate (7 Tage), journald (noch einzustellen), Backups (30 Tage), Moderationsprotokoll und Meldungen (noch kein Löschjob).
+10. **Löschfristen** praktisch umgesetzt: logrotate (7 Tage), journald (Produktion: eigener Namespace mit 7 Tagen, `docs/hub/production.md`), Backups (14 Tage), Moderationsprotokoll und Meldungen (noch kein Löschjob).

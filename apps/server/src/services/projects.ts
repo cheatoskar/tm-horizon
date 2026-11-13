@@ -51,7 +51,7 @@ export const projectCreateSchema = projectInputSchema.extend({ type: projectType
 
 const RESERVED_SLUGS = new Set(['new', 'admin', 'api', 'login', 'logout', 'me', 'settings', 'search', 'legal', 'impressum', 'datenschutz', 'terms', 'report', 'p', 'v1', 'dl', 'files']);
 
-const searchText = (p: { name: string; summary: string; author_name: string; tags: string; slug: string; description?: string }) =>
+export const searchText = (p: { name: string; summary: string; author_name: string; tags: string; slug: string; description?: string }) =>
   [p.name, p.slug, p.author_name, p.summary, parseJson<string[]>(p.tags, []).join(' '), (p.description ?? '').slice(0, 2000)].join(' ').toLowerCase().replace(/\s+/g, ' ');
 
 export async function roleIn(ctx: Ctx, projectId: string, userId: string | null): Promise<ProjectRole | null> {
@@ -83,7 +83,7 @@ export async function createProject(ctx: Ctx, input: ProjectInput, owner: { id: 
     id: newId('p'), slug: v.slug, name: v.name, summary: v.summary, description: v.description, categories: JSON.stringify(v.categories), tags: JSON.stringify(v.tags),
     games: JSON.stringify(v.games), installs: JSON.stringify(v.installs), license: v.license, links: JSON.stringify(v.links), dependencies: JSON.stringify(v.dependencies),
     conflicts: JSON.stringify(v.conflicts), author_name: owner?.name ?? 'Unknown', claimed: owner ? 1 : 0, catalog_id: null, state: 'draft', removal: null,
-    icon_id: null, banner_id: null, downloads: 0, search_text: '', owner_changed_at: null, tmloader_product: v.tmloaderProduct ?? null, source_url: null, claim_discord_id: null, showcase: null, showcase_from: null, type: v.type ?? null, github_downloads: 0, github_downloads_at: null,
+    icon_id: null, banner_id: null, downloads: 0, search_text: '', owner_changed_at: null, tmloader_product: v.tmloaderProduct ?? null, source_url: null, claim_discord_id: null, showcase: null, showcase_from: null, type: v.type ?? null, github_downloads: 0, github_downloads_at: null, catalog_entry: null,
     created_at: at, updated_at: at, ...extra,
   };
   row.search_text = searchText(row);
@@ -120,12 +120,30 @@ export function imageOf(ctx: Ctx, i: { id: string; kind: string; storage_key: st
   return { id: i.id, url: ctx.storage.publicUrl(i.storage_key), kind: i.kind as HubImage['kind'], width: i.width, height: i.height, order: i.ord, caption: i.caption };
 }
 
+/** Why the setup of a source could not be derived (services/autosetup.ts), one line. */
+export async function setupReasonOf(ctx: Ctx, sourceId: string): Promise<string | null> {
+  const row = await ctx.db.selectFrom('kv').select('value').where('key', '=', `autosetup.${sourceId}`).executeTakeFirst();
+  return row?.value ?? null;
+}
+
 export async function sourcesOf(ctx: Ctx, projectId: string): Promise<HubSource[]> {
   const rows = await ctx.db.selectFrom('sources').selectAll().where('project_id', '=', projectId).orderBy('created_at').execute();
-  return rows.map((s) => ({
+  const p = await ctx.db.selectFrom('projects').select(['installs', 'type']).where('id', '=', projectId).executeTakeFirst();
+  const setup = !!p && needsInstall(p);
+  const out: HubSource[] = [];
+  for (const s of rows) {
+    // Nothing to set up while the repository has no release at all (the crawler stores the count of releases it saw).
+    const rel = await ctx.db.selectFrom('kv').select('value').where('key', '=', `srcrel.${s.id}`).executeTakeFirst();
+    const needs = s.kind === 'github' && setup && rel?.value !== '0';
+    const reason = needs ? await setupReasonOf(ctx, s.id) : null;
+    out.push({
+    ...(needs ? { setupNeeded: true } : {}),
+    ...(reason ? { setupReason: reason } : {}),
     id: s.id, kind: s.kind as HubSource['kind'], target: s.target, product: s.product, assetPattern: s.asset_pattern, lastCheck: s.last_check, nextCheck: s.next_check,
     lastError: s.last_error, imported: s.imported, needsChoice: parseJson(s.needs_choice, null), webhook: !!s.webhook,
-  }));
+    });
+  }
+  return out;
 }
 
 /** What "Downloads" adds up to for a project (hub.ts DownloadBreakdown). */

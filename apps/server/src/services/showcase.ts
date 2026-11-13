@@ -29,7 +29,8 @@ export function resolveRepoImages(raw: unknown, repo: string, branch: string): u
   const abs = (v: unknown) => (typeof v === 'string' && !/^[a-z][a-z0-9+.-]*:/i.test(v) && !v.startsWith('//') && /\.(png|jpe?g|webp|gif)$/i.test(v) && !v.split('/').includes('..')
     ? `https://raw.githubusercontent.com/${repo}/${branch}/${v.replace(/^\.?\/+/, '').split('/').map(encodeURIComponent).join('/')}` : v);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
-  const doc = structuredClone(raw) as { blocks?: unknown };
+  const doc = structuredClone(raw) as { blocks?: unknown; icon?: unknown };
+  if ('icon' in doc) doc.icon = abs(doc.icon);
   if (!Array.isArray(doc.blocks)) return doc;
   for (const b of doc.blocks as Record<string, unknown>[]) {
     if (!b || typeof b !== 'object') continue;

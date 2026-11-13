@@ -1855,7 +1855,7 @@
   "perf.dxvk.err.running": "The game is running. Close it first.",
   "perf.dxvk.err.blocked": "This folder is protected.",
   "perf.dxvk.err.notWritable": "The game folder is not writable (Program Files needs administrator rights).",
-  "perf.dxvk.err.foreignDll": "Another d3d9.dll mod is already in the game folder (e.g. TM Vibrant Shaders); DXVK cannot go behind it.",
+  "perf.dxvk.err.foreignDll": "A d3d9.dll is already in the game folder (for example TM Vibrant Shaders). DXVK can't run behind it: remove that mod first.",
   "perf.dxvk.err.foreignConf": "The game folder already has a dxvk.conf that the launcher did not write.",
   "perf.dxvk.err.alreadyOn": "DXVK is already on.",
   "perf.dxvk.err.notInstalled": "The game is not installed.",

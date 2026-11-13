@@ -5,7 +5,7 @@
 pkgname=tm-horizon-bin
 _pkgname=tm-horizon
 # pkgver cannot contain "-": the release tag v0.3.0-beta.1 becomes 0.3.0_beta.1 here.
-_tag=0.5.1
+_tag=0.5.2
 pkgver=${_tag//-/_}
 pkgrel=1
 pkgdesc="One launcher for every TrackMania: games, TMLoader mods, maps, servers (games run through Wine/Proton)"
@@ -25,12 +25,12 @@ sha256sums_x86_64=('SKIP')
 
 package() {
   bsdtar -xf data.tar.gz -C "$srcdir"
-  # Tauri names the binary after the Cargo package (tm-hub) and the icons the same way.
-  install -Dm755 "$srcdir/usr/bin/tm-hub" "$pkgdir/usr/bin/tm-horizon"
+  # The binary and the icons are named after mainBinaryName (tm-horizon) since 0.5.0.
+  install -Dm755 "$srcdir/usr/bin/tm-horizon" "$pkgdir/usr/bin/tm-horizon"
   for size in 32x32 128x128 256x256@2; do
     local dest=${size%@2}
-    [ -f "$srcdir/usr/share/icons/hicolor/$size/apps/tm-hub.png" ] &&
-      install -Dm644 "$srcdir/usr/share/icons/hicolor/$size/apps/tm-hub.png" "$pkgdir/usr/share/icons/hicolor/$dest/apps/tm-horizon.png"
+    [ -f "$srcdir/usr/share/icons/hicolor/$size/apps/tm-horizon.png" ] &&
+      install -Dm644 "$srcdir/usr/share/icons/hicolor/$size/apps/tm-horizon.png" "$pkgdir/usr/share/icons/hicolor/$dest/apps/tm-horizon.png"
   done
   cat > "$srcdir/tm-horizon.desktop" <<DESKTOP
 [Desktop Entry]
@@ -42,7 +42,7 @@ Exec=tm-horizon
 Icon=tm-horizon
 Terminal=false
 Categories=Game;
-StartupWMClass=tm-hub
+StartupWMClass=tm-horizon
 DESKTOP
   install -Dm644 "$srcdir/tm-horizon.desktop" "$pkgdir/usr/share/applications/tm-horizon.desktop"
 }

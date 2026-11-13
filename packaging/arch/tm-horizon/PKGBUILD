@@ -4,7 +4,7 @@
 # `updpkgsums`). Build: `makepkg -si` in this folder.
 pkgname=tm-horizon
 # pkgver cannot contain "-": the release tag v0.3.0-beta.1 becomes 0.3.0_beta.1 here.
-_tag=0.5.1
+_tag=0.5.2
 pkgver=${_tag//-/_}
 pkgrel=1
 pkgdesc="One launcher for every TrackMania: games, TMLoader mods, maps, servers (games run through Wine/Proton)"
@@ -19,7 +19,7 @@ optdepends=('wine: run the games in a Wine prefix'
             'winetricks: fonts and runtimes for old games')
 provides=('tm-horizon')
 conflicts=('tm-horizon-bin')
-options=('!lto')
+options=('!lto' '!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$_tag.tar.gz")
 sha256sums=('SKIP')
 
@@ -33,6 +33,8 @@ build() {
   cd "$pkgname-$_tag/apps/launcher"
   export CARGO_HOME="$srcdir/cargo-home"
   export npm_config_cache="$srcdir/npm-cache"
+  # The release build (like release.yml): no preview-only art, no hub features (docs/release.md).
+  export TMHUB_PUBLIC_BUILD=1 TMHUB_RELEASE_PREVIEW=1
   # tauri build (not plain cargo) so the app loads its bundled UI instead of the dev server.
   npx tauri build --no-bundle
 }
@@ -45,7 +47,7 @@ check() {
 
 package() {
   cd "$pkgname-$_tag"
-  install -Dm755 apps/launcher/src-tauri/target/release/tm-hub "$pkgdir/usr/bin/tm-horizon"
+  install -Dm755 apps/launcher/src-tauri/target/release/tm-horizon "$pkgdir/usr/bin/tm-horizon"
   install -Dm644 packaging/linux/tm-horizon.desktop "$pkgdir/usr/share/applications/tm-horizon.desktop"
   local icons=apps/launcher/src-tauri/icons
   install -Dm644 "$icons/32x32.png" "$pkgdir/usr/share/icons/hicolor/32x32/apps/tm-horizon.png"

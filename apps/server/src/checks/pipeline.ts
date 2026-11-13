@@ -35,6 +35,8 @@ export interface CheckInput {
   previous?: PreviousVersion | null;
   /** The project's owner changed in the last 14 days (transfer, approved claim). */
   ownerChangedRecently?: boolean;
+  /** dinput8.dll is allowed in this version (checks/dinput8.ts: the author's own loader); it then gets an info finding instead of the rejection. */
+  allowDinput8?: boolean;
   signature?: { keyId: string; verified: boolean } | null;
   vt?: VtClient | null;
   vtUpload?: boolean;
@@ -110,7 +112,10 @@ export async function runChecks(input: CheckInput): Promise<CheckReport> {
       if (v.executable && !execPaths.includes(e.path)) execPaths.push(e.path);
     }
     const base = e.path.split('/').pop()!.toLowerCase();
-    if (base === 'dinput8.dll') add('reject', 'type.dinput8', 'dinput8.dll is never installed (StarForce games break, the launcher refuses it)', e.path);
+    if (base === 'dinput8.dll') {
+      if (input.allowDinput8) add('info', 'type.dinput8.allowed', 'dinput8.dll allowed for this project (the author own loader); the launcher never installs it into a StarForce game', e.path);
+      else add('reject', 'type.dinput8', 'dinput8.dll is never installed (StarForce games break, the launcher refuses it)', e.path);
+    }
     const p = parsePe(e.data, e.path);
     if (p) {
       const { packed, malformed, ...info } = p;

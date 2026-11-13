@@ -781,10 +781,11 @@ pub async fn catalog_mod_restore(app: AppHandle, id: String) -> ActionResult {
 
 // ---------------------------------------------------------------- updates for mods installed here
 
-/// A TrackMania game or TMLoader is running (updates and rollbacks wait for it to close).
-fn any_game_running() -> Option<String> {
-    const EXES: [&str; 8] = ["tmforever.exe", "tmnationseswc.exe", "maniaplanet.exe", "trackmania.exe", "trackmaniaturbo.exe", "tmloader.exe", "tmoriginal.exe", "tmsunrise.exe"];
-    platform::running_process_names().into_iter().find(|p| EXES.iter().any(|e| p.eq_ignore_ascii_case(e)))
+/// Why an update or rollback of a mod of `game` has to wait (a message), or None. Any TrackMania game counts;
+/// an open TMLoader only for Forever mods, which can live in TMLoader's products folder.
+fn any_game_running(game: &str) -> Option<String> {
+    const EXES: [&str; 7] = ["tmforever.exe", "tmnationseswc.exe", "maniaplanet.exe", "trackmania.exe", "trackmaniaturbo.exe", "tmoriginal.exe", "tmsunrise.exe"];
+    crate::optimize::close_first(&platform::running_process_names(), &EXES, matches!(game, "tmnf" | "tmuf"))
 }
 
 #[tauri::command]
@@ -830,8 +831,8 @@ pub async fn mod_set_auto(app: tauri::AppHandle, entry_id: String, game: String,
 pub async fn mod_update(app: AppHandle, entry_id: String, game: String, spec: Option<crate::catalogmods::InstallSpec>) -> ActionResult {
     crate::bg::run(move || -> ActionResult {
         let st = app.state::<AppState>();
-        if let Some(p) = any_game_running() {
-            return fail(format!("{p} is running. Close the game first."));
+        if let Some(m) = any_game_running(&game) {
+            return fail(m);
         }
         let Some(rec) = crate::updates::list(&st.data_dir).into_iter().find(|r| r.entry_id == entry_id && r.game == game) else { return fail("Not installed by TM Horizon") };
         let r = match rec.kind.as_str() {
@@ -869,8 +870,8 @@ pub async fn mod_update(app: AppHandle, entry_id: String, game: String, spec: Op
 pub async fn mod_rollback(app: AppHandle, entry_id: String, game: String) -> ActionResult {
     crate::bg::run(move || -> ActionResult {
         let st = app.state::<AppState>();
-        if let Some(p) = any_game_running() {
-            return fail(format!("{p} is running. Close the game first."));
+        if let Some(m) = any_game_running(&game) {
+            return fail(m);
         }
         let Some(rec) = crate::updates::list(&st.data_dir).into_iter().find(|r| r.entry_id == entry_id && r.game == game) else { return fail("Not installed by TM Horizon") };
         let Some(id) = rec.backup_id.clone() else { return fail("Nothing to roll back to (the install replaced no files)") };

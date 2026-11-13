@@ -8,7 +8,7 @@ import type { HubConfig } from '../src/config.ts';
 import { readZip } from '../src/lib/zip.ts';
 import { parseRef, parseXlsx } from '../src/lib/xlsx.ts';
 import {
-  buildCommunities, COMMUNITIES_CREDIT, COMMUNITIES_SUGGEST, iconUrl, inviteCode, parseCheckedDate, parseDirectory, parseInviteResponse,
+  applyOwn, buildCommunities, COMMUNITIES_CREDIT, COMMUNITIES_SUGGEST, iconUrl, inviteCode, parseCheckedDate, parseDirectory, parseInviteResponse,
 } from '../src/sources/communities.ts';
 
 const xlsx = fs.readFileSync(path.join(root, 'test', 'fixtures', 'directory.xlsx'));
@@ -108,6 +108,7 @@ test('communities: build looks every invite up once, handles 429 and caches the 
   const { ctx, asked } = networkContext();
   const now = new Date('2026-11-10T16:00:00.000Z');
   const out = await buildCommunities(ctx, now);
+  out.communities = out.communities.filter((c) => c.source === 'directory'); // data/communities-own.json is covered by its own test
   assert.equal(out.communities.length, 11);
   assert.equal(new Set(asked).size, 10, 'one lookup per distinct invite');
   assert.equal(asked.filter((c) => c === 'openplanet').length, 2, 'the rate limited lookup was repeated');
@@ -142,6 +143,7 @@ test('communities: lookups per build are capped', async () => {
     c.communities.maxLookupsPerBuild = 3;
   });
   const out = await buildCommunities(ctx, new Date('2026-11-10T16:00:00.000Z'));
+  out.communities = out.communities.filter((c) => c.source === 'directory');
   assert.equal(out.communities.filter((c) => c.invite && c.alive === null).length, 7);
   assert.match(out.sources.find((s) => s.id === 'discord-invites')!.error ?? '', /7 waiting/);
 });
@@ -153,4 +155,22 @@ test('communities: a failing sheet is a warning and an empty list', async () => 
   assert.equal(out.sources[0].ok, false);
   assert.equal(ctx.warnings.length, 1);
   assert.deepEqual(fixture('discord-invite-404.json'), { message: 'Unknown Invite', code: 10006 });
+});
+
+test('communities: own entries win over directory entries with the same invite code', () => {
+  const base = (id: string, invite: string | null, extra = {}) => ({
+    id, name: id, url: `https://discord.gg/${invite}`, invite, group: 'Communities', section: 'Communities', region: null, active: true,
+    alive: true, members: 323, online: 10, guildName: 'G', icon: 'https://cdn.example/x.png', checked: '2025-12-04', source: 'directory' as const, ...extra,
+  });
+  const list = [base('dir:a', 'AAA'), base('dir:a-2', 'AAA'), base('dir:b', 'BBB')];
+  const out = applyOwn(list, [
+    { invite: 'AAA', name: 'Mine', games: ['tmnf', 'tmuf'], featured: true, icon: '/community/a.png' },
+    { invite: 'CCC', name: 'New', games: ['tmnf'] },
+  ]);
+  const mine = out.filter((c) => c.invite === 'AAA');
+  assert.equal(mine.length, 1);
+  assert.deepEqual([mine[0].name, mine[0].icon, mine[0].featured, mine[0].games, mine[0].source, mine[0].members], ['Mine', '/community/a.png', true, ['tmnf', 'tmuf'], 'own', 323]);
+  assert.equal(out.find((c) => c.invite === 'BBB')!.source, 'directory');
+  assert.equal(out.find((c) => c.invite === 'CCC')!.url, 'https://discord.gg/CCC');
+  assert.equal(out.length, 3);
 });

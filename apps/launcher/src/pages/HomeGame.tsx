@@ -119,9 +119,9 @@ export function GameCommunity({ g }: { g: GameView }) {
   const t = useT();
   const re = COMMUNITY_WORDS[g.id] ?? (g.id.startsWith('tm2-') || g.id === 'sm-storm' ? TM2 : null);
   const list = communitiesFile.communities
-    .filter((c) => c.active !== false && c.alive !== false && c.invite && re && re.test([c.name, c.guildName ?? '', c.section].join(' ')))
+    .filter((c) => c.active !== false && c.alive !== false && c.invite && (c.games ? c.games.includes(g.id) : re && re.test([c.name, c.guildName ?? '', c.section].join(' '))))
     .filter((c, i, all) => all.findIndex((x) => (x.invite ?? x.url) === (c.invite ?? c.url)) === i)
-    .sort((a, b) => (b.members ?? 0) - (a.members ?? 0))
+    .sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || (b.members ?? 0) - (a.members ?? 0))
     .slice(0, 5);
   return (
     <section className="panel">

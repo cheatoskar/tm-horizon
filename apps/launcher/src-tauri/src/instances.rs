@@ -904,7 +904,7 @@ mod tests {
             exe: Some("TmForever.exe".into()), launcher: None, user_dir: None, linked: true, created: String::new(), tml_profile: None,
         };
         let info = install_info(&i);
-        let p = launch::plan_launch(&launch::PlanInput { game_id: "tmuf", install: &info, tmloader_exe: None, profile: None, eswc_use_launcher: false, join: None }).unwrap();
+        let p = launch::plan_launch(&launch::PlanInput { game_id: "tmuf", install: &info, tmloader_exe: None, profile: None, use_launcher: false, join: None }).unwrap();
         match p {
             launch::LaunchTarget::Exe { exe, cwd, .. } => {
                 assert_eq!(exe, Path::new(r"C:\d\instances\a").join("TmForever.exe"));

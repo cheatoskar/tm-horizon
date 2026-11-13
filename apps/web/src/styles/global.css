@@ -124,6 +124,18 @@ summary::-webkit-details-marker { display: none; }
 .nav-link { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 12px; text-decoration: none; font: 600 15px/1 var(--body); color: var(--text-2); transition: background .15s, color .15s; }
 .nav-link:hover { color: var(--text); background: var(--surface-2); }
 .nav-link.on { color: var(--text); background: var(--surface-2); }
+.disc-btn { text-decoration: none; }
+.acct-dd { display: none; }
+html.tmh-in .acct-dd { display: block; }
+html.tmh-in .signin { display: none; }
+.acct-btn { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 4px; border-radius: 999px; background: var(--surface-2); color: var(--text); font: 600 14px/1 var(--body); }
+.acct-btn:hover { background: var(--surface-3); }
+.acct-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.acct-av { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; flex: none; }
+.acct-av img { width: 100%; height: 100%; object-fit: cover; }
+.acct-name { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-dd[open] > summary .chev { transform: rotate(180deg); }
+.foot-disc { display: inline-flex; align-items: center; gap: 6px; }
 .top-end { display: flex; align-items: center; gap: 8px; flex: none; }
 .dd { position: relative; }
 .menu {
@@ -277,7 +289,6 @@ summary::-webkit-details-marker { display: none; }
 .chip img { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; object-position: top; margin-left: -3px; }
 .chip.sys { background: var(--accent-soft); color: var(--accent); }
 .chip.sys .i { color: var(--accent); }
-.chip.sample { background: rgba(242, 193, 78, .16); color: var(--warn); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: .04em; }
 .rc-stats { display: grid; justify-items: end; align-content: start; gap: 10px; min-width: 120px; padding-top: 2px; }
 .stat-row { display: flex; gap: 16px; }
 .stat { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font: 500 16px/1 var(--body); white-space: nowrap; }
@@ -586,7 +597,6 @@ summary::-webkit-details-marker { display: none; }
 .foot-in { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: 32px; }
 .foot-brand { display: grid; gap: 12px; align-content: start; }
 .foot-brand p { max-width: 42ch; }
-.proto-note { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: var(--text-2); }
 .foot h4 { font: 700 13px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--text); margin-bottom: 12px; }
 .foot-in > div:not(.foot-brand) { display: grid; gap: 8px; align-content: start; }
 .foot a { text-decoration: none; }
@@ -622,7 +632,8 @@ summary::-webkit-details-marker { display: none; }
   .two { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 860px) {
-  .top-nav, .signin span { display: none; }
+  .top-nav, .signin span, .acct-name, .acct-btn .chev { display: none; }
+  .acct-btn { padding: 0 4px; }
   .signin { width: 40px; padding: 0; justify-content: center; border-radius: 50%; }
   .phone-menu { display: block; }
   .top-end { margin-left: auto; }

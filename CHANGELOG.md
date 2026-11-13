@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.5.2 "Launcher Preview" (2026-11-13)
+
+Windows, plus Linux experimental (AppImage built on Ubuntu 22.04, Arch package), built with
+`TMHUB_RELEASE_PREVIEW=1`. Release text: `docs/release/notes-0.5.2.md`.
+
+- Linux (experimental): `latest.json` has a `linux-x86_64` entry for the signed AppImage, so the AppImage
+  updates itself from inside the app (.deb, .rpm and the Arch package update through the package manager).
+- Cpu/Gpu synchro (the game's GpuSync, default Immediate) on the Performance card and as a recommendation on every
+  D3D9 game page: "Set 1 Frame" with backup and Undo, or the game's launcher where the file is not writable.
+  Measured on TMNF with TM Vibrant Shaders: 50-70 FPS at Immediate, 90-105 FPS at 1 Frame.
+- DXVK and skid marks in a Program Files game folder: one UAC prompt copies only the verified files
+  (`elevate.rs`); the launcher itself stays unelevated.
+- An open TMLoader window or tray icon no longer counts as a running game (DXVK, config, replays, Play state).
+- TMNF/TMUF: "Start with the game's launcher" (TmForeverLauncher.exe), like ESWC.
+- Performance card in the app's card and control style; Original gets the Cpu/Gpu synchro card; a line points to
+  the in-game Smoothing switches of Horizon Performance.
+- Skid marks show a game file that is already Clean as "Clean (game folder)" instead of "Classic".
+- Servers: the ESWC master line says "Master server lists none · n known servers below" instead of "0 servers".
+- Live servers: "Online only" on by default and remembered. Statistics: large play time as hours only.
+- Communities: own 100% TMX / TM Horizon entry pinned for all five D3D9 games, all Discord invites refreshed.
+
 ## 0.5.1 "Launcher Preview" (2026-11-13)
 
 Windows only, built with `TMHUB_RELEASE_PREVIEW=1`. Release text: `docs/release/notes-0.5.1.md`.

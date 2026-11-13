@@ -1,7 +1,7 @@
 {
   "name": "@tm-hub/launcher",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.2",
   "type": "module",
   "scripts": {
     "scan": "node scanner/scan.mjs",
@@ -16,7 +16,7 @@
     "typecheck": "tsc -b",
     "tauri": "tauri",
     "check-i18n": "node scripts/check-i18n.mjs",
-    "test": "node --test src/data/tmformat.test.ts src/data/logins.test.ts src/data/play-entry.test.ts src/data/hubMerge.test.ts src/data/statsView.test.ts src/data/opPlugins.test.ts src/data/updateRules.test.ts"
+    "test": "node --test src/data/tmformat.test.ts src/data/logins.test.ts src/data/play-entry.test.ts src/data/hubMerge.test.ts src/data/statsView.test.ts src/data/opPlugins.test.ts src/data/updateRules.test.ts src/data/masterLine.test.ts"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.12.4",

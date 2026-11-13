@@ -19,6 +19,9 @@ pub struct Settings {
     pub tmloader_dir: Option<String>,
     /// ESWC: start TmNationsESWCLauncher.exe (Nadeo's settings dialog) instead of the game.
     pub eswc_use_launcher: bool,
+    /// The same choice for the other games with a Nadeo launcher, per game id ("tmnf", "tmuf":
+    /// TmForeverLauncher.exe). Missing = off (the game exe directly).
+    pub use_launcher: BTreeMap<String, bool>,
     /// The first-run question about tmhub:// links was answered.
     pub protocol_asked: bool,
     /// Folders added with "Add folder".
@@ -81,6 +84,7 @@ impl Default for Settings {
             update_url: String::new(),
             tmloader_dir: None,
             eswc_use_launcher: false,
+            use_launcher: BTreeMap::new(),
             protocol_asked: false,
             extra_folders: vec![],
             found_installs: vec![],
@@ -105,6 +109,26 @@ impl Default for Settings {
             setup_done: None,
             consoles: Default::default(),
             suggestions_dismissed: vec![],
+        }
+    }
+}
+
+impl Settings {
+    /// Start this game through its own Nadeo launcher (see `launch::PlanInput::use_launcher`)?
+    pub fn uses_launcher(&self, game: &str) -> bool {
+        match game {
+            "tmn-eswc" => self.eswc_use_launcher,
+            g => self.use_launcher.get(g).copied().unwrap_or(false),
+        }
+    }
+
+    /// Sets the choice for one game (ESWC keeps its old field).
+    pub fn set_use_launcher(&mut self, game: &str, on: bool) {
+        match game {
+            "tmn-eswc" => self.eswc_use_launcher = on,
+            g => {
+                self.use_launcher.insert(g.to_string(), on);
+            }
         }
     }
 }
@@ -150,6 +174,7 @@ mod tests {
         let l = load(&p);
         assert_eq!(l.hub_url, "https://x/");
         assert!(!l.eswc_use_launcher);
+        assert!(!l.uses_launcher("tmuf") && !l.uses_launcher("tmn-eswc"));
         assert!(!l.discord_presence);
         assert_eq!(l.density, "normal");
         assert_eq!(l.mods_view, "tiles", "old files get the tiles layout");

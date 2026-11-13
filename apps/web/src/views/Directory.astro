@@ -17,7 +17,7 @@ const alive = catalog.filter((e) => e.status === 'alive').length;
     <Fragment slot="above">
       <div class="note-bar">
         <Icon name="shield-check" />
-        <span><span set:html={t(lang, 'dir.note', { alive: `<b>${alive}</b>`, total: catalog.length, date: day(sources.catalog.updated, lang) })} />{sources.catalog.sample && <span class="badge sample" style="margin-left:6px">{t(lang, 'dir.sampleCatalog')}</span>}</span>
+        <span><span set:html={t(lang, 'dir.note', { alive: `<b>${alive}</b>`, total: catalog.length, date: day(sources.catalog.updated, lang) })} /></span>
       </div>
     </Fragment>
   </Discover>

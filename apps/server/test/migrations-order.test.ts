@@ -9,7 +9,7 @@ import { migrate, migrationsFor } from '../src/db/migrations.ts';
 const names = Object.keys(migrationsFor(true));
 
 test('the newest migration sorts last (Kysely runs them by name)', () => {
-  assert.equal([...names].sort().at(-1), '0007-discovered');
+  assert.equal([...names].sort().at(-1), '0010-server-poll');
   assert.equal(new Set(names).size, names.length);
 });
 

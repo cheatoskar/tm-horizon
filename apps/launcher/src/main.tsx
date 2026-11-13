@@ -21,6 +21,7 @@ import './styles-serverquery.css';
 import './styles-fix2.css';
 import './styles-hosting.css';
 import './styles-rc4.css';
+import './styles-perf.css';
 import './styles-controls.css'; // one control height per toolbar, last
 import { backend } from './data/backend';
 import { HubProvider } from './state';

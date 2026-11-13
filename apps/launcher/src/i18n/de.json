@@ -1855,7 +1855,7 @@
   "perf.dxvk.err.running": "Das Spiel läuft. Erst beenden.",
   "perf.dxvk.err.blocked": "Dieser Ordner ist geschützt.",
   "perf.dxvk.err.notWritable": "Der Spielordner ist nicht beschreibbar (Program Files braucht Administratorrechte).",
-  "perf.dxvk.err.foreignDll": "Ein anderer d3d9.dll-Mod liegt schon im Spielordner (z. B. TM Vibrant Shaders); DXVK kann nicht dahinter.",
+  "perf.dxvk.err.foreignDll": "Im Spielordner liegt schon eine d3d9.dll (z. B. TM Vibrant Shaders). DXVK kann nicht dahinter laufen: diesen Mod erst entfernen.",
   "perf.dxvk.err.foreignConf": "Im Spielordner liegt schon eine dxvk.conf, die nicht vom Launcher stammt.",
   "perf.dxvk.err.alreadyOn": "DXVK ist schon an.",
   "perf.dxvk.err.notInstalled": "Das Spiel ist nicht installiert.",

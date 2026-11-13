@@ -4691,7 +4691,7 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "tm-hub"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "base64 0.22.1",
  "dirs 6.0.0",
@@ -4701,6 +4701,7 @@ dependencies = [
  "hex",
  "igd-next",
  "image",
+ "libc",
  "md-5",
  "minisign-verify",
  "native-tls",

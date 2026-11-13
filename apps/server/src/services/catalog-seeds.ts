@@ -9,11 +9,18 @@ import type { ProjectsTable } from '../db/db.ts';
 
 interface Seed { mod: string; showcase: unknown; text: string }
 let cached: { entries: CatalogEntry[]; seeds: Seed[] } | null = null;
+let override: string | null = null;
+
+/** Reads entries and seed showcases from this catalog file instead of the bundled one (scripts/import-catalog.ts --catalog); null: the bundled one again. */
+export function useCatalogFile(file: string | null) {
+  override = file;
+  cached = null;
+}
 
 function load() {
   if (cached) return cached;
   try {
-    const file = createRequire(import.meta.url).resolve('@tm-hub/catalog/catalog.json');
+    const file = override ?? createRequire(import.meta.url).resolve('@tm-hub/catalog/catalog.json');
     const j = JSON.parse(readFileSync(file, 'utf8')) as { entries?: CatalogEntry[]; showcases?: { mod: string; showcase: unknown }[] };
     cached = { entries: j.entries ?? [], seeds: (j.showcases ?? []).map((s) => ({ ...s, text: JSON.stringify(s.showcase).toLowerCase() })) };
   } catch {

@@ -127,7 +127,8 @@ export function Preview({ pv, url, onProduct, existing }: { pv: SourcePreview; u
   });
   const gallery = picked.filter((u) => u !== banner);
 
-  const reason = existing ? (askInstall && games.length === 0 ? 'Pick at least one game.' : null) : pv.existing ? 'Already on the hub. Claim that project instead of importing a second one.'
+  const reason = existing ? (askInstall && games.length === 0 ? 'Pick at least one game.' : null)
+    : pv.existing ? (pv.existing.claimed ? `Already imported as "${pv.existing.slug}". New releases come in by themselves; open that project to see them (a first version waits for review).` : 'Already on the hub. Claim that project instead of importing a second one.')
     : !type ? 'Pick a type.'
     : !nameOk ? 'Name and URL name need at least 2 characters.'
     : !summaryOk ? 'The summary needs 10 to 200 characters.'
@@ -197,7 +198,7 @@ export function Preview({ pv, url, onProduct, existing }: { pv: SourcePreview; u
       {pv.existing && !existing && (
         <Notice tone="warn">
           {pv.existing.viaRepo ? 'The hub already lists this repository as the project' : 'A hub project already watches this source:'} <b>{pv.existing.slug}</b>{pv.existing.claimed ? ' (claimed).' : ' (not claimed yet).'}{' '}
-          {pv.existing.claimed ? <Link to={`/p/${pv.existing.slug}`}>View it</Link> : <Link className="btn sm primary" to={`/projects/${pv.existing.slug}?tab=claim`}>Claim this project</Link>}
+          {pv.existing.claimed ? <Link className="btn sm primary" to={`/projects/${pv.existing.slug}?tab=versions`}>Open it</Link> : <Link className="btn sm primary" to={`/projects/${pv.existing.slug}?tab=claim`}>Claim this project</Link>}
         </Notice>
       )}
       {pv.warnings.map((w, i) => <Notice key={i} tone="warn">{w}</Notice>)}
@@ -372,7 +373,7 @@ export function Preview({ pv, url, onProduct, existing }: { pv: SourcePreview; u
         {error && <Notice tone="err">{error}</Notice>}
         <div className="row">
           <button className="btn primary" disabled={busy || !!reason} onClick={() => void submit()}>{busy ? (existing ? 'Applying' : 'Importing') : (existing ? 'Apply' : 'Import')}</button>
-          {reason && <span className="hint">{reason}</span>}
+          {reason && <span className="msg warn small" role="status" style={{ margin: 0 }}>{reason}</span>}
         </div>
         <p className="hint" style={{ marginTop: 'var(--tm-s-3)', marginBottom: 0 }}>The hub watches the repo from now on and picks up new releases by itself.</p>
       </Section>

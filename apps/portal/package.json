@@ -1,7 +1,7 @@
 {
   "name": "@tm-hub/portal",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.2",
   "type": "module",
   "description": "TM Horizon Hub developer portal (projects, versions, sources, review queue, legal pages).",
   "license": "AGPL-3.0-only",

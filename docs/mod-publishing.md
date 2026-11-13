@@ -1,8 +1,8 @@
 # Mod publishing on TM Horizon (design)
 
-How authors put mods on TM Horizon and how the launcher gets them safely onto players' PCs. Nothing
-of this is built yet; the launcher today installs from the TMLoader servers with their SHA-256.
-This is the plan I want to build next.
+How authors put mods on TM Horizon and how the launcher gets them safely onto players' PCs. The hub, the author portal (sign-in with GitHub or Discord) and the review step are built and run for my own
+projects; opening them to other authors needs coordination with the community and TMX first. The launcher
+still installs other mods from the TMLoader servers with their SHA-256.
 
 ## Goals
 

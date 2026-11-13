@@ -86,6 +86,22 @@ pub fn process_name(pid: u32) -> Option<String> {
     Some(exe.file_name()?.to_string_lossy().to_lowercase())
 }
 
+/// SIGTERM to the process group `pid` leads. Never signals anything else: refuses pid <= 1, a
+/// process that is not its own group leader, and the group this process itself belongs to.
+#[cfg(unix)]
+pub fn term_group(pid: u32) -> bool {
+    if pid <= 1 || pid > i32::MAX as u32 {
+        return false;
+    }
+    let pid = pid as libc::pid_t;
+    unsafe {
+        if libc::getpgid(pid) != pid || libc::getpgrp() == pid {
+            return false;
+        }
+        libc::killpg(pid, libc::SIGTERM) == 0
+    }
+}
+
 /// Ends a leftover process, only if it still is the program the PID file names.
 pub fn kill_leftover(p: &PidFile) -> Result<(), String> {
     if check_leftover(Some(p), &process_name) != Leftover::Alive {
@@ -109,10 +125,7 @@ pub fn kill_leftover(p: &PidFile) -> Result<(), String> {
     #[cfg(not(windows))]
     {
         // the server was started in its own process group: end the group
-        let st = Command::new("kill").arg("-TERM").arg(format!("-{}", p.pid)).status().map_err(|e| e.to_string())?;
-        if !st.success() {
-            let _ = Command::new("kill").arg("-TERM").arg(p.pid.to_string()).status();
-        }
+        term_group(p.pid);
         Ok(())
     }
 }
@@ -198,7 +211,7 @@ impl Proc {
         }
         #[cfg(not(windows))]
         {
-            let _ = Command::new("kill").arg("-TERM").arg(format!("-{}", self.pid)).status();
+            term_group(self.pid);
             std::thread::sleep(std::time::Duration::from_millis(300));
         }
         let _ = self.child.kill();

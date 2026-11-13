@@ -1,7 +1,11 @@
-# Performance panel (game page: TMNF, TMUF, ESWC, Sunrise)
+# Performance panel (game page: TMNF, TMUF, ESWC, Sunrise; Original: Cpu/Gpu synchro only)
 
 One panel with four tabs. Code: `optimize.rs`, `syscfg.rs`, `perfbench.rs`, `replayarchive.rs`,
 `startwatch.rs`, UI `src/ui/PerfPanel.tsx`. Everything is per user, no admin, and every write can be undone.
+
+"The game runs" (every refusal below) means the game's own exe runs (`TmForever.exe` for TMNF/TMUF). An open
+TMLoader window or tray icon does not count: nothing here writes into TMLoader. TMLoader only blocks changes
+that write into its install (mod updates of Forever mods in its products folder, undo of such changes).
 
 ## Optimize (Windows settings per exe)
 
@@ -37,6 +41,40 @@ File: `Default.SystemConfig.Gbx` (TMNF/TMUF: `Documents\TrackMania\Config\`, ESW
   read back and compared before the file is written. Refused while the game runs. Undo copies the original back.
 - Not tested in the game yet. Read, round trip and back-up/undo are tested against the real files (read only) and
   with temp files.
+
+## Cpu/Gpu synchro
+
+The game's own setting (`GpuSync`, shown as *Cpu/Gpu synchro* in each game's launcher under Advanced). All five
+D3D9 games (TMNF, TMUF, ESWC, Sunrise, Original) default to 7 *Immediate*: after every Present the CPU waits until
+the GPU finished that frame, so CPU and GPU take turns and a shader mod's GPU time adds to the frame time in full.
+*1 Frame* (5) lets the CPU work on the next frame meanwhile (more FPS with shaders, about one frame more input
+delay). My measurement, TMNF with TM Vibrant Shaders: 50-70 FPS at Immediate, 90-105 FPS at 1 Frame. Values: 0 None, 1 3 Frames, 2 2 Frames & Half, 3 2 Frames, 4 1 Frame & Half, 5 1 Frame,
+6 Half a frame, 7 Immediate. Source: trackmania-internals `rendering/gpu-sync.md`.
+
+- Stored in chunk `0x0B013003` of the display node: six values (DisableShadowBuffer, **GpuSync**, EmulateCursorGDI,
+  VertexProcess, OptimizePartDyna, one more bool). Binary file (TMNF/TMUF, `Documents\TrackMania\Config`, shared
+  by both games): the u32 at index 1, written in place like the display fields above. Text file (ESWC, Sunrise,
+  Original, next to the exe): the line after DisableShadowBuffer; the value is one digit, so the chunk keeps its
+  byte count and only that byte changes.
+- A copy in `%LOCALAPPDATA%\VirtualStore\Program Files...` wins over the file in a Program Files folder (an old
+  game without admin rights reads and writes that copy).
+- Write: dialog with old -> new, backup copy, `syscfg-journal.json` entry, self-check (GpuSync is the new value,
+  display settings unchanged, text file same size), refused while the game runs. Undo is the panel's Undo of the
+  game config (copies the original back).
+- Folder not writable (text file in Program Files, no VirtualStore copy): shown read only with "Open game
+  launcher" (`TmForeverLauncher.exe` / `TmNationsESWCLauncher.exe` when present); nothing is elevated.
+- Game page recommendation (`GpuSyncTip`, top of the page, every D3D9 game) while the value is Immediate: "More
+  FPS: Cpu/Gpu synchro 1 Frame", the trade-off in the text and tooltip. Writable: "Set 1 Frame" writes 5 on that
+  click (same backup/journal path) and the toast offers Undo; not writable: "Open game launcher" with the line
+  where the setting is. "Not now" hides it for that game (local preference). Nothing is changed without a click.
+- Original has only this part of the panel (and the Smoothing hint).
+- Checked read only against my real files: TMNF binary file and the ESWC, Sunrise and Original text files all
+  read 7, and the round trip 7 -> 5 -> 7 gives the same display settings. Not tested in the game.
+
+## Smoothing hint
+
+When the Horizon Client is installed for the game (legacy folder or TMLoader product for Forever), the Optimize tab
+ends with one line pointing to the in-game switches: Insert > Horizon Performance > Smoothing (Timer 1 ms and more).
 
 ## Benchmark
 
@@ -78,12 +116,31 @@ Optional switch per game (experimental, not tested in the game). On puts two fil
 and `dxvk.conf` (`d3d9.maxFrameLatency = 1`). The archive is cached in `<launcher data>\dxvk\`. The dialog lists
 the files first. `dxvk-journal.json` records path, SHA-256 and what was there before (always nothing).
 
-Refused, nothing written: the game runs; the folder is protected or not writable (Program Files without admin);
+Refused, nothing written: the game runs; the folder is protected (the ESWC folder in Program Files, `fsx.rs`);
 a `d3d9.dll` is already there (TM Vibrant Shaders or the Sunrise repack's own proxy load the system d3d9 by full
-path, so DXVK cannot sit behind them); a `dxvk.conf` that I did not write.
+path, so DXVK cannot sit behind them; this is checked before write access, so the panel names it even in
+Program Files); a `dxvk.conf` that I did not write.
 
 Off removes exactly my two files, each only while its SHA-256 still matches the journal; a changed file stays
 and the panel says so (it then also blocks switching on again until I remove it by hand).
+
+### Game folder in Program Files (admin rights)
+
+TMNF/TMUF install to `C:\Program Files (x86)\TmNationsForever` / `TmUnitedForever` by default; the user cannot
+write there. The panel then shows "Install with admin rights" (and "Remove with admin rights" while DXVK is on):
+
+- The verified dll and the conf are staged in `<launcher data>\dxvk\stage\<time>\` and hashed again.
+- The journal entry is written first (user data, as always).
+- One UAC prompt runs `%SystemRoot%\System32\cmd.exe /d /v:off /s /c "copy /b /y "<staged>" "<game>\d3d9.dll" >nul &&
+  copy /b /y "<staged>" "<game>\dxvk.conf" >nul"` (`elevate.rs`). Nothing else runs elevated: the launcher
+  itself stays a normal process, no folder permissions change. Paths with `"`, `%` or control characters and
+  the protected ESWC folder are refused before the prompt.
+- Afterwards the unelevated side hashes both files in the game folder. Both match: on. Neither arrived: the
+  journal entry is closed and the step's error is shown (`cancelled` for a declined prompt). Only one matches:
+  `verify`, the entry stays open so Off removes what arrived.
+- Off: the files whose hash still matches are deleted with one elevated `del /f /q "<file>"` per file; the
+  journal entry is closed only when they are gone. A declined prompt changes nothing.
+- The stage folder is removed after each attempt.
 
 Whether the Competition Patch accepts DXVK is unknown, I do not claim it is allowed. Online it changes only
 how the image is drawn, not tested in the game.

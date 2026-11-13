@@ -5,7 +5,8 @@ import { buildApp } from './app.ts';
 import { publishDue } from './services/versions.ts';
 import { crawlTick } from './sources/crawler.ts';
 import { currentIndex, rebuildIndex } from './services/hubindex.ts';
-import { recheckDue } from './services/gameservers.ts';
+import { pollTick } from './services/serverpoll.ts';
+import { removeLongOffline } from './services/gameservers.ts';
 import { discoverTick } from './services/discover-github.ts';
 
 const cfg = loadConfig();
@@ -30,21 +31,28 @@ const tick = async () => {
 const timer = setInterval(tick, 60_000);
 setTimeout(tick, 5_000);
 
-// Game servers: ask every listed server again every 6 hours (own loop, so the slow queries never hold up publishing).
-let rechecking = false;
+// Game servers: the live list. Every listed server is asked directly on its game port every 90 s (backing off to
+// 10 min while it does not answer); own loop, so the slow queries never hold up publishing. The old 6-hourly
+// re-check is replaced by this (the poll refreshes names and offline marks too).
+let polling = false;
 const serverTick = async () => {
-  if (rechecking) return;
-  rechecking = true;
+  if (polling) return;
+  polling = true;
   try {
-    if (await recheckDue(ctx)) await rebuildIndex(ctx);
+    if (cfg.SERVER_POLL) await pollTick(ctx);
+    if (Date.now() - lastClean > 6 * 3600_000) {
+      lastClean = Date.now();
+      if ((await removeLongOffline(ctx)).length) await rebuildIndex(ctx);
+    }
   } catch (e) {
-    console.error('[hub] server re-check failed', (e as Error).message);
+    console.error('[hub] server poll failed', (e as Error).message);
   } finally {
-    rechecking = false;
+    polling = false;
   }
 };
-const serverTimer = setInterval(serverTick, 10 * 60_000);
-setTimeout(serverTick, 30_000);
+let lastClean = Date.now();
+const serverTimer = setInterval(serverTick, 10_000);
+setTimeout(serverTick, 20_000);
 
 await app.listen({ host: cfg.HOST, port: cfg.PORT });
 console.log(`[hub] listening on http://${cfg.HOST}:${cfg.PORT} (${cfg.NODE_ENV}, db ${cfg.DATABASE_URL.split(':')[0]}, storage ${cfg.STORAGE}${cfg.HUB_DEV_LOGIN ? ', DEV LOGIN ON' : ''})`);

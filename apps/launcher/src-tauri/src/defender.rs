@@ -53,7 +53,9 @@ pub fn start_error(path: &Path, code: Option<i32>) -> Option<String> {
     if !could_be_block(code) {
         return None;
     }
-    let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    // Split on both separators: a Windows path seen on another OS (tests on Linux CI) has no `file_name`.
+    let full = path.to_string_lossy();
+    let name = full.rsplit(['\\', '/']).next().unwrap_or_default().to_string();
     (matches!(code, Some(225) | Some(226)) || blocks(path)).then(|| format!("{MARK}{name}"))
 }
 

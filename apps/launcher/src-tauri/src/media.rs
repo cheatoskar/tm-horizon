@@ -408,10 +408,10 @@ mod tests {
         let d = t.path();
         put(&d.join("TrackMania/screenshots/a.jpg"), b"1");
         std::thread::sleep(std::time::Duration::from_millis(30));
-        put(&d.join("TrackMania/ScreenShots/2024/b.PNG"), b"22");
-        put(&d.join("TrackMania/ScreenShots/2024/deep/c.jpg"), b"x");
-        put(&d.join("TrackMania/ScreenShots/notes.txt"), b"x");
-        put(&d.join("TrackMania/ScreenShots/shot.tga"), b"x");
+        put(&d.join("TrackMania/screenshots/2024/b.PNG"), b"22");
+        put(&d.join("TrackMania/screenshots/2024/deep/c.jpg"), b"x");
+        put(&d.join("TrackMania/screenshots/notes.txt"), b"x");
+        put(&d.join("TrackMania/screenshots/shot.tga"), b"x");
         std::thread::sleep(std::time::Duration::from_millis(30));
         put(&d.join("TrackMania/Clips/run.mp4"), b"333");
         put(&d.join("TrackMania/TMVS/photo_001.png"), b"4");
@@ -448,10 +448,10 @@ mod tests {
         let t = docs();
         let l = list(&specs(Some(t.path()), &[]));
         let keep = wanted(&l.items);
-        let p = t.path().join("TrackMania/ScreenShots/2024/b.PNG");
+        let p = t.path().join("TrackMania/screenshots/2024/b.PNG");
         let (size, m) = crate::thumbs::stamp(&p).unwrap();
         assert!(keep.contains(&crate::thumbs::key(&p, size, &m, crate::thumbs::Variant::Thumb)));
-        let tga = t.path().join("TrackMania/ScreenShots/shot.tga");
+        let tga = t.path().join("TrackMania/screenshots/shot.tga");
         let (size, m) = crate::thumbs::stamp(&tga).unwrap();
         assert!(keep.contains(&crate::thumbs::key(&tga, size, &m, crate::thumbs::Variant::View)));
     }
@@ -483,11 +483,11 @@ mod tests {
         let never = |_: &Path| -> Result<(), String> { panic!("must not delete") };
         let p = |x: PathBuf| vec![x.to_string_lossy().to_string()];
         assert!(delete(&p(outside.path().join("x.jpg")), &sp, never).is_err());
-        assert!(delete(&p(t.path().join("TrackMania/ScreenShots/notes.txt")), &sp, never).is_err());
-        assert!(delete(&p(t.path().join("TrackMania/ScreenShots/2024/deep/c.jpg")), &sp, never).is_err());
+        assert!(delete(&p(t.path().join("TrackMania/screenshots/notes.txt")), &sp, never).is_err());
+        assert!(delete(&p(t.path().join("TrackMania/screenshots/2024/deep/c.jpg")), &sp, never).is_err());
         assert!(delete(&p(t.path().join("TrackMania/TMVS/other.png")), &sp, never).is_err());
-        assert!(delete(&p(t.path().join("TrackMania/ScreenShots/2024")), &sp, never).is_err());
-        assert!(delete(&p(t.path().join("TrackMania/ScreenShots/../../../x.jpg")), &sp, never).is_err());
+        assert!(delete(&p(t.path().join("TrackMania/screenshots/2024")), &sp, never).is_err());
+        assert!(delete(&p(t.path().join("TrackMania/screenshots/../../../x.jpg")), &sp, never).is_err());
         assert!(delete(&[], &sp, never).is_err());
         // one bad path refuses the whole call
         let mixed = vec![t.path().join("TrackMania/Clips/run.mp4").to_string_lossy().to_string(), outside.path().join("x.jpg").to_string_lossy().to_string()];
@@ -498,7 +498,7 @@ mod tests {
     fn delete_calls_trash_for_valid_files() {
         let t = docs();
         let sp = specs(Some(t.path()), &[]);
-        let f = t.path().join("TrackMania/ScreenShots/2024/b.PNG");
+        let f = t.path().join("TrackMania/screenshots/2024/b.PNG");
         let seen = std::cell::RefCell::new(Vec::new());
         let r = delete(&[f.to_string_lossy().to_string()], &sp, |p| {
             seen.borrow_mut().push(p.to_path_buf());

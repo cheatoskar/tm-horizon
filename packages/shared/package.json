@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/shared",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Hub data types (the shapes of packages/api/dist) and the design tokens of the launcher and the website.",
   "license": "AGPL-3.0-only",
