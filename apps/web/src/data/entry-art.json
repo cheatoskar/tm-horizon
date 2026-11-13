@@ -1,0 +1,997 @@
+{
+ "100tmx": {
+  "url": "https://100tmx.com/opengraph-image?a92cdc1e83e43227",
+  "ext": "png",
+  "kind": "logo",
+  "source": "og:image",
+  "checked": "2026-11-11"
+ },
+ "adminserv": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "adminserv-neo": {
+  "url": "https://gitlab.com/assets/apple-touch-icon-b049d4bc0dd9626f31db825d61880737befc7835982586d015bded10b4435460.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "awesome-trackmania": {
+  "url": "https://avatars.githubusercontent.com/u/33872428?v=4&s=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "github organisation",
+  "checked": "2026-11-11"
+ },
+ "dedimania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "discord-developers": {
+  "url": "https://cdn.discordapp.com/icons/209098370453602304/80c1a1f172cb4a3b8ea962b457ef138c.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-dirt-league": {
+  "url": "https://cdn.discordapp.com/icons/495287561590145036/9e360020647b0750ecaf5be001e96a7a.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-evo": {
+  "url": "https://cdn.discordapp.com/icons/384138149686935562/f9761fbfc672f71b65164c53ccf9b832.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-evo-discovery": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "discord-fullspeed": {
+  "url": "https://cdn.discordapp.com/icons/614885345871396875/484c03b027c06cb65ac8863d6233605c.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-maji-discovery": {
+  "url": "https://cdn.discordapp.com/icons/793535191133192224/1d4b38330c7f4cba96cc65e63f3b04bf.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-mania-exchange": {
+  "url": "https://cdn.discordapp.com/icons/288311888842850304/4084acf773850232ec1f3cc624f036fc.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-maniapark": {
+  "url": "https://cdn.discordapp.com/icons/408708765668605994/b258125f7ad26c864018403b33fd41e0.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-nascar": {
+  "url": "https://cdn.discordapp.com/icons/517810269855023105/2594e0deba6a81a14388c90a0cc0c4cf.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-news": {
+  "url": "https://cdn.discordapp.com/icons/260804512552452096/66724517d78ec4aa07650841e63ad6fa.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-openplanet": {
+  "url": "https://cdn.discordapp.com/icons/276076890714800129/5006a664cb1f49dd37abcd350ce44dec.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-openplanet-botlist": {
+  "url": "https://discordbotlist.com/apple-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "discord-planet-dirt-cup": {
+  "url": "https://cdn.discordapp.com/icons/370969903869460480/440fc91e5d47493c1d13dfd05a8e4a0a.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-pursuit": {
+  "url": "https://cdn.discordapp.com/icons/229678938098630656/be142ce56d8bd80898dc9fafea25b329.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-rpg-trial": {
+  "url": "https://cdn.discordapp.com/icons/308050026884497410/63e24ba58306cdec3894a550452ac9ef.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-smurfen": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "discord-speedrunning": {
+  "url": "https://cdn.discordapp.com/icons/396655697334501376/2bcdeb3bb7e94e46722fe046449642cc.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-tm-one": {
+  "url": "https://cdn.discordapp.com/icons/279576786529157121/df529f02bf0e2404e9d9a3c3f6be4361.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-tma-discovery": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "discord-tmcs": {
+  "url": "https://cdn.discordapp.com/icons/476031003341750274/fe6a07b43ec70bb0808528752c5589ac.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-tmx-allround": {
+  "url": "https://cdn.discordapp.com/icons/522098290032902145/41f09c43715c55cb187d864a5fb2d7d8.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-trackmania-discovery": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "discord-trackmania-hub": {
+  "url": "https://cdn.discordapp.com/icons/158349559959912448/f6d3023ea57e95e35e33d243fa82480c.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-united-designers": {
+  "url": "https://cdn.discordapp.com/icons/530532629477326848/8db7bd0391c818d023046ce6f1fdb74a.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "discord-world-team-cup": {
+  "url": "https://cdn.discordapp.com/icons/317972339700793345/786007d996159ada00da6523507b37a5.png?size=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "discord invite",
+  "checked": "2026-11-11"
+ },
+ "docker-tmnf": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "env-tm-highlands": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "evosc": {
+  "url": "https://avatars.githubusercontent.com/u/33872428?v=4&s=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "github organisation",
+  "checked": "2026-11-11"
+ },
+ "evosc-old": {
+  "url": "https://avatars.githubusercontent.com/u/137595137?v=4&s=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "github organisation",
+  "checked": "2026-11-11"
+ },
+ "fancymanialinks": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "forevertas": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "gbx-net": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "gbx-tools-wolfgang": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "gbx-wiki-gbx": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "gbxdump": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "gbxedit": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "huntmania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "item-exchange": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "item-exchange-tm2": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "kacky": {
+  "url": "https://discordbotlist.com/apple-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "krzychor-campaign-maker": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "liquipedia": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "liquipedia-tournaments": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mania-actu": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mania-exchange-hub": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mania-exchange-sm": {
+  "url": "https://images.mania.exchange/logos/mx/square_sm.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "mania-exchange-tm2": {
+  "url": "https://images.mania.exchange/logos/mx/square_sm.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "mania-server-manager": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniacalendar": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniacontrol": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniapark": {
+  "url": "https://images.mania-exchange.com/logos/mp/logo.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 600px",
+  "checked": "2026-11-11"
+ },
+ "maniapark-old": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniaplanet-doc": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniaplanet-forum": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniaplanet-official": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "maniascript-ref": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mapedit": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "marie-stuff": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-classic-advertising": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-hitbox-highlandscar": {
+  "url": "https://maniapark.com/image/Ia4AGo-ZSkaxorv3Fq7oJQ?hq=false",
+  "ext": "webp",
+  "kind": "preview",
+  "source": "maniapark og:image",
+  "checked": "2026-11-11"
+ },
+ "mod-medal-cars": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-nando-banner": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-nando-banners": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-stadiumcar-para-skin": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-tm-advertisements": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mod-tm-wii-skin-pack": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "mx-api-docs": {
+  "url": "https://images.mania.exchange/logos/api/square_sm.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 600px",
+  "checked": "2026-11-11"
+ },
+ "nadeo-api-docs": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "nadeo-api-py": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "nadeo-live-leaderboards": {
+  "url": "https://webservices.openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "nadeo-oauth-docs": {
+  "url": "https://webservices.openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "nadeo-webservices-docs": {
+  "url": "https://webservices.openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "nations-converter": {
+  "url": "https://bigbang1112.eu/nc/assets/favicon/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "nations-converter-news": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "openplanet-docs": {
+  "url": "https://openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "pyplanet": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "reddit-tmnf": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "reddit-trackmania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "rmc-openplanet": {
+  "url": "https://openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "rmct-weekly": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "servers-tmf-wrapper": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "skin-uploads-doc": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "smurfen": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "southmoon-cars": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-api": {
+  "url": "https://avatars.githubusercontent.com/u/11006616?v=4&s=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "github organisation",
+  "checked": "2026-11-11"
+ },
+ "speedrun-tm2020": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tm2canyon": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tm2lagoon": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tm2stadium": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tm2valley": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tmnf": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tmo": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tmturbo": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "speedrun-tmuf": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "statsmania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "steam-tmnf-discussion-servers": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "steam-workshop-tm2-canyon": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "steam-workshop-tm2-lagoon": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "steam-workshop-tm2-stadium": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "steam-workshop-tm2-valley": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-forevertas": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-linesight": {
+  "url": "https://avatars.githubusercontent.com/u/173616704?v=4&s=128",
+  "ext": "png",
+  "kind": "logo",
+  "source": "github organisation",
+  "checked": "2026-11-11"
+ },
+ "tas-plugin-docs": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-saimoen-finetuner": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-saimoen-incremental": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-saimoen-site": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-shweetz-drawfuture": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-shweetz-lowinputbf": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-shweetz-nosepos": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-tminterface-client-python": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tas-tminterface-public": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tick": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm-live": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm-masters": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm-rpg-trial": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm2-dedicated": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm2-dedicated-docs": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tm2020-dedicated": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmf-net": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tminterface": {
+  "url": "https://donadigo.com/assets/images/icons/ificon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "tmloader-index",
+  "checked": "2026-11-11"
+ },
+ "tmnf-dedicated-docs": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmnf-exchange": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmnf-hub-gamers": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmnf-plugins": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmnf-tracksigns": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmnforever-tm-exchange": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmr-remastered": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmtas-exchange": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmtelemetry": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmuf-exchange": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmx-api-nuget": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmx-legacy-root": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "tmx-nations": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmx-original": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "tmx-sunrise": {
+  "url": "https://images.mania.exchange/logos/tm1x/logo_sq.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "trackmania-carpark": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "trackmania-doc": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "trackmania-exchange": {
+  "url": "https://images.mania.exchange/logos/tmx/square_sm.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "icon 800px",
+  "checked": "2026-11-11"
+ },
+ "trackmania-io": {
+  "url": "https://trackmania.io/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "trackmania-official": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "trackmania-open": {
+  "url": "https://trackmaniaopen.com/wp-content/uploads/2026/06/cropped-deai-yarikata-180x180.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "trackmania-skins-revamped": {
+  "url": "https://forums.pixeltailgames.com/uploads/default/optimized/3X/0/5/05ba85afd5944e4281c2c163b6c913d3485dbd38_2_180x180.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "trackstudio": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "twitch-trackmania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "uaseco": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "ubisoft-nadeo-medium": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "ultimate-medals": {
+  "url": "https://openplanet.dev/img/apple-touch-icon.png",
+  "ext": "png",
+  "kind": "logo",
+  "source": "apple-touch-icon",
+  "checked": "2026-11-11"
+ },
+ "vscode-maniascript": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "xaseco": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "xaseco-wiki": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "youtube-trackmania": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ },
+ "zrt-tmcup": {
+  "url": null,
+  "kind": null,
+  "source": null,
+  "checked": "2026-11-11"
+ }
+}

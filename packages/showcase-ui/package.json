@@ -1,0 +1,41 @@
+{
+  "name": "@tm-hub/showcase-ui",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Renders mod showcase pages (declarative blocks, packages/shared/src/showcase.ts): the same React components in the launcher, the portal preview and, as static markup, the website. Also the README renderer (readme.ts, ReadmeView, readme.css) shared by launcher, portal and website.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/test.mjs",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./showcase.css": "./src/showcase.css",
+    "./enhance": {
+      "types": "./src/enhance.ts",
+      "default": "./src/enhance.ts"
+    },
+    "./readme.css": "./src/readme.css",
+    "./readme": {
+      "types": "./src/readme.ts",
+      "default": "./src/readme.ts"
+    }
+  },
+  "dependencies": {
+    "@tm-hub/shared": "*",
+    "lucide-react": "^0.460.0",
+    "marked": "^14.1.4",
+    "parse5": "^8.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "typescript": "5.6"
+  }
+}

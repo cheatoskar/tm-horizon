@@ -1,0 +1,38 @@
+---
+// Showcase page of a mod (packages/shared/src/showcase.ts), rendered once at build time by the same React
+// components the launcher uses (react-dom/server, no client framework). The slider and the click-to-load
+// video buttons get their small script from @tm-hub/showcase-ui/enhance.
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { ShowcaseView, type ShowcaseLabels } from '@tm-hub/showcase-ui';
+import '@tm-hub/showcase-ui/showcase.css';
+import type { Showcase } from '@tm-hub/shared/showcase';
+import { gameById } from '../data/games';
+import { t, type Lang } from '../i18n';
+import { webImg } from '@tm-hub/shared/extimg';
+interface Props {
+  showcase: Showcase;
+  lang?: Lang;
+  /** tmhub://install/<id>: the install buttons of the showcase. */
+  installHref?: string;
+  companion?: { label: string; url: string } | null;
+  releases?: { version: string; date?: string | null; notes: string }[];
+}
+const { showcase, lang = 'en', installHref, companion = null, releases = [] } = Astro.props;
+const ProxiedImg = ({ url, alt, className }: { url: string; alt: string; className?: string }) => {
+  const src = webImg(url);
+  return src ? createElement('img', { className, src, alt, loading: 'lazy', decoding: 'async' }) : null;
+};
+const KEYS: (keyof ShowcaseLabels)[] = ['compat', 'hotkeys', 'changelog', 'faq', 'game', 'status', 'keyHeader', 'action', 'works', 'partial', 'planned', 'no', 'before', 'after', 'compareHint', 'playVideo', 'videoNote', 'openVideo', 'install', 'version'];
+const labels = Object.fromEntries(KEYS.map((k) => [k, t(lang, 'showcase.' + k, { provider: '{provider}' })])) as unknown as ShowcaseLabels;
+const html = renderToStaticMarkup(createElement(ShowcaseView, {
+  showcase,
+  // Pictures through our image proxy (/ext-img/); a picture from any other host is left out.
+  ctx: { labels, gameName: (id: string) => gameById[id]?.name ?? id, installHref, companion, releases, Img: ProxiedImg },
+}));
+---
+<Fragment set:html={html} />
+<script>
+  import { enhanceShowcases } from '@tm-hub/showcase-ui/enhance';
+  enhanceShowcases();
+</script>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Settings of plugin.horizon_announce.php (TM Horizon announce plugin for XAseco 1.x). -->
+<horizon_announce>
+	<!-- Address of the TM Horizon hub, with https:// (the hub operator tells you). -->
+	<hub_url>https://hub.example.org/</hub_url>
+	<!-- The announce token you got after the approval. Keep it secret; it belongs to this server only. -->
+	<token></token>
+</horizon_announce>

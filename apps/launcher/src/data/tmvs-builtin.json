@@ -1,0 +1,240 @@
+[
+ {
+  "id": "vibrant",
+  "name": "Vibrant",
+  "description": "The default. Warm sun, rich colours, glowing borders, light shafts.",
+  "tags": [
+   "day"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/vibrant.jpg"
+ },
+ {
+  "id": "realistic",
+  "name": "Realistic",
+  "description": "The game's own colours and sky; only the light is new.",
+  "tags": [
+   "day",
+   "realistic"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/realistic.jpg"
+ },
+ {
+  "id": "golden_hour",
+  "name": "Golden Hour",
+  "description": "Clear sky, low warm sun, long light shafts.",
+  "tags": [
+   "sunset",
+   "day"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/golden_hour.jpg"
+ },
+ {
+  "id": "dreamy",
+  "name": "Dreamy",
+  "description": "Soft pastel bloom, pink and teal.",
+  "tags": [
+   "day",
+   "pastel"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/dreamy.jpg"
+ },
+ {
+  "id": "neon",
+  "name": "Neon",
+  "description": "Starry night, bright neon that lights up the whole track.",
+  "tags": [
+   "night",
+   "neon"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/neon.jpg"
+ },
+ {
+  "id": "horizon",
+  "name": "Horizon",
+  "description": "A glowing black hole and a ringed planet over a dark stadium.",
+  "tags": [
+   "night",
+   "space"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/horizon.jpg"
+ },
+ {
+  "id": "aurora",
+  "name": "Aurora",
+  "description": "Northern lights over the track, green and teal.",
+  "tags": [
+   "night"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/aurora.jpg"
+ },
+ {
+  "id": "competition",
+  "name": "Competition",
+  "description": "Clarity first: shadows and depth, no haze or lens effects.",
+  "tags": [
+   "day",
+   "clarity",
+   "lightweight"
+  ],
+  "load": 1,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/competition.jpg"
+ },
+ {
+  "id": "performance",
+  "name": "Performance",
+  "description": "The Vibrant look for weaker GPUs: fewer samples, no shafts.",
+  "tags": [
+   "day",
+   "lightweight"
+  ],
+  "load": 1,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/performance.jpg"
+ },
+ {
+  "id": "rainy",
+  "name": "Rainy",
+  "description": "Overcast, wet track, puddles and rain.",
+  "tags": [
+   "rain",
+   "weather"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/rainy.jpg"
+ },
+ {
+  "id": "replay_cinema",
+  "name": "Replay Cinema",
+  "description": "Film look with motion blur and depth of field, for replays.",
+  "tags": [
+   "cinematic",
+   "replay"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/replay_cinema.jpg"
+ },
+ {
+  "id": "storm",
+  "name": "Storm",
+  "description": "Low clouds, pouring rain, deep puddles, lightning and thunder.",
+  "tags": [
+   "rain",
+   "weather",
+   "storm"
+  ],
+  "load": 3,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/storm.jpg"
+ },
+ {
+  "id": "snowstorm",
+  "name": "Snowstorm",
+  "description": "A blizzard: driving snow and thick haze close around you.",
+  "tags": [
+   "snow",
+   "weather"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/snowstorm.jpg"
+ },
+ {
+  "id": "horror",
+  "name": "Horror",
+  "description": "Black night in thick fog. Only your headlights light the road.",
+  "tags": [
+   "night",
+   "dark"
+  ],
+  "load": 2,
+  "games": [
+   "tmnf",
+   "tmuf",
+   "eswc",
+   "tm2"
+  ],
+  "image": "tmvs/builtin/horror.jpg"
+ }
+]

@@ -1,0 +1,114 @@
+---
+import { webImg } from '@tm-hub/shared/extimg';
+import Icon from './Icon.astro';
+import Thumb from './Thumb.astro';
+import { compact, ago, day, safeLink } from '../lib/fmt';
+import { t, lh, nf, type Lang } from '../i18n';
+import { installLink } from '../lib/links';
+import type { Item } from '../data/site';
+interface Props { it: Item; kind?: string; small?: boolean; lang?: Lang }
+const { it, kind = 'mods', small = false, lang = 'en' } = Astro.props;
+const server = kind === 'servers';
+const dir = it.dir;
+const noLink = !!it.noLink || !it.href || !!dir;
+const ext = it.external && !server && !noLink;
+const href = it.external ? it.href : lh(lang, it.href);
+const text = `${it.title} ${it.author ?? ''} ${it.desc} ${it.chips.map((c) => c.label).join(' ')}`.toLowerCase();
+const comm = server ? it.community : undefined;
+const full = server && it.max && !comm ? it.players! / it.max : 0;
+const links = comm ? [{ icon: 'message-circle', title: t(lang, 'server.contact'), l: safeLink(comm.contact) }, { icon: 'globe', title: t(lang, 'server.homepage'), l: safeLink(comm.homepage) }].filter((x) => x.l) : [];
+const status = comm ? (comm.online === true ? 'on' : comm.online === false ? 'off' : '') : '';
+---
+<article
+  class={`rc ${server ? 'srv' : ''} ${small ? 'small' : ''}`}
+  data-item
+  data-text={text}
+  data-name={it.title.toLowerCase()}
+  data-games={it.games.join(' ')}
+  data-cat={it.cat}
+  data-sys={it.sys ?? ''}
+  data-online={it.online ?? ''}
+  data-status={it.status}
+  data-downloads={it.downloads ?? (server ? it.players : -1)}
+  data-stars={it.stars ?? -1}
+  data-updated={it.updated ?? ''}
+  data-region={it.region ?? ''}
+  data-active={it.active === false ? 'no' : 'yes'}
+  data-members={dir?.members ?? -1}
+  data-presence={dir?.online ?? -1}
+>
+  <div class="rc-icon">
+    <Thumb src={it.icon ?? it.image} seed={it.key} glyph={it.glyph} size={small ? 64 : 96} cover={server || (!it.icon && !!it.image)} />
+    {server && !comm && it.players! > 0 && <span class="live-dot" title={t(lang, 'server.playersOnline')}></span>}
+    {comm && status === 'on' && <span class="live-dot" title={t(lang, 'server.reachable')}></span>}
+  </div>
+  <div class="rc-main">
+    <h3 class="rc-title">
+      {server
+        ? <span class="rc-name tm-name" set:html={it.titleHtml ?? it.title} />
+        : noLink ? <span class="rc-name">{it.title}</span> : <a class="rc-name" href={href} rel={ext ? 'noopener' : undefined}>{it.title}</a>}
+      {it.author && <span class="rc-by">{server ? t(lang, 'card.on') : t(lang, 'card.by')} {it.author}</span>}
+      {ext && <Icon name="external-link" size={15} class="rc-ext" />}
+    </h3>
+    {it.desc && <p class="rc-desc">{server ? <><Icon name="map-pin" size={15} /> {it.desc}</> : it.desc}</p>}
+    <div class="chips">
+      {it.chips.map((c) => (
+        <span class={`chip ${c.tone ?? ''}`} title={c.title}>
+          {c.img && webImg(c.img) ? <img src={webImg(c.img)!} alt="" loading="lazy" /> : c.icon ? <Icon name={c.icon} size={14} /> : null}
+          {c.label}
+        </span>
+      ))}
+    </div>
+    {comm && (status || links.length > 0) && (
+      <div class="owner">
+        {status === 'on' && <span class="srv-status"><span class="dot st-alive"></span>{t(lang, 'server.online')}</span>}
+        {status === 'off' && <span class="srv-status"><span class="dot st-off"></span>{comm.lastSeen ? t(lang, 'server.lastSeen', { when: ago(comm.lastSeen, lang) }) : t(lang, 'server.offline')}</span>}
+        {links.map((x) => x.l!.href
+          ? <a class="owner-link" href={x.l!.href} rel="noopener nofollow ugc" target="_blank" title={x.title}><Icon name={x.icon} size={14} />{x.l!.label}<Icon name="external-link" size={12} /></a>
+          : <span class="owner-link" title={x.title}><Icon name={x.icon} size={14} />{x.l!.label}</span>)}
+      </div>
+    )}
+  </div>
+  <div class="rc-stats">
+    {dir ? (
+      <>
+        <div class="stat-row">
+          {dir.members != null && <span class="stat" title={t(lang, 'comm.members')}><Icon name="users" size={18} /><b>{compact(dir.members, lang)}</b></span>}
+          {dir.online != null && <span class="stat" title={t(lang, 'comm.online')}><span class="dot st-alive"></span><b>{compact(dir.online, lang)}</b></span>}
+        </div>
+        {dir.alive === false
+          ? <span class="btn sm join" aria-disabled="true"><Icon name="link-2-off" size={15} />{t(lang, 'status.expired')}</span>
+          : <a class="btn sm primary join" href={dir.url} target="_blank" rel="noopener noreferrer nofollow ugc"><Icon name={dir.invite ? 'log-in' : 'external-link'} size={15} />{dir.invite ? t(lang, 'btn.join') : t(lang, 'btn.open')}</a>}
+        {it.statLabel && <span class="stat upd" title={t(lang, 'comm.checkedBy')}><Icon name="shield-check" size={17} /><span>{t(lang, 'card.checked', { date: day(it.statLabel, lang) })}</span></span>}
+      </>
+    ) : server ? (
+      <>
+        {!comm && <div class="players"><Icon name="users" size={18} /><b>{it.players}</b><span>/ {it.max}</span></div>}
+        {!comm && <div class="meter" aria-hidden="true"><i style={`width:${Math.max(3, Math.round(full * 100))}%`}></i></div>}
+        {it.join && !it.sample
+          ? <a class="btn sm primary join" href={it.join}><Icon name="play" size={15} />{t(lang, 'btn.join')}</a>
+          : comm?.address
+            ? (
+              <div class="addr">
+                <code>{comm.address}</code>
+                <button class="btn sm" type="button" data-copy={comm.address}><Icon name="copy" size={15} /><span data-copy-l>{t(lang, 'btn.copy')}</span></button>
+                <small>{t(lang, 'server.addressHint')}</small>
+              </div>
+            )
+            : <span class="btn sm join" aria-disabled="true"><Icon name="play" size={15} />{t(lang, 'btn.join')}</span>}
+      </>
+    ) : (
+      <>
+        <div class="stat-row">
+          {it.downloads != null && it.downloads >= 0 && <span class="stat" title={t(lang, 'card.releaseDownloads', { n: nf(lang, it.downloads) })}><Icon name="download" size={18} /><b>{compact(it.downloads, lang)}</b></span>}
+          {it.stars != null && it.stars >= 0 && <span class="stat" title={t(lang, 'card.stars', { n: nf(lang, it.stars) })}><Icon name="star" size={18} /><b>{compact(it.stars, lang)}</b></span>}
+          {it.downloads == null && it.stars == null && it.version && <span class="stat vtag" title={t(lang, 'card.latestVersion')}><Icon name="tag" size={17} /><b>{it.version.startsWith('v') ? it.version : 'v' + it.version}</b></span>}
+          {it.downloads == null && it.stars == null && !it.version && it.status && ['alive', 'unclear', 'dead'].includes(it.status) && <span class={`stat st-${it.status}`}><span class="dot"></span>{t(lang, `status.${it.status}`)}</span>}
+        </div>
+        {it.canInstall && it.installId && <a class="btn sm primary join" href={installLink(it.installId)} title={t(lang, 'btn.installTip')}><Icon name="download" size={15} />{t(lang, 'btn.install')}</a>}
+        {it.updated ? <span class="stat upd" title={day(it.updated, lang)}><Icon name="history" size={17} /><span data-ago={it.updated}>{ago(it.updated, lang)}</span></span>
+          : it.statLabel ? <span class="stat upd" title={t(lang, 'card.lastCheck')}><Icon name="shield-check" size={17} /><span>{t(lang, 'card.checked', { date: day(it.statLabel, lang) })}</span></span> : null}
+      </>
+    )}
+  </div>
+</article>

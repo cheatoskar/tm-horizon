@@ -1,0 +1,250 @@
+# Release build, triggered by pushing a tag v* (docs/release.md).
+# Builds the Windows installer (NSIS) and the Linux packages (AppImage, deb, rpm), puts them with a
+# SHA256SUMS file into ONE draft GitHub release for the tag and, when signing is set up, also writes
+# latest.json for the in-app updater (also copied to the `updater-beta` release for the beta channel).
+# Tags with -beta or -rc in the name become prereleases.
+#
+# Signing is optional: secret TAURI_SIGNING_PRIVATE_KEY (+ TAURI_SIGNING_PRIVATE_KEY_PASSWORD) and
+# repository variable TAURI_UPDATER_PUBKEY. Without them the bundles are built unsigned, latest.json is
+# skipped and the build still succeeds.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            bundles: nsis
+            dirs: nsis
+          - name: Linux
+            os: ubuntu-22.04
+            bundles: appimage,deb
+            dirs: appimage deb rpm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tauri system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
+            librsvg2-dev patchelf build-essential curl wget file libssl-dev libxdo-dev
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/launcher/src-tauri
+          key: release-${{ matrix.os }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # The tag must match the app version, otherwise the installer and latest.json disagree.
+      - name: Check tag against app version
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          conf=$(node -p 'require("./apps/launcher/src-tauri/tauri.conf.json").version')
+          if [ "v$conf" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match version $conf in tauri.conf.json"
+            exit 1
+          fi
+
+      # Signing config as a JSON file (passed with --config), only when key and public key are both set.
+      - name: Updater signing config
+        id: signing
+        shell: bash
+        env:
+          HAS_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY != '' }}
+          PUBKEY: ${{ vars.TAURI_UPDATER_PUBKEY }}
+        run: |
+          if [ "$HAS_KEY" = "true" ] && [ -n "$PUBKEY" ]; then
+            node -e '
+              const fs = require("node:fs");
+              const path = require("node:path");
+              const file = path.join(process.env.RUNNER_TEMP, "updater-config.json");
+              const config = {
+                bundle: { createUpdaterArtifacts: true },
+                plugins: { updater: { pubkey: process.env.PUBKEY } },
+              };
+              fs.writeFileSync(file, JSON.stringify(config));
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, "config=" + file + "\n");
+            '
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No updater signing (secret TAURI_SIGNING_PRIVATE_KEY and variable TAURI_UPDATER_PUBKEY needed): building unsigned bundles, no latest.json."
+          fi
+
+      - name: Build bundles
+        shell: bash
+        working-directory: apps/launcher
+        env:
+          BUNDLES: ${{ matrix.bundles }}
+          SIGNED: ${{ steps.signing.outputs.signed }}
+          UPDATER_CONFIG: ${{ steps.signing.outputs.config }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+          # Public build: no preview-only art (header banners, box covers, ESWC hero), see ART_CREDITS.md.
+          # `beforeBuildCommand` (npm run build) inherits it.
+          TMHUB_PUBLIC_BUILD: '1'
+          # 0.5.x "Launcher Preview": no hub features and no calls to my servers (docs/release.md). Remove when the hub is live.
+          TMHUB_RELEASE_PREVIEW: '1'
+        run: |
+          args=(tauri build --bundles "$BUNDLES")
+          if [ "$SIGNED" = "true" ]; then
+            args+=(--config "$UPDATER_CONFIG")
+          fi
+          npx "${args[@]}"
+
+      # The rpm is built on its own: the released Tauri bundler passes a pre-release version like
+      # 0.3.0-beta.1 unchanged to the rpm crate, which refuses '-' in the Version tag (the fix, '~' instead,
+      # is only on Tauri's dev branch). So a pre-release gets 0.3.0~beta.1 for this one bundle. If it still
+      # fails, the release is built without an rpm (continue-on-error) instead of failing completely.
+      - name: Build rpm
+        if: runner.os == 'Linux'
+        continue-on-error: true
+        shell: bash
+        working-directory: apps/launcher
+        env:
+          UPDATER_CONFIG: ${{ steps.signing.outputs.config }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TMHUB_PUBLIC_BUILD: '1'
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const path = require("node:path");
+            const v = require("./src-tauri/tauri.conf.json").version;
+            const cfg = process.env.UPDATER_CONFIG ? JSON.parse(fs.readFileSync(process.env.UPDATER_CONFIG, "utf8")) : {};
+            cfg.version = v.replace("-", "~");
+            const file = path.join(process.env.RUNNER_TEMP, "rpm-config.json");
+            fs.writeFileSync(file, JSON.stringify(cfg));
+            fs.appendFileSync(process.env.GITHUB_ENV, "RPM_CONFIG=" + file + String.fromCharCode(10));
+          '
+          npx tauri build --bundles rpm --config "$RPM_CONFIG"
+
+      # The product name has a space ("TM Horizon"); GitHub would turn it into a dot in the asset name,
+      # so the files are renamed here and latest.json and SHA256SUMS use the final names.
+      - name: Collect bundles
+        shell: bash
+        env:
+          DIRS: ${{ matrix.dirs }}
+        run: |
+          mkdir -p out
+          bundle=apps/launcher/src-tauri/target/release/bundle
+          for d in $DIRS; do
+            for f in "$bundle/$d"/*; do
+              [ -f "$f" ] || continue
+              case "$f" in
+                *.exe|*.exe.sig|*.AppImage|*.AppImage.sig|*.deb|*.rpm) ;;
+                *) continue ;;
+              esac
+              name=$(basename "$f")
+              cp "$f" "out/${name// /-}"
+            done
+          done
+          ls -l out
+          # Sanity check of the public build: none of the preview-only art may be in the app's frontend.
+          if [ -d apps/launcher/dist/header-art ] || find apps/launcher/dist/store-art -name 'cover.*' | grep -q .; then
+            echo "::error::Preview-only art found in apps/launcher/dist (public build flag not applied)"
+            exit 1
+          fi
+          if [ -z "$(ls -A out)" ]; then
+            echo "::error::No bundles found in $bundle"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.name }}
+          path: out/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Draft release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: out
+
+      - name: latest.json (signed builds only)
+        shell: bash
+        run: |
+          if compgen -G "out/*.sig" > /dev/null; then
+            node scripts/updater-json.mjs --dir out --tag "$TAG" --repo "$GH_REPO" --notes "TM Horizon $TAG" > out/latest.json
+            cat out/latest.json
+          else
+            echo "::notice::No .sig files, so latest.json is skipped (updater signing not set up)."
+          fi
+
+      - name: SHA256SUMS
+        shell: bash
+        working-directory: out
+        run: |
+          sha256sum -- * > ../SHA256SUMS
+          mv ../SHA256SUMS SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Draft release for the tag
+        shell: bash
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG exists, replacing its assets."
+          else
+            flags=(--draft --verify-tag --title "$TAG" --generate-notes)
+            case "$TAG" in
+              *-beta*|*-rc*) flags+=(--prerelease) ;;
+            esac
+            gh release create "$TAG" "${flags[@]}"
+          fi
+          gh release upload "$TAG" out/* --clobber
+
+      - name: Beta channel (updater-beta release)
+        shell: bash
+        run: |
+          if [ ! -f out/latest.json ]; then
+            echo "No latest.json, beta channel not updated."
+            exit 0
+          fi
+          if ! gh release view updater-beta > /dev/null 2>&1; then
+            gh release create updater-beta --prerelease --target "$GITHUB_SHA" \
+              --title "Updater beta channel" \
+              --notes "Holds latest.json for the beta update channel. Replaced by every signed release; no downloads here."
+          fi
+          gh release upload updater-beta out/latest.json --clobber

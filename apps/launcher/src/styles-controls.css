@@ -1,0 +1,32 @@
+/* 0.5.1-c: one control height per toolbar (loaded last).
+   Every row of controls (buttons, selects, segmented toggles, chips, search fields) is a "bar". A bar sets
+   --bar-h once and every control in it takes that height, whatever size class the control itself has
+   (.btn.sm next to a .select used to be 32 px next to 40 px; .seg.sm had no height and stood at 40 px).
+   Page bars (page head, page toolbars) use --ctl-h, section bars (a section's head, card action rows) use
+   --ctl-h-sm. A new toolbar gets the class `ctl-bar` (or `ctl-bar sm`) instead of its own heights.
+   Checked by tools/shoot-051c.mjs (lists rows with mixed heights on every page). */
+.page-head, .toolbar, .ctl-bar { --bar-h: var(--ctl-h); }
+.section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head,
+.inst-actions, .ctl-bar.sm { --bar-h: var(--ctl-h-sm); }
+:root[data-density="compact"] :is(.page-head, .toolbar, .ctl-bar) { --bar-h: var(--ctl-h-sm); }
+
+/* The controls: direct children of a bar or of its button group. */
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions)
+  > :is(.btn, .btn.sm, .select, .seg, .seg.small-seg, .seg.sm, .search, .fchip, input.text-in, select.input, input.input),
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions)
+  > :is(.row-btns, .chips) > :is(.btn, .btn.sm, .select, .seg, .seg.small-seg, .seg.sm, .search, .fchip, input.text-in, select.input, input.input) {
+  height: var(--bar-h);
+  box-sizing: border-box;
+}
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions) .row-btns { align-items: center; }
+
+/* Segmented toggles: 3 px inset, the inner buttons fill the rest (1 px border on each side). */
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions)
+  :is(.seg, .seg.small-seg, .seg.sm) { padding: 3px; align-items: center; }
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions)
+  :is(.seg, .seg.small-seg, .seg.sm) > button { height: calc(var(--bar-h) - 8px); }
+
+/* Selects and chips centre their content at any height; icon-only buttons stay square. */
+:is(.page-head, .toolbar, .ctl-bar, .section-head, .st-head, .md-head, .cs-head, .hm-pane-head, .hs-head, .hc-head, .sub-head, .cl-head, .pd-head, .addons-head, .inst-actions)
+  :is(.select, .fchip) { display: inline-flex; align-items: center; }
+.inst-actions > .btn.icon.tiny { width: var(--bar-h); height: var(--bar-h); }

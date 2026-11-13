@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TM Horizon",
+  "version": "0.5.1",
+  "identifier": "com.tmhorizon.launcher",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "TM Horizon",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "decorations": false,
+        "center": true,
+        "backgroundColor": "#0a0c11",
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost https: data: blob:; media-src 'self' asset: http://asset.localhost blob:; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://streamable.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost",
+      "assetProtocol": {
+        "enable": true,
+        "scope": []
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "publisher": "TM Horizon",
+    "category": "Game",
+    "shortDescription": "One launcher for every TrackMania",
+    "longDescription": "Library, TMLoader mods, TMX maps and ManiaPark skins for every TrackMania game.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "headerImage": "icons/nsis-header.bmp",
+        "sidebarImage": "icons/nsis-sidebar.bmp",
+        "installerIcon": "icons/icon.ico",
+        "displayLanguageSelector": false,
+        "languages": [
+          "English",
+          "German",
+          "French",
+          "Polish"
+        ],
+        "template": "windows/installer.nsi",
+        "customLanguageFiles": {
+          "Polish": "windows/Polish.nsh"
+        }
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "allowDowngrades": true
+    },
+    "linux": {
+      "deb": {
+        "section": "games",
+        "recommends": [
+          "wine"
+        ]
+      },
+      "rpm": {
+        "recommends": [
+          "wine"
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVGQUY1OTU0ODFEOTM4OEEKUldTS09ObUJWRm12Nzk5aU8vUlJRNXY3RXZGQnV0dmR2Vk92MWRENEtlMklKdmhUS0lKZ0pLNmUK",
+      "endpoints": [
+        "https://github.com/cheatoskar/tm-horizon/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
+  "mainBinaryName": "tm-horizon"
+}

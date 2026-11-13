@@ -1,0 +1,30 @@
+{
+  "name": "tm-hub-monorepo",
+  "private": true,
+  "description": "TM Horizon: launcher, website and data pipeline for every TrackMania game.",
+  "license": "AGPL-3.0-only",
+  "engines": { "node": ">=24" },
+  "workspaces": [
+    "packages/shared",
+    "packages/map-inspector",
+    "packages/catalog",
+    "packages/showcase-ui",
+    "packages/api",
+    "apps/launcher",
+    "apps/web",
+    "apps/server",
+    "apps/portal"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "test:scripts": "node --test scripts/updater-json.test.mjs",
+    "check-links": "node scripts/check-links.mjs",
+    "check-legal": "node scripts/check-legal.mjs",
+    "dev:hub": "node scripts/dev-hub.mjs",
+    "build:api": "npm run build -w @tm-hub/api",
+    "build:web": "npm run build -w @tm-hub/web",
+    "build:launcher": "npm run build -w @tm-hub/launcher",
+    "hub-data": "npm run hub-api -w @tm-hub/launcher"
+  }
+}

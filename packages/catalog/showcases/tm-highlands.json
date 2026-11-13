@@ -1,0 +1,68 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "green"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TrackMania Highlands",
+      "tagline": "The first community environment for TrackMania United Forever.",
+      "badges": [
+        "TMUF",
+        "Environment",
+        "Community"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "mountain",
+          "title": "New environment",
+          "text": "Adds Highlands as a new environment to TrackMania United Forever."
+        },
+        {
+          "icon": "download",
+          "title": "Install from the ZIP",
+          "text": "TM Horizon checks TmHighlands.zip from ModDB, backs up the two game files it replaces and unpacks it. Undo puts them back."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "On and off",
+          "text": "Switch Highlands off without uninstalling: the environment and the car are set aside until you switch it on again."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "Download **TmHighlands.zip** (about 650 MB, 1.55 GB unpacked) from the ModDB page and open the game page of United Forever: the card *Recommended for your game* finds the file in Downloads. Only the GameData folder is unpacked; the readme and credits from the ZIP are shown before you install. Highlands replaces *Game.FidCache.Gbx* and the *BaseEditorSimple* campaign; TM Horizon keeps both, and Undo in History restores them."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "TrackMania Highlands is made by the TrackMania Modding Community, 2021–2025, some rights reserved. Project lead: **St1ngLeR** (environment, vehicle, skins, physics), with more modellers named in *Highlands Credits.txt* inside the ZIP. The community Discord is linked in the readme."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "ModDB page",
+          "url": "https://www.moddb.com/mods/trackmania-highlands"
+        }
+      ]
+    }
+  ]
+}

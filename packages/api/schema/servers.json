@@ -1,0 +1,422 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/ServersFile",
+  "definitions": {
+    "ServersFile": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1,
+          "description": "Format version of this file; bumped on breaking changes."
+        },
+        "generated": {
+          "$ref": "#/definitions/IsoDateTime"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceStatus"
+          }
+        },
+        "servers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GameServer"
+          }
+        },
+        "notAvailable": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/GameId"
+                  },
+                  {
+                    "type": "string",
+                    "const": "forever"
+                  }
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "game",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Sources that need a secret or have no public list, with what is needed."
+        },
+        "masterServers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MasterServerInfo"
+          },
+          "description": "ESWC master servers with their player and server counts (getservers.php); empty when that source is off."
+        }
+      },
+      "required": [
+        "generated",
+        "masterServers",
+        "notAvailable",
+        "schemaVersion",
+        "servers",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "IsoDateTime": {
+      "type": "string",
+      "description": "ISO 8601 date-time in UTC, e.g. \"2026-11-10T16:00:00.000Z\"."
+    },
+    "SourceStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Source id, e.g. \"modloader:https://unlimiter.net/modloader/\" or \"tmx:tmnf\"."
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "count": {
+          "type": "number",
+          "description": "Items this source contributed."
+        },
+        "sample": {
+          "type": "boolean",
+          "description": "true when the items are made-up sample data (no token, no public source)."
+        },
+        "cached": {
+          "type": "boolean",
+          "description": "Served from the local cache instead of the network (fresh enough or the network failed)."
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "ok",
+        "count",
+        "sample"
+      ],
+      "additionalProperties": false,
+      "description": "How one source did during the build."
+    },
+    "GameServer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "\"<source>:<login or id>\"."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "maniaplanet",
+            "trackmania.io",
+            "community",
+            "tmf-master",
+            "sample"
+          ],
+          "description": "\"community\": registered by its owner (data/servers/), reachability checked by the build; \"tmf-master\": TrackMania Forever master server list (needs TMF_LOGIN/TMF_PASSWORD)."
+        },
+        "sample": {
+          "type": "boolean"
+        },
+        "game": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/GameId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ManiaPlanet title id, e.g. \"TMStadium@nadeo\" or a custom title."
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameRaw": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "login": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "players": {
+          "type": "number"
+        },
+        "maxPlayers": {
+          "type": "number"
+        },
+        "spectators": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "zone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "\"World|Europe|France\" (ManiaPlanet) or a region like \"eu-west\" (TM2020)."
+        },
+        "mode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "private": {
+          "type": "boolean"
+        },
+        "join": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link that starts the game and joins, when the source gives enough to build one."
+        },
+        "club": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Club or page the server belongs to (TM2020 club rooms)."
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "\"host:port\" of the game port (community servers; ESWC, Original and Sunrise join by address)."
+        },
+        "online": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Community servers: game port answered a TCP connect in this build (null = not checked, e.g. login only)."
+        },
+        "lastSeen": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/IsoDateTime"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Community servers: last build in which the game port answered."
+        },
+        "language": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Community servers: language of the server, e.g. \"en\", \"de\", \"multi\"."
+        },
+        "contact": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Community servers: Discord invite or handle the owner chose to publish."
+        },
+        "homepage": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Community servers: website of the server or its community."
+        },
+        "maxSpectators": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "TMF master server: maximum spectators."
+        },
+        "environments": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "TMF master server: environments the server runs (\"Stadium\", \"Snow\", ...), from its pack mask."
+        },
+        "ladder": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "min",
+                "max"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "TMF master server: ladder limits of the server (points)."
+        },
+        "privateForSpectators": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "TMF master server: a spectator password is set."
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "sample",
+        "game",
+        "title",
+        "name",
+        "nameRaw",
+        "description",
+        "login",
+        "players",
+        "maxPlayers",
+        "spectators",
+        "zone",
+        "mode",
+        "private",
+        "join",
+        "club"
+      ],
+      "additionalProperties": false
+    },
+    "GameId": {
+      "type": "string",
+      "enum": [
+        "tmo",
+        "tms",
+        "eswc",
+        "tmnf",
+        "tmuf",
+        "tm2-canyon",
+        "tm2-stadium",
+        "tm2-valley",
+        "tm2-lagoon",
+        "sm-storm",
+        "tm2020",
+        "turbo"
+      ],
+      "description": "Game ids shared with the catalog (packages/catalog/catalog.json)."
+    },
+    "MasterServerInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "\"eswc-master:<name>\"."
+        },
+        "game": {
+          "$ref": "#/definitions/GameId"
+        },
+        "name": {
+          "type": "string"
+        },
+        "level": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "\"Beginner\" | \"Normal\" | \"Expert\" (ladder level of the room), null when unknown."
+        },
+        "players": {
+          "type": "number",
+          "description": "Players online on this master server."
+        },
+        "servers": {
+          "type": "number",
+          "description": "Game servers registered on this master server."
+        },
+        "buddies": {
+          "type": "number"
+        },
+        "address": {
+          "type": "string",
+          "description": "Master server address as given (\"host\" or \"ip\"), and its port."
+        },
+        "port": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "game",
+        "name",
+        "level",
+        "players",
+        "servers",
+        "buddies",
+        "address",
+        "port"
+      ],
+      "additionalProperties": false,
+      "description": "One ESWC master server (\"room\") from getservers.php, with its counters."
+    }
+  },
+  "$id": "https://cheatoskar.github.io/tm-hub/schema/servers.json",
+  "title": "tm-hub servers.json"
+}

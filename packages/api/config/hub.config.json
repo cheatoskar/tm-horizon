@@ -1,0 +1,203 @@
+{
+  "userAgent": "TM-Horizon-hub (+https://tm-horizon.com)",
+  "modloader": {
+    "comment": "TMLoader repositories. readLocalConfig also reads %LOCALAPPDATA%/TMLoader/config.yaml (read only) and masterserver adds the servers it lists.",
+    "readLocalConfig": true,
+    "masterserver": "https://modloader.tomashu.dev/modloader/v1/",
+    "servers": [
+      "https://modloader.tomashu.dev/modloader/TmForever/v1/",
+      "https://tomashu.pages.dev/modloader/TmForever/v1/",
+      "https://unlimiter.net/modloader/",
+      "https://donadigo.com/modloader/",
+      "https://fullspeed.mooo.com/modloader/",
+      "https://cheatoskar.github.io/TM-Vibrant-Shaders/modloader/",
+      "https://home.koyaanis.com/modloader/",
+      "https://bigbang1112.github.io/always-official/modloader/"
+    ],
+    "indexTtlMinutes": 30,
+    "hashLatestOnly": true,
+    "fileRecheckHours": 24,
+    "overrides": {
+      "TM Vibrant Shaders": {
+        "category": "graphics",
+        "games": [
+          "tmnf",
+          "tmuf",
+          "tm2-canyon",
+          "tm2-stadium",
+          "tm2-valley",
+          "tm2-lagoon"
+        ]
+      },
+      "KimMod": {
+        "category": "tools"
+      },
+      "TMFOXR": {
+        "category": "VR",
+        "games": [
+          "tmuf"
+        ]
+      }
+    }
+  },
+  "github": {
+    "comment": "Repositories besides the GitHub links in the catalog. GITHUB_TOKEN from the environment is used when set.",
+    "repos": [
+      "BigBang1112/randomizer-anywhere",
+      "BigBang1112/gbx-net",
+      "BigBang1112/nations-converter",
+      "cheatoskar/TM-Vibrant-Shaders",
+      "jiink/TrackManiaForeverOpenXR"
+    ],
+    "ttlMinutesAnonymous": 180,
+    "ttlMinutesToken": 55,
+    "minRemaining": 6
+  },
+  "tmx": {
+    "comment": "Trackmania Exchange family, API v2 (https://api2.mania.exchange). Two short lists per game, one request each, one second apart.",
+    "count": 8,
+    "delayMs": 1000,
+    "ttlMinutes": 55,
+    "sites": [
+      {
+        "site": "tmo-x",
+        "game": "tmo",
+        "host": "original.tm-exchange.com",
+        "kind": "tracks"
+      },
+      {
+        "site": "tms-x",
+        "game": "tms",
+        "host": "sunrise.tm-exchange.com",
+        "kind": "tracks"
+      },
+      {
+        "site": "tmn-x",
+        "game": "eswc",
+        "host": "nations.tm-exchange.com",
+        "kind": "tracks"
+      },
+      {
+        "site": "tmnf-x",
+        "game": "tmnf",
+        "host": "tmnf.exchange",
+        "kind": "tracks"
+      },
+      {
+        "site": "tmuf-x",
+        "game": "tmuf",
+        "host": "tmuf.exchange",
+        "kind": "tracks"
+      },
+      {
+        "site": "tm2-mx",
+        "game": "tm2-canyon",
+        "host": "tm.mania.exchange",
+        "kind": "maps",
+        "titlepack": "TMCanyon"
+      },
+      {
+        "site": "tm2-mx",
+        "game": "tm2-stadium",
+        "host": "tm.mania.exchange",
+        "kind": "maps",
+        "titlepack": "TMStadium"
+      },
+      {
+        "site": "tm2-mx",
+        "game": "tm2-valley",
+        "host": "tm.mania.exchange",
+        "kind": "maps",
+        "titlepack": "TMValley"
+      },
+      {
+        "site": "tm2-mx",
+        "game": "tm2-lagoon",
+        "host": "tm.mania.exchange",
+        "kind": "maps",
+        "titlepack": "TMLagoon"
+      },
+      {
+        "site": "sm-x",
+        "game": "sm-storm",
+        "host": "sm.mania.exchange",
+        "kind": "maps"
+      },
+      {
+        "site": "tmx",
+        "game": "tm2020",
+        "host": "trackmania.exchange",
+        "kind": "maps"
+      }
+    ]
+  },
+  "discord": {
+    "comment": "Scheduled events of these guilds are read when DISCORD_BOT_TOKEN is set and the bot is in the guild. invite is shown to users.",
+    "guilds": [],
+    "ttlMinutes": 25
+  },
+  "servers": {
+    "maniaplanet": {
+      "enabled": true,
+      "pages": 1,
+      "pageSize": 100,
+      "minPlayers": 0,
+      "ttlMinutes": 10
+    },
+    "trackmaniaIo": {
+      "enabled": true,
+      "pages": 1,
+      "ttlMinutes": 10
+    },
+    "community": {
+      "comment": "Registered servers in data/servers/*.yaml; each build tries a TCP connect to the game port.",
+      "enabled": true,
+      "dir": "data/servers",
+      "timeoutMs": 3000,
+      "concurrency": 16
+    },
+    "eswcMaster": {
+      "comment": "TM Nations ESWC getservers.php (no login, TLS 1.0). Live-tested 2026-11-10: one master server (docs/eswc-masterserver.md).",
+      "enabled": true,
+      "host": "game.trackmanianations.com",
+      "path": "/online_game",
+      "version": "0.1.7.9",
+      "lang": "en",
+      "timeoutMs": 10000,
+      "certSha256": "BF:86:09:07:AA:5F:E4:00:15:AA:11:CA:5B:19:69:CD:F8:87:E3:E5:B9:74:EF:F0:AE:B2:E9:61:FC:F6:9E:3A"
+    }
+  },
+  "events": {
+    "comment": "Approved event submissions (issue form event.yml) in data/events/*.yaml; past events drop out.",
+    "submittedDir": "data/events",
+    "live": {
+      "comment": "Public event sources without a secret: trackmania.io competitions (the newest `lookup` are checked for dates) and the TMTAS exchange events page (TAS events).",
+      "trackmaniaIo": {
+        "enabled": true,
+        "lookup": 12,
+        "ttlMinutes": 30
+      },
+      "tmtas": {
+        "enabled": true,
+        "ttlMinutes": 30
+      }
+    }
+  },
+  "communities": {
+    "comment": "Discord server list kept by mx_eyebo (Mania Exchange) as a public Google Sheet; the xlsx export keeps the hyperlinks. Each invite is looked up once per inviteTtlHours with GET discord.com/api/v10/invites/<code>?with_counts=true, sequential, delayMs apart, at most maxLookupsPerBuild per build (oldest first). Ask mx_eyebo before this goes public.",
+    "enabled": true,
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/1Rr581P5Icd5_-bYypVLaUDqi1pdMGbBNM-E7Bapz_ME/",
+    "exportUrl": "https://docs.google.com/spreadsheets/d/1Rr581P5Icd5_-bYypVLaUDqi1pdMGbBNM-E7Bapz_ME/export?format=xlsx",
+    "sheetTtlHours": 24,
+    "inviteTtlHours": 24,
+    "delayMs": 1100,
+    "maxLookupsPerBuild": 150
+  },
+  "catalog": {
+    "comment": "First readable path wins (packages/catalog in this monorepo), then url.",
+    "paths": [
+      "../catalog/catalog.json"
+    ],
+    "url": null
+  }
+}

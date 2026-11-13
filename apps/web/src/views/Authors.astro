@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { BRAND_MARKS } from '@tm-hub/shared/brandmarks';
+import { t, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+// Developer portal (login). PUBLIC_PORTAL_URL at build time, e.g. https://hub.example.org/ or http://localhost:5174/
+const portal = String(import.meta.env.PUBLIC_PORTAL_URL ?? '').replace(/\/?$/, '/').replace(/^\/$/, '');
+---
+<Layout title={t(lang, 'nav.authors')} lang={lang}>
+  <div class="phead">
+    <div><h1>{t(lang, 'nav.authors')}</h1><p class="lead">{t(lang, 'authors.lead')}</p></div>
+  </div>
+  <ol class="steps">
+    <li class="card"><h3>{t(lang, 'authors.s1t')}</h3><p>{t(lang, 'authors.s1')}</p></li>
+    <li class="card"><h3>{t(lang, 'authors.s2t')}</h3><p>{t(lang, 'authors.s2')}</p></li>
+    <li class="card"><h3>{t(lang, 'authors.s3t')}</h3><p>{t(lang, 'authors.s3')}</p></li>
+    <li class="card"><h3>{t(lang, 'authors.s4t')}</h3><p>{t(lang, 'authors.s4')}</p></li>
+  </ol>
+
+  <section class="sec" id="sign-in">
+    <div class="sec-h"><h2>{t(lang, 'nav.signIn')}</h2></div>
+    <div class="card login-card">
+      <div class="brand-logins">
+        {(['github', 'discord'] as const).map((p) => {
+          const m = BRAND_MARKS[p];
+          const body = <><svg viewBox={m.viewBox} aria-hidden="true" focusable="false"><path d={m.path} fill="currentColor" /></svg><span>{t(lang, 'authors.loginBtn', { name: m.label })}</span></>;
+          return portal
+            ? <a class={`brand-login ${p}`} href={`${portal}auth/${p}/start?next=%2F`}>{body}</a>
+            : <span class={`brand-login ${p} off`} aria-disabled="true" title={t(lang, 'forms.soon')}>{body}</span>;
+        })}
+      </div>
+      <p class="muted" style="margin-top:14px">{portal ? t(lang, 'authors.loginAfter') : t(lang, 'forms.soon')}</p>
+    </div>
+  </section>
+<style is:global>
+  .login-card { padding: 20px; max-width: 560px; }
+  .brand-logins { display: grid; gap: 12px; max-width: 360px; }
+  .brand-login { display: flex; align-items: center; justify-content: center; gap: 12px; height: 48px; padding: 0 16px; border-radius: 10px; font: 600 15px var(--body); text-decoration: none; background: #fff; color: #24292f; box-shadow: inset 0 0 0 1px var(--line); }
+  .brand-login.discord { background: #5865f2; color: #fff; box-shadow: none; }
+  .brand-login svg { width: 22px; height: 22px; flex: none; }
+  .brand-login:hover { filter: brightness(.95); }
+  .brand-login.off { opacity: .45; cursor: not-allowed; }
+</style>
+</Layout>

@@ -1,0 +1,140 @@
+{
+  "updated": "2026-11-10",
+  "entries": [
+    {
+      "id": "tmnf-exchange",
+      "name": "TMNF Exchange (TMNF-X)",
+      "category": "exchange",
+      "games": [
+        "tmnf"
+      ],
+      "url": "https://tmnf.exchange/",
+      "api": "https://api2.mania.exchange/",
+      "description": "Map and replay sharing site for TrackMania Nations Forever.",
+      "maintainer": null,
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "search and download maps/replays via API"
+    },
+    {
+      "id": "tmuf-exchange",
+      "name": "TMUF Exchange (TMUF-X)",
+      "category": "exchange",
+      "games": [
+        "tmuf"
+      ],
+      "url": "https://tmuf.exchange/",
+      "api": "https://api2.mania.exchange/",
+      "description": "Map and replay sharing site for TrackMania United Forever.",
+      "maintainer": null,
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "search and download maps/replays via API"
+    },
+    {
+      "id": "tmnforever-tm-exchange",
+      "name": "TMX tmnforever.tm-exchange.com (legacy address)",
+      "category": "exchange",
+      "games": [
+        "tmnf",
+        "tmuf"
+      ],
+      "url": "https://tmnforever.tm-exchange.com/",
+      "api": null,
+      "description": "Old address of the TMNF exchange, listed in awesome-trackmania.",
+      "maintainer": null,
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "open in browser"
+    },
+    {
+      "id": "tmx-original",
+      "name": "TMO Exchange (Original)",
+      "category": "exchange",
+      "games": [
+        "tmo"
+      ],
+      "url": "https://original.tm-exchange.com/",
+      "api": "https://api2.mania.exchange/",
+      "description": "Map exchange for TrackMania Original.",
+      "maintainer": null,
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "open in browser"
+    },
+    {
+      "id": "tmx-sunrise",
+      "name": "TMS Exchange (Sunrise)",
+      "category": "exchange",
+      "games": [
+        "tms"
+      ],
+      "url": "https://sunrise.tm-exchange.com/",
+      "api": "https://api2.mania.exchange/",
+      "description": "Map exchange for TrackMania Sunrise.",
+      "maintainer": null,
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "open in browser"
+    },
+    {
+      "id": "twinkie-forever",
+      "name": "TwinkieForever",
+      "category": "mod",
+      "games": [
+        "tmnf",
+        "tmuf"
+      ],
+      "url": "https://github.com/TwinkieTweaks/TwinkieForever",
+      "api": null,
+      "description": "Modular overlay and patch system for TrackMania Forever.",
+      "maintainer": "TwinkieTweaks",
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "install via TMLoader"
+    },
+    {
+      "id": "twinkie-org",
+      "name": "TwinkieTweaks GitHub organisation",
+      "category": "mod",
+      "games": [
+        "tmnf",
+        "tmuf",
+        "tmo",
+        "tms",
+        "eswc"
+      ],
+      "url": "https://github.com/TwinkieTweaks",
+      "api": null,
+      "description": "Repos for TwinkieForever, TwinkieX and the Gecko AngelScript engine.",
+      "maintainer": "TwinkieTweaks",
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": "release/version checks via GitHub API"
+    },
+    {
+      "id": "bingoforever",
+      "name": "BingoForever",
+      "category": "mod",
+      "games": [
+        "tmnf",
+        "tmuf"
+      ],
+      "url": "https://github.com/manfromfms/BingoForever",
+      "api": null,
+      "description": "Twinkie fork adding a multiplayer Bingo mode.",
+      "maintainer": "manfromfms",
+      "language": "en",
+      "status": "alive",
+      "checked": "2026-11-10",
+      "launcher": null
+    }
+  ]
+}

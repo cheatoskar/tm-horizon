@@ -1,0 +1,7 @@
+id: 2026-11-12-eswc-night
+title: ESWC night
+games: [eswc]
+start: "2026-11-12T20:00:00+01:00"
+durationMinutes: 90
+host: Example Community
+join: 198.51.100.20:2352

@@ -1,0 +1,22 @@
+{
+  "skid.title": "Bremsspuren",
+  "skid.text": "Saubere Bremsspuren: die Grasspuren auf der Straße. Nur Optik, geht online.",
+  "skid.classic": "Klassisch",
+  "skid.clean": "Sauber",
+  "skid.custom": "Von etwas anderem geändert.",
+  "skid.missing": "Textur in diesem Spielordner nicht gefunden.",
+  "skid.restore": "Zurücksetzen",
+  "skid.noSource": "Die Spiel-eigene Spurtextur fehlt oder ist geändert.",
+  "hist.k.skid-clean": "Bremsspuren auf sauber gestellt",
+  "hist.k.skid-classic": "Bremsspuren auf klassisch gestellt",
+  "skid.tmlText": "Sauber kommt als TMLoader-Produkt: ohne Admin, der Spielordner bleibt wie er ist.",
+  "skid.tmlOn": "Sauber über TMLoader, Profil {profile}.",
+  "skid.tmlTest": "Noch ungetestet: Spiel starten und Bremsspuren auf Stadium-Straße ansehen.",
+  "skid.tmlTip": "Installiert das TMLoader-Produkt Skid Marks und schaltet es in diesem Profil ein.",
+  "skid.direct": "Spieldateien",
+  "skid.directTip": "Stattdessen die Textur im Spielordner ändern (braucht dort Admin).",
+  "skid.admin": "Das Spiel liegt in Program Files: dafür TM Horizon als Administrator starten.",
+  "skid.useTml": "TMLoader nutzen",
+  "hist.k.skid-tml": "Bremsspuren auf sauber gestellt (TMLoader)",
+  "hist.k.skid-tml-remove": "Bremsspuren-Produkt aus TMLoader entfernt"
+}

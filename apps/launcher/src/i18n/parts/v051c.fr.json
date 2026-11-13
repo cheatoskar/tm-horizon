@@ -1,0 +1,13 @@
+{
+  "stats.campaign": "Campagne",
+  "stats.campaignTip": "Circuit fourni avec le jeu (auteur Nadeo).",
+  "stats.beforeHorizon": "{time} avant TM Horizon",
+  "stats.beforeTip": "Temps de jeu compté par le jeu dans vos profils ({list}), moins le temps compté par TM Horizon.",
+  "host.presetName.100tmx": "Cartes TMX non terminées",
+  "host.presetName.short_lol": "Toutes les cartes TMX : Short & LOL",
+  "host.presetName.lunatic": "Toutes les cartes TMX : Lunatic",
+  "host.presetName.rpg": "Toutes les cartes TMX : RPG",
+  "host.presetName.fullspeed": "Toutes les cartes TMX : Fullspeed",
+  "host.presetName.tech": "Toutes les cartes TMX : Tech",
+  "host.presetName.multilap": "Toutes les cartes TMX : Multilap"
+}

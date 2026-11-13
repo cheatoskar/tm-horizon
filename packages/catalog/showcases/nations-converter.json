@@ -1,0 +1,121 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "cyan"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Nations Converter",
+      "tagline": "Converts maps from TrackMania Nations and United Forever to Trackmania (2020).",
+      "image": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/StadiumCrystalClassic_after.jpg",
+      "badges": [
+        "TMNF, TMUF to TM2020",
+        "Web tool",
+        "Open source"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "refresh-cw",
+          "title": "Map conversion",
+          "text": "Turns old Nations and United maps into maps for Trackmania (2020)."
+        },
+        {
+          "icon": "music",
+          "title": "Music",
+          "text": "Adds music to non-Stadium maps by default; the option can be switched off or pointed at other tracks."
+        },
+        {
+          "icon": "layers",
+          "title": "Environments",
+          "text": "Examples in the repository cover Stadium, Snow, Rally and Desert maps."
+        },
+        {
+          "icon": "code-2",
+          "title": "Open source",
+          "text": "Licensed AGPL-3.0; the source is on GitHub."
+        }
+      ]
+    },
+    {
+      "type": "compare",
+      "before": {
+        "url": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/RallySolidModless_before.jpg",
+        "label": "Original"
+      },
+      "after": {
+        "url": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/RallySolidModless_after.jpg",
+        "label": "Converted"
+      },
+      "caption": "A Rally map before and after the conversion"
+    },
+    {
+      "type": "gallery",
+      "title": "More converted maps",
+      "images": [
+        {
+          "url": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/StadiumCrystalClassic_after.jpg",
+          "caption": "A Stadium map in Trackmania (2020)"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/DesertSolidModless_after.jpg",
+          "caption": "Desert"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/BigBang1112/nations-converter/HEAD/Src/NationsConverterWeb/NationsConverterWeb/wwwroot/img/comparisons/SnowSolidModless_after.jpg",
+          "caption": "Snow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Status",
+      "markdown": "The repository notes that the project is in maintenance mode: no meaningful updates are planned for the next year or so."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works",
+          "note": "source maps"
+        },
+        {
+          "game": "tmuf",
+          "status": "works",
+          "note": "source maps"
+        },
+        {
+          "game": "tm2020",
+          "status": "works",
+          "note": "target game"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Nations Converter is made by BigBang1112. The pictures come from the project repository."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Nations Converter",
+          "url": "https://bigbang1112.eu/nc/"
+        },
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/BigBang1112/nations-converter",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

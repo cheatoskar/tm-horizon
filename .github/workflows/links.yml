@@ -1,0 +1,66 @@
+# Daily check of the mod download links in the catalog and the TMLoader mod index (scripts/check-links.mjs).
+# Broken links go into ONE open issue "Broken mod links"; when everything is fine again it is closed.
+# Only the built-in GITHUB_TOKEN is used.
+name: Mod links
+
+on:
+  schedule:
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: links
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: Broken mod links
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # TMLoader index with the SHA-256 values (packages/api/dist/mods.json); network sources may fail.
+      - name: Hub data
+        run: npm run build -w @tm-hub/api
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Check links
+        run: node scripts/check-links.mjs --out links-report.md > /dev/null
+
+      - name: Issue
+        shell: bash
+        run: |
+          broken=$(jq .broken links-report.md.json)
+          number=$(gh issue list --search 'in:title "Broken mod links"' --state open --json number --jq '.[0].number // empty')
+          echo "Broken links: $broken, open issue: ${number:-none}"
+          if [ "$broken" -gt 0 ]; then
+            if [ -n "$number" ]; then
+              gh issue edit "$number" --body-file links-report.md
+            else
+              gh issue create --title "$TITLE" --body-file links-report.md
+            fi
+          elif [ -n "$number" ]; then
+            gh issue comment "$number" --body "All checked links work again ($(date -u +%F)). Closing."
+            gh issue close "$number"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: links-report
+          path: links-report.md*
+          retention-days: 14

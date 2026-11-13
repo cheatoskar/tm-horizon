@@ -1,0 +1,42 @@
+{
+  "name": "@tm-hub/launcher",
+  "private": true,
+  "version": "0.5.1",
+  "type": "module",
+  "scripts": {
+    "scan": "node scanner/scan.mjs",
+    "fetch-mods": "node scanner/fetch-mods.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:public": "tsc -b && vite build --mode public",
+    "preview": "vite preview --port 4173 --strictPort",
+    "shots": "node tools/shoot.mjs",
+    "art": "node scanner/fetch-art.mjs && python -I tools/make-assets.py",
+    "hub-api": "node scanner/import-hub-api.mjs",
+    "typecheck": "tsc -b",
+    "tauri": "tauri",
+    "check-i18n": "node scripts/check-i18n.mjs",
+    "test": "node --test src/data/tmformat.test.ts src/data/logins.test.ts src/data/play-entry.test.ts src/data/hubMerge.test.ts src/data/statsView.test.ts src/data/opPlugins.test.ts src/data/updateRules.test.ts"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "5.6",
+    "vite": "^6.4.6",
+    "yaml": "^2.9.1"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/barlow-semi-condensed": "^5.3.0",
+    "@tauri-apps/api": "^2.12.4",
+    "@tm-hub/catalog": "*",
+    "@tm-hub/map-inspector": "*",
+    "@tm-hub/shared": "*",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "license": "AGPL-3.0-only"
+}

@@ -1,0 +1,60 @@
+/* Owner test 1111g fixes (branch fixes-1111b). */
+
+/* Openplanet badge in Openplanet's own logo pink (#EB2F8D, sampled from the logo), readable in both themes. */
+.src-badge.src-openplanet { background: rgba(235, 47, 141, 0.18); color: #ff74b8; box-shadow: inset 0 0 0 1px rgba(235, 47, 141, 0.35); }
+:root[data-theme="light"] .src-badge.src-openplanet { background: rgba(235, 47, 141, 0.13); color: #a3104f; box-shadow: inset 0 0 0 1px rgba(235, 47, 141, 0.4); }
+
+/* Mods page: tiles / list switch next to the sort. */
+.layout-seg button { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; }
+
+/* List layout: one compact row per mod. Columns: icon | name, author, source | type and games | status and action. */
+.modlist.as-list { display: flex; flex-direction: column; gap: 6px; }
+.modlist.as-list > .modcard { grid-template-columns: 40px minmax(0, 1.25fr) minmax(0, 1fr) auto; gap: 14px; padding: 8px 12px; border-radius: 12px; height: auto; align-content: center; }
+.modlist.as-list > .modcard:hover { transform: none; }
+.modlist.as-list .modcard .mod-icon, .modlist.as-list .modcard .tile-icon, .modlist.as-list .modcard .mod-icon.sk { width: 40px !important; height: 40px !important; border-radius: 10px; }
+.modlist.as-list .modcard .tile-icon img { width: 100%; height: 100%; }
+.modlist.as-list .modcard-text { display: contents; }
+.modlist.as-list .modcard-text > p, .modlist.as-list .modcard-text > div:not(.modcard-title):not(.modcard-tags) { display: none; }
+.modlist.as-list .modcard-title { flex-wrap: nowrap; align-items: center; overflow: hidden; min-width: 0; }
+.modlist.as-list .modcard-title b { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; min-width: 0; }
+.modlist.as-list .modcard-title > .dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; flex: 0 1 auto; min-width: 0; }
+.modlist.as-list .modcard-tags { flex-wrap: nowrap; overflow: hidden; margin-top: 0; min-width: 0; }
+.modlist.as-list .modcard-tags > * { flex: none; }
+.modlist.as-list .modcard-stats { flex-direction: row; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.modlist.as-list .modcard-stats .stat-lines, .modlist.as-list .modcard-stats .upd { display: none; }
+.modlist.as-list .modcard .catalog-btns { flex-direction: row; min-width: 0; }
+/* One action per row: with an Install/Update button, the secondary "open page" button goes (it is on the mod page). */
+.modlist.as-list .modcard-stats:has(.btn.primary) .btn.ghost { display: none; }
+.modlist.as-list .modcard-stats .pill { margin-left: 0; }
+.modlist.as-list .modcard.skeleton .sk-line { height: 10px; }
+
+/* Game page, Mods section: companion links of installed mods as one quiet row. */
+.game-mods .companion-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 4px; }
+
+/* Installations card: every row has Play; "Make default" only on the others; the default one carries a tag. */
+.inst-row .inst-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.inst-row .inst-default { margin-left: 8px; vertical-align: 2px; }
+.inst-row b.ellip { display: flex; align-items: center; min-width: 0; }
+
+/* Horizon Client: the main block at the top of the game page. */
+.hh-card { border-color: rgba(var(--acc-rgb), 0.35); }
+.hh-card .hh-main { margin-top: 10px; }
+.hh-card .hh-adv { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+.hh-card .hh-adv > summary { cursor: pointer; color: var(--fg-2); }
+.hh-card .hh-adv[open] > summary { margin-bottom: 8px; }
+.hh-card .hh-adv > * + * { margin-top: 8px; }
+
+/* Join guide (ESWC, Sunrise, Original). */
+.join-guide ol { margin: 8px 0 8px 18px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+
+/* News: search, period and sort above the chips; "Load older" under the list. */
+.nw-toolbar { margin-bottom: 10px; flex-wrap: wrap; }
+.nw-older { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 18px 0 8px; }
+
+/* Horizon Client modules: the module's own icon. */
+.hh-plugin .hh-icon { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; flex: none; }
+
+/* Game page head: the picture behind it (also our designed cover with its title text) never takes clicks;
+   before, the cover's title lay over Play, Profile and Report on ESWC/Sunrise/Original without online covers. */
+.hero .hero-art, .hero .hero-art *, .hero .hero-shade, .art .art-type { pointer-events: none; }
+.hero .hero-content { z-index: 2; }

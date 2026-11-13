@@ -1,0 +1,214 @@
+{
+  "fetchedAt": "2026-11-10T16:11:32.472Z",
+  "titles": {
+    "tmnf": {
+      "appid": 11020,
+      "steamName": "TrackMania Nations Forever",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tmnf/cover.jpg",
+          "source": "Steam library cache (librarycache\\11020\\library_600x900.jpg)"
+        },
+        "hero": {
+          "path": "store-art/tmnf/hero.jpg",
+          "source": "Steam library cache (librarycache\\11020\\library_hero.jpg)"
+        },
+        "logo": {
+          "path": "store-art/tmnf/logo.png",
+          "source": "Steam library cache (librarycache\\11020\\logo.png)"
+        }
+      }
+    },
+    "tmuf": {
+      "appid": 7200,
+      "steamName": "Trackmania United Forever",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tmuf/cover.jpg",
+          "source": "Steam library cache (librarycache\\7200\\library_600x900.jpg)"
+        },
+        "hero": {
+          "path": "store-art/tmuf/hero.jpg",
+          "source": "Steam library cache (librarycache\\7200\\library_hero.jpg)"
+        },
+        "logo": {
+          "path": "store-art/tmuf/logo.png",
+          "source": "Steam library cache (librarycache\\7200\\logo.png)"
+        }
+      }
+    },
+    "tm2-canyon": {
+      "appid": 228760,
+      "steamName": "TrackMania² Canyon",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm2-canyon/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/228760/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm2-canyon/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/228760/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm2-canyon/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/228760/logo.png"
+        }
+      }
+    },
+    "tm2-stadium": {
+      "appid": 232910,
+      "steamName": "TrackMania² Stadium",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm2-stadium/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/232910/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm2-stadium/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/232910/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm2-stadium/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/232910/logo.png"
+        }
+      }
+    },
+    "tm2-valley": {
+      "appid": 243360,
+      "steamName": "TrackMania² Valley",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm2-valley/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/243360/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm2-valley/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/243360/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm2-valley/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/243360/logo.png"
+        }
+      }
+    },
+    "tm2-lagoon": {
+      "appid": 600720,
+      "steamName": "Trackmania² Lagoon",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm2-lagoon/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/600720/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm2-lagoon/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/600720/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm2-lagoon/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/600720/logo.png"
+        }
+      }
+    },
+    "sm-storm": {
+      "appid": 229870,
+      "steamName": "ShootMania Storm",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/sm-storm/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/229870/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/sm-storm/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/229870/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/sm-storm/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/229870/logo.png"
+        }
+      }
+    },
+    "tm-turbo": {
+      "appid": 375900,
+      "steamName": "Trackmania® Turbo",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm-turbo/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/375900/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm-turbo/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/375900/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm-turbo/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/375900/logo.png"
+        }
+      }
+    },
+    "tm2020": {
+      "appid": 2225070,
+      "steamName": "Trackmania",
+      "verified": true,
+      "files": {
+        "cover": {
+          "path": "store-art/tm2020/cover.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2225070/library_600x900.jpg"
+        },
+        "hero": {
+          "path": "store-art/tm2020/hero.jpg",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2225070/library_hero.jpg"
+        },
+        "logo": {
+          "path": "store-art/tm2020/logo.png",
+          "source": "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2225070/logo.png"
+        }
+      }
+    },
+    "tm-original": {
+      "appid": null,
+      "verified": false,
+      "files": {
+        "cover": {
+          "path": "store-art/tm-original/cover.jpg",
+          "source": "Box art (PC CD-ROM cover, Nadeo/Focus), scan on archive.org: https://archive.org/download/TMORIGINAL/TrackMania-Original-Cover.jpg (https://archive.org/details/TMORIGINAL). Copyrighted, no licence: local test build only. The owner-supplied box scan (378x529) shows the same box; this larger scan is kept."
+        }
+      }
+    },
+    "tmn-eswc": {
+      "appid": null,
+      "verified": false,
+      "files": {
+        "cover": {
+          "path": "store-art/tmn-eswc/cover.jpg",
+          "source": "Owner-supplied box scan (TrackMania Nations ESWC, 574x800), 2026-11-10. Copyrighted box art, no licence: local test build only; clear rights before a public release."
+        },
+        "hero": {
+          "path": "store-art/tmn-eswc/hero.jpg",
+          "source": "My own screenshot (TMVS photo_045, 2560x1440, scaled to 1600x900), 2026-11-12. Free for public builds."
+        }
+      }
+    },
+    "tm-sunrise": {
+      "appid": null,
+      "verified": false,
+      "files": {
+        "cover": {
+          "path": "store-art/tm-sunrise/cover.jpg",
+          "source": "Owner-supplied box scan (TrackMania Sunrise, Deep Silver edition, 461x664), 2026-11-10. Copyrighted box art, no licence: local test build only; clear rights before a public release."
+        },
+        "hero": {
+          "path": "store-art/tm-sunrise/hero.jpg",
+          "source": "Screenshot by OrangeAedan, CC BY 4.0, Wikimedia Commons: https://upload.wikimedia.org/wikipedia/commons/2/2d/TrackManiaSunrise_Image_of_the_island_car_with_a_sunset.png"
+        }
+      }
+    }
+  }
+}

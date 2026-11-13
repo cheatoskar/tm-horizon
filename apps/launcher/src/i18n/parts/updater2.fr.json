@@ -1,0 +1,20 @@
+{
+  "updp.tip": "Un nouveau TM Horizon est prêt",
+  "updp.label": "Mise à jour {v}",
+  "updp.title": "TM Horizon {v}",
+  "updp.restartNow": "Redémarrer",
+  "updp.noNotes": "Pas de notes de version.",
+  "updp.readyAuto": "Téléchargée. S'installe à la fermeture de TM Horizon ou au prochain démarrage.",
+  "updp.ready": "Téléchargée et prête.",
+  "updp.downloadingAuto": "Se télécharge en arrière-plan, puis s'installe à la fermeture.",
+  "updp.manual": "Installer la télécharge et redémarre TM Horizon.",
+  "updp.readyShort": "Version {v} téléchargée",
+  "updw.title": "Nouveautés de {v}",
+  "updw.news": "Actus",
+  "updw.noNotes": "TM Horizon a été mis à jour. Les notes sont dans les actus et sur GitHub.",
+  "upd.auto": "Installer les mises à jour automatiquement",
+  "upd.autoNote": "Téléchargement en arrière-plan, installation au prochain démarrage ou à la fermeture. Jamais pendant une partie.",
+  "news.horizon": "TM Horizon",
+  "updp.startTitle": "Mise à jour de TM Horizon vers {v}…",
+  "updp.startText": "L'installateur prend le relais et rouvre TM Horizon."
+}

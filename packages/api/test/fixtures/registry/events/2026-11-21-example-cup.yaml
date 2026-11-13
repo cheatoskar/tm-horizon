@@ -1,0 +1,11 @@
+id: 2026-11-21-example-cup
+title: Example Cup
+games: [tmnf]
+start: 2026-11-21T19:00:00+01:00
+durationMinutes: 120
+host: Example Community
+hostLink: https://discord.gg/example
+join: tmtp://#join=example_cup
+description: Five maps, time attack.
+link: https://example.org/cup
+issue: 2

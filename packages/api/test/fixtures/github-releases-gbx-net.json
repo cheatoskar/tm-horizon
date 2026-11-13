@@ -1,0 +1,231 @@
+[
+  {
+    "tag_name": "v2.5.1",
+    "name": "2.5.1",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-11-06T01:26:16Z",
+    "html_url": "https://github.com/BigBang1112/gbx-net/releases/tag/v2.5.1",
+    "body": "- Added signature chunk at the end of written binary bodies\n  - Added `GbxBody.Signature` and `Gbx.ValidateSignature(Async)` returning `GbxSignatureStatus`\n- Implemented remaining MP4 and TM2020 `CPlugVehicleCarPhyTuning` chunks and discovered many of their member names\n- `CPlugVehicleVisModelShared`: Discovered member names of materials, lights, particles, sounds, arms, and wheels\n- `CPlugVehicle...",
+    "assets": [
+      {
+        "name": "GBX.NET.2.5.1.nupkg",
+        "size": 12984930,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.2.5.1.nupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.2.5.1.snupkg",
+        "size": 11295070,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.2.5.1.snupkg",
+        "download_count": 1,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Builders.2.5.1.nupkg",
+        "size": 6940738,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.Builders.2.5.1.nupkg",
+        "download_count": 1,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Builders.2.5.1.snupkg",
+        "size": 8113728,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.Builders.2.5.1.snupkg",
+        "download_count": 1,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Crypto.1.2.4.nupkg",
+        "size": 91431,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.Crypto.1.2.4.nupkg",
+        "download_count": 4,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Crypto.1.2.4.snupkg",
+        "size": 62026,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.1/GBX.NET.Crypto.1.2.4.snupkg",
+        "download_count": 1,
+        "content_type": "application/octet-stream"
+      }
+    ]
+  },
+  {
+    "tag_name": "v2.5.0",
+    "name": "2.5.0",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-10-28T13:30:52Z",
+    "html_url": "https://github.com/BigBang1112/gbx-net/releases/tag/v2.5.0",
+    "body": "- **Added 250+ new Gbx classes** and updated existing ones\r\n- **Discovered 4500+ member names** across class and archive layouts\r\n- Reworked node references to preserve external file and resource descriptors for any node\r\n  - Added `NodeRef<T>`, `NodeRefList<T>`, and `References` views with lazy resolution\r\n  - Deprecated older `External<T>` APIs\r\n  - Node collections now use `NodeRefList<T>`\r\n- F...",
+    "assets": [
+      {
+        "name": "GBX.NET.2.5.0.nupkg",
+        "size": 12464807,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.2.5.0.nupkg",
+        "download_count": 10,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.2.5.0.snupkg",
+        "size": 10850159,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.2.5.0.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Builders.2.5.0.nupkg",
+        "size": 6235967,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Builders.2.5.0.nupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Builders.2.5.0.snupkg",
+        "size": 7368579,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Builders.2.5.0.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.CLI.0.1.0.nupkg",
+        "size": 18527196,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.CLI.0.1.0.nupkg",
+        "download_count": 8,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Crypto.1.2.3.nupkg",
+        "size": 88609,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Crypto.1.2.3.nupkg",
+        "download_count": 6,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Crypto.1.2.3.snupkg",
+        "size": 60684,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Crypto.1.2.3.snupkg",
+        "download_count": 5,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Imaging.ImageSharp.1.0.4.nupkg",
+        "size": 53198,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Imaging.ImageSharp.1.0.4.nupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Imaging.ImageSharp.1.0.4.snupkg",
+        "size": 48898,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Imaging.ImageSharp.1.0.4.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Imaging.SkiaSharp.1.1.4.nupkg",
+        "size": 36781,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Imaging.SkiaSharp.1.1.4.nupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Imaging.SkiaSharp.1.1.4.snupkg",
+        "size": 35968,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Imaging.SkiaSharp.1.1.4.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.PAK.2.4.5.nupkg",
+        "size": 155208,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.PAK.2.4.5.nupkg",
+        "download_count": 7,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.PAK.2.4.5.snupkg",
+        "size": 121562,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.PAK.2.4.5.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Templates.0.2.2.nupkg",
+        "size": 105975,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Templates.0.2.2.nupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Tool.0.3.4.nupkg",
+        "size": 35199,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Tool.0.3.4.nupkg",
+        "download_count": 4,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Tool.0.3.4.snupkg",
+        "size": 29578,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Tool.0.3.4.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Tool.CLI.0.5.4.nupkg",
+        "size": 162792,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Tool.CLI.0.5.4.nupkg",
+        "download_count": 6,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.Tool.CLI.0.5.4.snupkg",
+        "size": 90143,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.Tool.CLI.0.5.4.snupkg",
+        "download_count": 4,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.ZLib.1.1.3.nupkg",
+        "size": 24371,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.ZLib.1.1.3.nupkg",
+        "download_count": 5,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.ZLib.1.1.3.snupkg",
+        "size": 32243,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.5.0/GBX.NET.ZLib.1.1.3.snupkg",
+        "download_count": 3,
+        "content_type": "application/octet-stream"
+      }
+    ]
+  },
+  {
+    "tag_name": "v2.4.5",
+    "name": "GBX.NET 2.4.5",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-09-17T20:35:35Z",
+    "html_url": "https://github.com/BigBang1112/gbx-net/releases/tag/v2.4.5",
+    "body": "Very much sure this is the last one before 2.5!\n\n- Added block skin and flag support for TM1.0 (by greffmaster)\n- Added `GameplayId` support to `CPlugMaterial` (by Zai)\n- Implemented profile vehicle details\n- Implemented better way to read properties from `CGameCtnChallengeParameters` in `CGameCtnChallenge`\n- Fixed and enhanced support for modern `CPlugSurface` (by XertroV agent)\n- Fixed newer Man...",
+    "assets": [
+      {
+        "name": "GBX.NET.2.4.5.nupkg",
+        "size": 4460322,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.4.5/GBX.NET.2.4.5.nupkg",
+        "download_count": 16,
+        "content_type": "application/octet-stream"
+      },
+      {
+        "name": "GBX.NET.2.4.5.snupkg",
+        "size": 3521705,
+        "browser_download_url": "https://github.com/BigBang1112/gbx-net/releases/download/v2.4.5/GBX.NET.2.4.5.snupkg",
+        "download_count": 6,
+        "content_type": "application/octet-stream"
+      }
+    ]
+  }
+]

@@ -1,0 +1,108 @@
+{
+  "page": 0,
+  "pageCount": 35,
+  "rooms": [
+    {
+      "id": 1199217,
+      "clubid": 3074,
+      "clubname": "$s$o$fff[KACKY]",
+      "name": "KR7 WHITE #1",
+      "nadeo": false,
+      "login": "kacky_1_event",
+      "playercount": 78,
+      "playermax": 115,
+      "region": "",
+      "script": "Kacky",
+      "scriptsettings": [],
+      "serverinfo": {}
+    },
+    {
+      "id": 112186,
+      "clubid": 367,
+      "clubname": "$sTM $2cfF$ffformula $d00L$fffeague",
+      "name": "TM $2cfF$ffformula $d00L$fffeague",
+      "nadeo": true,
+      "login": "",
+      "playercount": 69,
+      "playermax": 100,
+      "region": "eu-west",
+      "script": "TrackMania/TM_TimeAttack_Online.Script.txt",
+      "scriptsettings": {
+        "S_DecoImageUrl_WhoAmIUrl": {
+          "key": "S_DecoImageUrl_WhoAmIUrl",
+          "type": "text",
+          "value": "/api/club/367"
+        },
+        "S_ForceLapsNb": {
+          "key": "S_ForceLapsNb",
+          "type": "integer",
+          "value": "-1"
+        },
+        "S_TimeLimit": {
+          "key": "S_TimeLimit",
+          "type": "integer",
+          "value": "600"
+        }
+      },
+      "serverinfo": {}
+    },
+    {
+      "id": 1199220,
+      "clubid": 3074,
+      "clubname": "$s$o$fff[KACKY]",
+      "name": "KR7 WHITE #4",
+      "nadeo": false,
+      "login": "kacky_4_event",
+      "playercount": 45,
+      "playermax": 101,
+      "region": "",
+      "script": "Kacky",
+      "scriptsettings": [],
+      "serverinfo": {}
+    },
+    {
+      "id": 1199219,
+      "clubid": 3074,
+      "clubname": "$s$o$fff[KACKY]",
+      "name": "KR7 WHITE #3",
+      "nadeo": false,
+      "login": "kacky_3_event",
+      "playercount": 32,
+      "playermax": 100,
+      "region": "",
+      "script": "Kacky",
+      "scriptsettings": [],
+      "serverinfo": {}
+    },
+    {
+      "id": 1203624,
+      "clubid": 114223,
+      "clubname": "$5AFAltered $FA2U10S",
+      "name": "U10S Giant V1",
+      "nadeo": true,
+      "login": "",
+      "playercount": 29,
+      "playermax": 100,
+      "region": "eu-west",
+      "script": "TrackMania/TM_TimeAttack_Online.Script.txt",
+      "scriptsettings": {
+        "S_DecoImageUrl_WhoAmIUrl": {
+          "key": "S_DecoImageUrl_WhoAmIUrl",
+          "type": "text",
+          "value": "/api/club/114223"
+        },
+        "S_ForceLapsNb": {
+          "key": "S_ForceLapsNb",
+          "type": "integer",
+          "value": "-1"
+        },
+        "S_TimeLimit": {
+          "key": "S_TimeLimit",
+          "type": "integer",
+          "value": "270"
+        }
+      },
+      "serverinfo": {}
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "amber"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Nostalgic Completionist",
+      "tagline": "Console app that queues random unfinished TMX tracks for TrackMania Nations ESWC, Sunrise and Original.",
+      "badges": [
+        "ESWC, TMS, TMO",
+        "Console app",
+        "MIT"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "target",
+          "title": "Two modes",
+          "text": "Finish unfinished tracks, or beat unbeaten author times; it skips on a saved replay."
+        },
+        {
+          "icon": "download",
+          "title": "Batches from TMX",
+          "text": "Downloads a batch of random tracks and pushes them to the track list of a LAN server."
+        },
+        {
+          "icon": "save",
+          "title": "Replay copies",
+          "text": "Accepted replays are copied to a folder per session for upload."
+        },
+        {
+          "icon": "flag",
+          "title": "Ban list",
+          "text": "A ban file per game excludes tracks for good."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Notes",
+      "markdown": "The app connects to the running game through GBXRemote and detects finishes by watching the replay folder. It does not support Stunts, Platform or multilap tracks. For ESWC the game must be started before the app.\n\nIt was made for the 100% TMX project and is a fork of the project of the same name by BigBang1112."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "eswc",
+          "status": "works"
+        },
+        {
+          "game": "tms",
+          "status": "works"
+        },
+        {
+          "game": "tmo",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Fork by cheatoskar of Nostalgic Completionist by BigBang1112."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/cheatoskar/nostalgic-completionist"
+        }
+      ]
+    }
+  ]
+}

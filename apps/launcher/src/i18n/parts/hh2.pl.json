@@ -1,0 +1,17 @@
+{
+  "hh.mods": "Mody",
+  "hh.noMods": "Brak zainstalowanych modów. Mody to osobne wtyczki, na przykład Legacy Randomizer.",
+  "hh.clipsOnly": "Klipy: tylko TMNF i TMUF.",
+  "hh.srcLine": "Źródło: {what}",
+  "hh.srcRelease": "wydanie z GitHub",
+  "hh.srcFolder": "własny folder",
+  "hh.srcChange": "zmień",
+  "hh.folderIs": "Folder: {dir}",
+  "play.mapInDownloaded": "Mapa jest w Downloaded – otwórz ją w grze.",
+  "tmxup.linkText": "Automatycznie wysyła twoje nowe rekordy do TMX. Moduł „TMX Upload” w grze musi być włączony.",
+  "tmxup.linkOpen": "Otwórz ustawienia",
+  "hh.oneLine": "Menu w grze z modułami.",
+  "hh.nextStart": "Działa od następnego startu.",
+  "hh.switchFailed": "Nie udało się przełączyć: {name}.",
+  "hh.inProfile": "w {profile}"
+}

@@ -1,0 +1,57 @@
+---
+// One route file for every page in every language: English at the root, de/pl/fr under /de/, /pl/, /fr/.
+// The page bodies live in src/views; this file lists the paths and picks the view.
+import Home from '../views/Home.astro';
+import Events from '../views/Events.astro';
+import Launcher from '../views/Launcher.astro';
+import Authors from '../views/Authors.astro';
+import Directory from '../views/Directory.astro';
+import Games from '../views/Games.astro';
+import Game from '../views/Game.astro';
+import Mod from '../views/Mod.astro';
+import CatalogMod from '../views/CatalogMod.astro';
+import Download from '../views/Download.astro';
+import AddServer from '../views/AddServer.astro';
+import DiscoverType from '../views/DiscoverType.astro';
+import Legal from '../views/Legal.astro';
+import DevHome from '../views/DevHome.astro';
+import DevDoc from '../views/DevDoc.astro';
+import GithubProjects from '../views/GithubProjects.astro';
+import { devDocs } from '../data/dev';
+import { langs, defaultLang } from '../i18n';
+import { games } from '../data/games';
+import { mods, catalogMods, types } from '../data/site';
+
+export async function getStaticPaths() {
+  const dev = await devDocs();
+  const out: { params: { slug: string | undefined }; props: Record<string, unknown> }[] = [];
+  for (const lang of langs) {
+    const add = (path: string, view: string, props: Record<string, unknown> = {}) => {
+      const slug = [lang === defaultLang ? '' : lang, path].filter(Boolean).join('/') || undefined;
+      out.push({ params: { slug }, props: { lang, view, ...props } });
+    };
+    add('', 'home');
+    add('events', 'events');
+    add('add-server', 'addserver');
+    add('launcher', 'launcher');
+    add('download', 'download');
+    add('authors', 'authors');
+    add('directory', 'directory');
+    add('games', 'games');
+    add('dev', 'devhome');
+    for (const d of dev) add(`dev/docs/${d.id}`, 'devdoc', { id: d.id });
+    for (const doc of ['impressum', 'datenschutz', 'nutzungsbedingungen']) add(doc, 'legal', { doc });
+    for (const ty of types) add(`discover/${ty.id}`, 'type', { type: ty.id });
+    add('discover/github', 'github');
+    for (const g of games) add(`game/${g.id}`, 'game', { g });
+    for (const m of mods) add(`mod/${m.id}`, 'mod', { mod: m });
+    for (const e of catalogMods) add(`mod/${e.id}`, 'catalogmod', { entry: e });
+  }
+  return out;
+}
+
+const { view, ...props } = Astro.props as { view: string; [k: string]: any };
+const views: Record<string, any> = { home: Home, events: Events, addserver: AddServer, launcher: Launcher, authors: Authors, directory: Directory, games: Games, game: Game, mod: Mod, catalogmod: CatalogMod, download: Download, type: DiscoverType, legal: Legal, devhome: DevHome, devdoc: DevDoc, github: GithubProjects };
+const View = views[view];
+---
+<View {...props} />

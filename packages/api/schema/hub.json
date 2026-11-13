@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/HubIndex",
+  "definitions": {
+    "HubIndex": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "name": {
+          "type": "string",
+          "const": "tm-hub"
+        },
+        "generated": {
+          "$ref": "#/definitions/IsoDateTime"
+        },
+        "buildMs": {
+          "type": "number",
+          "description": "Build duration in milliseconds."
+        },
+        "files": {
+          "type": "object",
+          "properties": {
+            "mods": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "projects": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "maps": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "events": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "servers": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "catalog": {
+              "$ref": "#/definitions/HubFileInfo"
+            },
+            "communities": {
+              "$ref": "#/definitions/HubFileInfo"
+            }
+          },
+          "required": [
+            "mods",
+            "projects",
+            "maps",
+            "events",
+            "servers",
+            "catalog",
+            "communities"
+          ],
+          "additionalProperties": false
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "mods": {
+              "type": "number"
+            },
+            "projects": {
+              "type": "number"
+            },
+            "maps": {
+              "type": "number"
+            },
+            "events": {
+              "type": "number"
+            },
+            "servers": {
+              "type": "number"
+            },
+            "catalog": {
+              "type": "number"
+            },
+            "communities": {
+              "type": "number"
+            },
+            "playersOnline": {
+              "type": "number",
+              "description": "Players on the listed servers right now (real sources only), plus the players of the ESWC master servers."
+            }
+          },
+          "required": [
+            "mods",
+            "projects",
+            "maps",
+            "events",
+            "servers",
+            "catalog",
+            "communities",
+            "playersOnline"
+          ],
+          "additionalProperties": false
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "name",
+        "generated",
+        "buildMs",
+        "files",
+        "counts",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "IsoDateTime": {
+      "type": "string",
+      "description": "ISO 8601 date-time in UTC, e.g. \"2026-11-10T16:00:00.000Z\"."
+    },
+    "HubFileInfo": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path, e.g. \"mods.json\"."
+        },
+        "count": {
+          "type": "number"
+        },
+        "sample": {
+          "type": "boolean",
+          "description": "Some or all items are sample data."
+        }
+      },
+      "required": [
+        "path",
+        "count",
+        "sample"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$id": "https://cheatoskar.github.io/tm-hub/schema/hub.json",
+  "title": "tm-hub hub.json"
+}

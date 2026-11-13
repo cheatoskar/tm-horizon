@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import EventCard from '../components/EventCard.astro';
+import ResultCard from '../components/ResultCard.astro';
+import { events, eventsSample, catalog, catalogItem } from '../data/site';
+import { forms, formsOpen } from '../data/links';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const organisers = catalog.filter((e) => e.category === 'events').sort((a, b) => (a.status === 'alive' ? 0 : 1) - (b.status === 'alive' ? 0 : 1)).map((e) => catalogItem(e, lang));
+---
+<Layout title={t(lang, 'nav.events')} desc={t(lang, 'events.desc')} lang={lang}>
+  <div class="phead">
+    <div>
+      <h1>{t(lang, 'nav.events')}</h1>
+      <p class="lead">{t(lang, 'events.lead')}</p>
+    </div>
+    {eventsSample && <span class="badge sample" style="height:28px;font-size:12px">{t(lang, 'events.sampleData')}</span>}
+  </div>
+
+  <div class="submit-bar">
+    {forms.event
+      ? <a class="btn primary" href={forms.event} target="_blank" rel="noopener"><Icon name="calendar-plus" />{t(lang, 'events.submit')}</a>
+      : <span class="btn ghost" aria-disabled="true" role="link"><Icon name="calendar-plus" />{t(lang, 'events.submit')}</span>}
+    <span class="muted">{formsOpen ? t(lang, 'forms.note') : t(lang, 'forms.soon')}</span>
+  </div>
+
+  <div class="two">
+    <div data-ev-groups>
+      <div class="ev-list" data-ev-live></div>
+      <div class="ev-list" data-ev-soon>{events.map((e) => <EventCard e={e} lang={lang} />)}</div>
+      <details class="ev-past" data-ev-pastbox hidden><summary>{t(lang, 'events.past')} <span class="muted" data-ev-pastn></span></summary><div class="ev-list" data-ev-past></div></details>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3><Icon name="bot" size={18} /> {t(lang, 'events.whereTitle')}</h3>
+        <p class="muted" style="font-size:15px">{t(lang, 'events.whereText')}</p>
+      </div>
+      <a class="note-bar link" href={lh(lang, '/authors/')}><Icon name="calendar-plus" /><span><b>{t(lang, 'events.runEvents')}</b> {t(lang, 'events.addDiscord')}</span><Icon name="arrow-right" /></a>
+    </aside>
+  </div>
+
+  <section class="sec">
+    <div class="sec-h"><h2>{t(lang, 'events.organisers')}</h2><span class="sub">{t(lang, 'events.fromDirectory')}</span><a class="more" href={lh(lang, '/discover/events/')}>{t(lang, 'btn.all')} <Icon name="arrow-right" size={16} /></a></div>
+    <div class="results list">{organisers.slice(0, 8).map((it) => <ResultCard it={it} kind="events" lang={lang} />)}</div>
+  </section>
+</Layout>

@@ -1,0 +1,86 @@
+# Rebuild the hub data (packages/api) every hour and publish packages/api/dist to GitHub Pages
+# (https://cheatoskar.github.io/tm-hub/, the launcher's default hub URL).
+# Repository settings needed: Settings > Pages > Source: "GitHub Actions".
+# Optional secrets: DISCORD_BOT_TOKEN (see docs/discord-bot.md); TMF_LOGIN/TMF_PASSWORD
+# (docs/tmf-masterserver.md); ESWC_LOGIN (docs/eswc-masterserver.md). GITHUB_TOKEN is provided by Actions.
+# Community servers in packages/api/data/servers/ get a TCP connect to their game port on every run.
+name: Build hub data
+
+on:
+  schedule:
+    - cron: '17 * * * *' # hourly, off the full hour
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['packages/api/**', 'packages/shared/**', 'packages/catalog/**', '.github/workflows/hub-data.yml']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: packages/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+        working-directory: .
+
+      # HTTP cache (ETags, response bodies, download hashes) carried from run to run,
+      # so mod files are downloaded once and unchanged sources answer 304. Also keeps
+      # lastSeen of the community servers and the last ESWC master server list.
+      - uses: actions/cache@v4
+        with:
+          path: packages/api/.cache
+          key: hub-cache-${{ github.run_id }}
+          restore-keys: hub-cache-
+
+      - run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          TMF_LOGIN: ${{ secrets.TMF_LOGIN }}
+          TMF_PASSWORD: ${{ secrets.TMF_PASSWORD }}
+          ESWC_LOGIN: ${{ secrets.ESWC_LOGIN }}
+          ESWC_PASSWORD: ${{ secrets.ESWC_PASSWORD }}
+
+      - name: Test (parsers, and dist/ against the schemas)
+        run: npm test
+
+      - name: Add schemas and Pages files
+        run: |
+          cp -r schema dist/schema
+          cp ../shared/src/types.ts dist/types.ts
+          touch dist/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/api/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

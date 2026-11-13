@@ -1,0 +1,50 @@
+/* Mods page: one unified list and consistent section spacing (tokens --s1..--s6). */
+.unified-list { margin-bottom: var(--s4); }
+.show-more { align-self: center; margin: var(--s4) 0 var(--s5); }
+.src-badge { margin-left: 0; }
+.src-badge.src-tmloader { background: rgba(var(--c-110-200-255, 110 200 255), 0.14); }
+.modcard .catalog-btns { flex-direction: column; align-items: flex-end; gap: var(--s2); min-width: 168px; }
+.modcard-tags .cat { text-transform: capitalize; }
+
+/* ESWC mods area (game page) and the sections after it. */
+.eswc-mods { margin: var(--s4) 0 var(--s5); }
+.eswc-mods + .pd-mods, .eswc-mods + * { margin-top: var(--s4); }
+.eswc-backups, .catinst-backups { margin-top: var(--s3); }
+.catinst-backups { margin: var(--s5) 0 var(--s6); display: flex; flex-direction: column; gap: var(--s2); }
+.catinst-files { margin: var(--s2) 0 var(--s3); padding-left: var(--s4); display: flex; flex-direction: column; gap: var(--s1); max-height: 280px; overflow: auto; }
+.catinst .target-row { margin-bottom: var(--s3); }
+.catinst p { margin: var(--s2) 0; }
+
+/* More-mods and community sections used to end flush against what follows (Openplanet block, buttons). */
+.more-mods, .community-mods { margin-bottom: var(--s6); }
+.more-mods + .notice, .more-mods + .btn, .community-mods + .notice { margin-top: var(--s5); }
+.notice.op { margin: var(--s5) 0 var(--s4); }
+.mods-main > .btn.ghost:last-child { margin: var(--s4) 0 var(--s6); }
+
+/* Card pictures: owner avatars and plugin banners fill the same rounded tile as the generated initials. */
+.tile-icon { width: 88px; height: 88px; border-radius: 18px; flex: none; box-shadow: 0 0 0 1px var(--line); }
+.modcard .tile-icon > img { border-radius: 18px; }
+
+/* Collections row above the source switch. */
+.coll-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s3); }
+.coll-chip { height: 30px; padding: 0 var(--s3); border-radius: 999px; border: 1px solid var(--line); background: var(--glass); color: var(--fg-2); font: inherit; font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.coll-chip:hover { border-color: var(--line-2); color: var(--fg); }
+.coll-chip.on { border-color: var(--tm-accent, #ff6a2a); color: var(--fg); background: rgba(var(--tint), 0.08); }
+.coll-chip .dim { margin-left: 4px; font-size: 11px; }
+
+/* Loading skeleton cards and the empty state. */
+.modcard.skeleton { cursor: default; pointer-events: none; }
+.modcard.skeleton .modcard-text { gap: var(--s3); }
+.sk, .sk-line { display: block; background: linear-gradient(100deg, rgba(var(--tint), 0.04) 20%, rgba(var(--tint), 0.11) 50%, rgba(var(--tint), 0.04) 80%) 0 0 / 200% 100%; animation: cimg-shimmer 1.3s linear infinite; border-radius: 12px; }
+.sk-line { height: 12px; border-radius: 6px; }
+.sk-line.w40 { width: 40%; } .sk-line.w60 { width: 60%; } .sk-line.w90 { width: 90%; }
+@media (prefers-reduced-motion: reduce) { .sk, .sk-line { animation: none; } }
+.empty-rich { display: flex; flex-direction: column; align-items: center; gap: var(--s3); padding: var(--s6) var(--s4); color: var(--fg-2); }
+.empty-rich > b { color: var(--fg); font-weight: 650; }
+
+/* Install dialog: failure with Retry and Open folder. */
+.catinst-err { padding: var(--s3) var(--s4); border-radius: 12px; border: 1px solid var(--line); background: rgba(var(--tint), 0.04); margin: var(--s3) 0; }
+.catinst-errtext { margin: var(--s2) 0 var(--s3); color: var(--fg-2); overflow-wrap: anywhere; user-select: text; }
+.catinst-errbtns { display: flex; flex-wrap: wrap; gap: var(--s2); }
+
+/* README reading comfort (mod page): calm rhythm, readable code, tidy tables and pictures. */

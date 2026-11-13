@@ -1,0 +1,22 @@
+{
+  "skid.title": "Skid marks",
+  "skid.text": "Clean skid marks: the grass marks on road. Visual only, works online.",
+  "skid.classic": "Classic",
+  "skid.clean": "Clean",
+  "skid.custom": "Changed by something else.",
+  "skid.missing": "Texture not found in this game folder.",
+  "skid.restore": "Restore",
+  "skid.noSource": "The game's own mark texture is missing or changed.",
+  "hist.k.skid-clean": "Skid marks set to clean",
+  "hist.k.skid-classic": "Skid marks set to classic",
+  "skid.tmlText": "Clean comes as a TMLoader product: no admin, the game folder stays as it is.",
+  "skid.tmlOn": "Clean through TMLoader, profile {profile}.",
+  "skid.tmlTest": "Not tested yet: start the game and look at skid marks on Stadium road.",
+  "skid.tmlTip": "Installs the TMLoader product Skid Marks and turns it on in this profile.",
+  "skid.direct": "Game files",
+  "skid.directTip": "Change the texture in the game folder instead (needs admin there).",
+  "skid.admin": "The game is in Program Files: this needs TM Horizon as administrator.",
+  "skid.useTml": "Use TMLoader",
+  "hist.k.skid-tml": "Skid marks set to clean (TMLoader)",
+  "hist.k.skid-tml-remove": "Skid marks TMLoader product removed"
+}

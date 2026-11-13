@@ -1,0 +1,96 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "green"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "CenterSpeed",
+      "tagline": "Speedometer for TrackMania Nations and United Forever: your speed in the middle of the screen or on the license plate.",
+      "badges": [
+        "TMNF, TMUF",
+        "ModLoader mod",
+        "By OneCredit"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "gauge",
+          "title": "Speedometer",
+          "text": "Speed in the middle of the screen, or drawn on the license plate of the car."
+        },
+        {
+          "icon": "flag",
+          "title": "Checkpoint times",
+          "text": "Speed and time at each checkpoint, with the difference to your best run."
+        },
+        {
+          "icon": "users",
+          "title": "Live tracking and spectating",
+          "text": "Compare against another player online and see speed and times of the player you spectate."
+        },
+        {
+          "icon": "settings",
+          "title": "Settings on F8",
+          "text": "Size, position, gears, RPM bars and plate settings per environment."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "1. Install the TrackMania ModLoader and start it once.\n2. Add `https://fullspeed.mooo.com/modloader/` under the servers in `%LocalAppData%\\TMLoader\\config.yaml`.\n3. Install CenterSpeed from the list and tick it. ModLoader installs CoreMod, which CenterSpeed needs, by itself.\n\nUpdates arrive automatically each time ModLoader starts."
+    },
+    {
+      "type": "hotkeys",
+      "rows": [
+        {
+          "keys": "F8",
+          "action": "Open the CenterSpeed settings"
+        },
+        {
+          "keys": "F9",
+          "action": "Live tracking"
+        }
+      ]
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "CenterSpeed is made by OneCredit."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Installation guide",
+          "url": "https://fullspeed.mooo.com/mod"
+        },
+        {
+          "kind": "link",
+          "label": "ModLoader",
+          "url": "https://tomashu.pages.dev/software/tmloader",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

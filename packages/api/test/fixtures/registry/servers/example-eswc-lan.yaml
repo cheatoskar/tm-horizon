@@ -1,0 +1,6 @@
+id: example-eswc-lan
+game: eswc
+name: Example ESWC server
+address: 198.51.100.20:2352
+mode: Rounds
+language: multi

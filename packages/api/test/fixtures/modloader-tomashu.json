@@ -1,0 +1,84 @@
+{
+  "api": 1,
+  "game": "TmForever",
+  "products": {
+    "TmForever": {
+      "name": "TrackMania Modded Forever",
+      "author": "Nadeo, modded by Tomashu",
+      "type": "program",
+      "description": "TrackMania Forever with modding support for both Nations and United",
+      "icon_link": "https://tomashu.pages.dev/modloader/TmForever/TmForever/icon.png",
+      "homepage": "https://www.trackmaniaforever.com/",
+      "external": true,
+      "versions": {
+        "2.12.0": {
+          "executable": "TmForever.exe",
+          "dependencies": [
+            {
+              "id": "CoreMod"
+            }
+          ],
+          "download_link": "https://tomashu.pages.dev/modloader/TmForever/TmForever/v2.12.0+52a5fe664e265eae312a699bbbfcb16ca0c167a7479980c3a5de36e16d7ad019.zip",
+          "hash_sha256": "52a5fe664e265eae312a699bbbfcb16ca0c167a7479980c3a5de36e16d7ad019",
+          "changelog": "- Added modding support\n- Increased RAM limit to 4GB\n- Changed icon\n- Improve security by enabling ASLR (but breaks old modifications)"
+        },
+        "2.12.0-compat": {
+          "executable": "TmForever.exe",
+          "dependencies": [
+            {
+              "id": "CoreMod"
+            }
+          ],
+          "download_link": "https://tomashu.pages.dev/modloader/TmForever/TmForever/v2.12.0-compat+d0b163411e943eb094f90f7c91488f2d76e731324f7c8fc9e7d46835fa4e7e23.zip",
+          "hash_sha256": "d0b163411e943eb094f90f7c91488f2d76e731324f7c8fc9e7d46835fa4e7e23",
+          "changelog": "- Added modding support\n- Increased RAM limit to 4GB\n- Changed icon"
+        }
+      }
+    },
+    "CoreMod": {
+      "name": "CoreMod",
+      "author": "Tomashu",
+      "type": "modification",
+      "description": "CoreMod is required by other mods to work properly. It also fixes some known issues with the original game.",
+      "homepage": "https://tomashu.dev/",
+      "versions": {
+        "1.0.12": {
+          "executable": "CoreMod.dll",
+          "priority": 2000000000,
+          "dependencies": [
+            {
+              "id": "TmForever"
+            }
+          ],
+          "download_link": "https://tomashu.pages.dev/modloader/TmForever/CoreMod/v1.0.12+55c143a54f6ae5193be07420e9d57a93a54f4fee150380a96250b59faf5c94e9.zip",
+          "hash_sha256": "55c143a54f6ae5193be07420e9d57a93a54f4fee150380a96250b59faf5c94e9",
+          "changelog": "- Prevent accidental clicks on window focus\n- Fix some 3D skins not loading"
+        },
+        "1.0.11": {
+          "executable": "CoreMod.dll",
+          "priority": 2000000000,
+          "dependencies": [
+            {
+              "id": "TmForever"
+            }
+          ],
+          "download_link": "https://tomashu.pages.dev/modloader/TmForever/CoreMod/v1.0.11+51fc723d9401af91b5c14e1b161d763a6dd4f099a78678c49c591c3ebd80032c.zip",
+          "hash_sha256": "51fc723d9401af91b5c14e1b161d763a6dd4f099a78678c49c591c3ebd80032c",
+          "changelog": "- Improve lightmap calculation performance\n- Fix car not accelerating on race start\n- Disable going fullscreen on maximize\n- Fix window resizing issues on linux"
+        },
+        "1.0.10": {
+          "executable": "CoreMod.dll",
+          "priority": 2000000000,
+          "dependencies": [
+            {
+              "id": "TmForever"
+            }
+          ],
+          "download_link": "https://tomashu.pages.dev/modloader/TmForever/CoreMod/v1.0.10+4f70ffadd9b9b191ea93f3789d355b628e97d46ca50b34a17329681626079259.zip",
+          "hash_sha256": "4f70ffadd9b9b191ea93f3789d355b628e97d46ca50b34a17329681626079259",
+          "changelog": "- Save inputs in unfinished replays\n- Reuse HTTPS connections"
+        }
+      }
+    }
+  }
+}

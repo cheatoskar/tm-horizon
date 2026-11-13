@@ -1,0 +1,31 @@
+# dependencies and build output (every workspace)
+node_modules/
+dist/
+.astro/
+.cache/
+*.log
+*.tsbuildinfo
+__pycache__/
+
+# launcher (Tauri)
+apps/launcher/src-tauri/target/
+apps/launcher/src-tauri/gen/
+# raw screenshots for tools/make-own-covers.py (only the composed covers are committed)
+apps/launcher/public/covers-own/drop/*
+!apps/launcher/public/covers-own/drop/.gitkeep
+
+# website: generated data and art that is not ours to rehost
+apps/web/src/data/site.json
+apps/web/src/data/github-projects.json
+apps/web/public/img/icons/
+apps/web/public/img/avatars/
+apps/web/public/img/games/*.webp
+
+# data pipeline
+packages/api/registry-errors.md
+
+# local screenshots of test runs are kept in screens/ on purpose
+apps/web/src/data/readmes/
+
+# public launcher builds: catalog without hidden entries (packages/catalog/public-catalog.mjs)
+packages/catalog/generated/

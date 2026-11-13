@@ -1,0 +1,22 @@
+/* Hub login (ui/HubAccount.tsx). Brand colours come from packages/shared/src/brandmarks.ts as CSS variables. */
+.hub-logins { display: grid; gap: 10px; max-width: 360px; width: 100%; }
+.hub-login-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px; height: 46px; padding: 0 18px; border-radius: 11px;
+  font-weight: 650; font-size: 15px; background: var(--hb-bg); color: var(--hb-fg); border: 1px solid rgba(var(--tint), 0.12);
+  transition: filter 0.15s, transform 0.12s;
+}
+:root[data-theme="light"] .hub-login-btn { background: var(--hb-bg-l); color: var(--hb-fg-l); }
+.hub-login-btn svg { width: 22px; height: 22px; flex: none; }
+.hub-login-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.hub-login-btn:active:not(:disabled) { transform: translateY(1px); }
+.hub-login-btn:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.hub-login-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.hub-login-wait { display: flex; align-items: center; gap: 8px; }
+.hub-login-status { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.hub-login-hint { margin: 8px 0 0; }
+.hub-account .setrow.column { flex-direction: column; align-items: flex-start; }
+.hub-avatar { width: 32px; height: 32px; border-radius: 50%; flex: none; object-fit: cover; }
+.hub-avatar.empty { display: grid; place-items: center; background: var(--acc-soft); color: var(--acc-2); font-weight: 700; }
+.hub-form { display: grid; gap: 6px; }
+.hub-form label { margin-top: 6px; }
+.hub-textarea { height: auto; padding: 8px 10px; resize: vertical; font: inherit; }

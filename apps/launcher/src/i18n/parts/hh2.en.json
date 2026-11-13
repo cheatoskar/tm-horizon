@@ -1,0 +1,17 @@
+{
+  "hh.mods": "Mods",
+  "hh.noMods": "No mods installed. Mods are separate plugins, for example the Legacy Randomizer.",
+  "hh.clipsOnly": "Clips: TMNF and TMUF only.",
+  "hh.srcLine": "Source: {what}",
+  "hh.srcRelease": "GitHub release",
+  "hh.srcFolder": "own folder",
+  "hh.srcChange": "change",
+  "hh.folderIs": "Folder: {dir}",
+  "play.mapInDownloaded": "The map is under Downloaded – open it in the game.",
+  "tmxup.linkText": "Uploads your new personal bests to TMX automatically. The in-game module “TMX Upload” has to be on.",
+  "tmxup.linkOpen": "Open settings",
+  "hh.oneLine": "In-game menu with modules.",
+  "hh.nextStart": "Applies from the next start.",
+  "hh.switchFailed": "Could not switch {name}.",
+  "hh.inProfile": "in {profile}"
+}

@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Capsule from '../components/Capsule.astro';
+import Icon from '../components/Icon.astro';
+import { gameById, cover } from '../data/games';
+import { mods } from '../data/site';
+import { t, lh, priceText, gameText, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const order = ['tm2020', 'turbo', 'tm2-lagoon', 'tm2-valley', 'tm2-stadium', 'sm-storm', 'tm2-canyon', 'tm-turbo-ds', 'tm-wii', 'tm-ds', 'tmuf', 'tmnf', 'eswc', 'tms', 'tmo'];
+const list = order.map((id) => gameById[id]);
+const modCount = (gid: string) => mods.filter((m) => m.games.includes(gid)).length;
+---
+<Layout title={t(lang, 'nav.games')} lang={lang}>
+  <div class="phead">
+    <div><h1>{t(lang, 'nav.games')}</h1><p class="lead">{t(lang, 'games.lead')}</p></div>
+  </div>
+  <div class="shelf">{list.map((g) => <Capsule g={g} mods={modCount(g.id)} lang={lang} />)}</div>
+
+  <section class="sec" id="get">
+    <div class="sec-h"><h2>{t(lang, 'home.gamesMore')}</h2></div>
+    <div class="card tbl">
+      <table class="get-tbl">
+        <thead><tr><th>{t(lang, 'games.thGame')}</th><th>{t(lang, 'games.thPrice')}</th><th>{t(lang, 'games.thWhere')}</th><th>{t(lang, 'games.thMods')}</th><th>{t(lang, 'games.thMaps')}</th></tr></thead>
+        <tbody>
+          {list.map((g) => (
+            <tr>
+              <td><a class="gcell" href={lh(lang, `/game/${g.id}/`)}><img src={cover(g.id)} alt="" loading="lazy" /><span>{g.name}<br /><span class="muted" style="font-weight:500">{g.year}</span></span></a></td>
+              <td>{priceText(lang, g.price)}</td>
+              <td><span class="muted">{gameText(lang, g, 'get')}</span>{g.stores.length > 0 && <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">{g.stores.map((s) => <a class="btn sm ghost" href={s.url} rel="noopener">{s.label === 'Official site' ? t(lang, 'game.officialSite') : s.label}</a>)}</div>}</td>
+              <td>{g.modSystem === 'none' ? <span class="muted">{t(lang, 'games.none')}</span> : <span class="chip sys"><Icon name={g.modSystem === 'TMLoader' ? 'plug' : 'orbit'} size={14} />{g.modSystem}</span>}</td>
+              <td>{g.exchange ? <a href={g.exchange.url} rel="noopener" style="color:var(--accent);font-weight:600">{g.exchange.label}</a> : <span class="muted">{t(lang, 'games.inGame')}</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:12px;font-size:13px">{t(lang, 'games.artNote')}</p>
+  </section>
+</Layout>

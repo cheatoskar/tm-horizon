@@ -1,0 +1,31 @@
+/* Live server status (src/ui/LiveServers.tsx) */
+.live-servers { margin: 18px 0 22px; }
+.live-table .tr.live-tr { grid-template-columns: minmax(220px, 2.2fr) 130px minmax(110px, 1fr) minmax(130px, 1.2fr) 150px 120px 92px; }
+/* Compact list (game pages, narrower column): the join/copy column takes what its button needs. */
+.live-table .tr.live-tr.compact { grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(90px, 1.2fr) 120px 104px max-content; }
+.live-table .tr.off:not(.th) { opacity: 0.6; }
+.live-table .tr.off:not(.th):hover { opacity: 0.85; }
+.live-lock { vertical-align: -2px; margin-left: 6px; color: var(--dim); }
+.live-ago { margin-left: 4px; font-size: 11.5px; }
+.live-state { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.live-empty { padding: 16px; }
+.live-foot { margin: 8px 2px 0; }
+.live-check { display: inline-flex; align-items: center; gap: 6px; margin-right: 6px; cursor: pointer; }
+.live-dlg { display: flex; flex-direction: column; gap: 8px; min-width: min(640px, 80vw); }
+.live-dlg > b { margin-top: 8px; }
+.live-add { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.live-add .grow { flex: 1; min-width: 180px; }
+.live-error { color: var(--bad, #f87171); }
+.live-list { display: flex; flex-direction: column; max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+.live-item { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+.live-item:last-child { border-bottom: 0; }
+.live-text { height: auto; padding: 8px 10px; resize: vertical; width: 100%; }
+@media (max-width: 1100px) {
+  .live-table .tr.live-tr, .live-table .tr.live-tr.compact { grid-template-columns: minmax(180px, 2fr) minmax(90px, 1fr) minmax(90px, 1fr) 120px 100px 80px; }
+  .live-table .tr.live-tr:not(.compact) > :nth-child(2) { display: none; }
+}
+.icon-gap { display: inline-block; width: 28px; }
+
+/* "More" behind a one-line note: the details are in the tooltip. */
+.more-tip { color: var(--acc-text, var(--acc-2)); text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; white-space: nowrap; }
+.more-tip:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 3px; }

@@ -1,0 +1,15 @@
+{
+  "updb.title": "Update verfügbar",
+  "updb.version": "Version {v}",
+  "updb.install": "Installieren",
+  "updb.later": "Später",
+  "updb.more": "Mehr",
+  "updb.less": "Weniger",
+  "updb.downloading": "Lädt {pct}",
+  "updb.restart": "Neu starten",
+  "updb.winNote": "Der Installer schließt die App und startet die neue Version.",
+  "updb.testDone": "Geprüft, Testmodus, nichts installiert.",
+  "updb.errSig": "Der Download passt nicht zur Signatur. Es wurde nichts installiert.",
+  "updb.errNet": "Keine Verbindung zum Update-Server.",
+  "updb.errOther": "Update fehlgeschlagen: {msg}"
+}

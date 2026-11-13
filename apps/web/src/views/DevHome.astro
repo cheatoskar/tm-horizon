@@ -1,0 +1,133 @@
+---
+// "For developers": overview in all four languages. The levels table, the diagram of how the pieces fit,
+// and the list of the (English) documentation pages from the "dev" content collection.
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { devDocs, devGroups } from '../data/dev';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const L = (p: string) => lh(lang, p);
+const docs = await devDocs();
+const titleOf = (id: string) => docs.find((d) => d.id === id)?.data.title ?? id;
+const levels = [
+  { id: '0', key: 'l0', read: [] as string[] },
+  { id: '1', key: 'l1', read: ['tutorial-publish', 'publishing', 'review-and-claims'] },
+  { id: '2', key: 'l2', read: ['showcase', 'related-links'] },
+  { id: '3a', key: 'l3a', read: ['tutorial-first-plugin', 'horizon-host', 'plugin-abi', 'node-explorer'] },
+  { id: '3b', key: 'l3b', read: ['tutorial-first-script', 'scripting'] },
+  { id: '4', key: 'l4', read: ['tutorial-crossover', 'porting-kit', 'porting'] },
+];
+const d = (k: string) => t(lang, `dev.d.${k}`);
+---
+<Layout title={t(lang, 'nav.dev')} desc={t(lang, 'dev.meta')} lang={lang}>
+  <div class="phead">
+    <div><h1>{t(lang, 'dev.h1')}</h1><p class="lead">{t(lang, 'dev.lead')}</p></div>
+    <a class="btn primary" href={L('/dev/docs/publishing/')}><Icon name="book-open" /> {t(lang, 'dev.docs.h')}</a>
+  </div>
+
+  <section class="sec" id="levels">
+    <div class="sec-h"><h2>{t(lang, 'dev.levels.h')}</h2></div>
+    <div class="card dev-levels">
+      <div class="tbl">
+        <table>
+          <thead><tr><th>{t(lang, 'dev.col.level')}</th><th>{t(lang, 'dev.col.do')}</th><th>{t(lang, 'dev.col.get')}</th><th>{t(lang, 'dev.col.read')}</th></tr></thead>
+          <tbody>
+            {levels.map((lv) => (
+              <tr id={`level-${lv.id}`}>
+                <td><span class="dev-lv">{lv.id}</span></td>
+                <td>{t(lang, `dev.${lv.key}.do`)}</td>
+                <td>{t(lang, `dev.${lv.key}.get`)}</td>
+                <td class="dev-read">{lv.read.length ? lv.read.map((id) => <a href={L(`/dev/docs/${id}/`)}>{titleOf(id)}</a>) : <span class="muted">-</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="pieces">
+    <div class="sec-h"><h2>{t(lang, 'dev.pieces.h')}</h2></div>
+    <p class="lead" style="margin:-6px 0 16px">{t(lang, 'dev.pieces.lead')}</p>
+    <div class="card dev-diagram">
+      <svg viewBox="0 0 920 470" role="img" aria-label={t(lang, 'dev.d.alt')} xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="dev-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" /></marker></defs>
+        <rect class="dev-frame" x="10" y="150" width="900" height="310" rx="18" />
+        <text class="dev-lbl" x="28" y="173">{d('game')}</text>
+
+        <foreignObject x="20" y="10" width="230" height="84"><div class="dev-bx"><b>{d('authors')}</b><span>{d('authorsSub')}</span></div></foreignObject>
+        <foreignObject x="345" y="10" width="230" height="84"><div class="dev-bx"><b>TM Horizon Hub</b><span>{d('hubSub')}</span></div></foreignObject>
+        <foreignObject x="670" y="10" width="230" height="84"><div class="dev-bx"><b>TM Horizon Launcher</b><span>{d('launcherSub')}</span></div></foreignObject>
+        <line class="dev-ar" x1="250" y1="52" x2="343" y2="52" marker-end="url(#dev-ah)" />
+        <text class="dev-lbl mid" x="297" y="42">{d('arrRelease')}</text>
+        <line class="dev-ar" x1="575" y1="52" x2="668" y2="52" marker-end="url(#dev-ah)" />
+        <text class="dev-lbl mid" x="622" y="42">{d('arrIndex')}</text>
+        <line class="dev-ar" x1="785" y1="94" x2="785" y2="148" marker-end="url(#dev-ah)" />
+        <text class="dev-lbl end" x="775" y="126">{d('arrInstall')}</text>
+
+        <foreignObject x="30" y="190" width="250" height="72"><div class="dev-bx"><b>TMLoader</b><span>{d('tmlSub')}</span></div></foreignObject>
+        <foreignObject x="30" y="276" width="250" height="72"><div class="dev-bx"><b>Horizon Legacy Loader</b><span>{d('hllSub')}</span></div></foreignObject>
+        <foreignObject x="30" y="362" width="250" height="72"><div class="dev-bx soft"><b>{d('other')}</b><span>{d('otherSub')}</span></div></foreignObject>
+        <line class="dev-ar" x1="280" y1="226" x2="358" y2="226" marker-end="url(#dev-ah)" />
+        <line class="dev-ar" x1="280" y1="312" x2="358" y2="312" marker-end="url(#dev-ah)" />
+        <line class="dev-ar dash" x1="280" y1="398" x2="358" y2="398" marker-end="url(#dev-ah)" />
+
+        <foreignObject x="360" y="190" width="230" height="244"><div class="dev-bx hot tall"><b>Horizon Client</b><span>{d('hostSub')}</span></div></foreignObject>
+
+        <foreignObject x="670" y="190" width="230" height="72"><div class="dev-bx"><b>Plugins</b><span>{d('pluginsSub')}</span></div></foreignObject>
+        <foreignObject x="670" y="276" width="230" height="72"><div class="dev-bx"><b>Horizon Scripts</b><span>{d('scriptsSub')}</span></div></foreignObject>
+        <foreignObject x="670" y="362" width="230" height="72"><div class="dev-bx"><b>Node Explorer</b><span>{d('neSub')}</span></div></foreignObject>
+        <line class="dev-ar" x1="590" y1="226" x2="668" y2="226" marker-end="url(#dev-ah)" />
+        <line class="dev-ar" x1="590" y1="312" x2="668" y2="312" marker-end="url(#dev-ah)" />
+        <line class="dev-ar" x1="590" y1="398" x2="668" y2="398" marker-end="url(#dev-ah)" />
+      </svg>
+    </div>
+  </section>
+
+  <section class="sec" id="docs">
+    <div class="sec-h"><h2>{t(lang, 'dev.docs.h')}</h2><span class="sub">{t(lang, 'dev.docs.note')}</span></div>
+    <p class="dev-abi card"><Icon name="flask-conical" size={16} /> <span>{t(lang, 'dev.abi')}</span></p>
+    <div class="dev-groups">
+      {devGroups.map((g) => (
+        <div class="card dev-group">
+          <h3>{t(lang, `dev.g.${g}`)}</h3>
+          <ul>
+            {docs.filter((x) => x.data.group === g).map((x) => <li><a href={L(`/dev/docs/${x.id}/`)}>{x.data.title}</a></li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .dev-levels { padding: 8px 6px; }
+  .dev-levels td { vertical-align: top; line-height: 1.5; }
+  .dev-levels td:nth-child(2) { min-width: 220px; }
+  .dev-lv { display: inline-grid; place-items: center; min-width: 34px; height: 34px; padding: 0 6px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font: 800 16px var(--body); }
+  .dev-read { display: grid; gap: 4px; }
+  .dev-read a { color: var(--accent); }
+  .dev-diagram { padding: 16px; overflow-x: auto; }
+  .dev-diagram svg { display: block; width: 100%; min-width: 760px; height: auto; color: var(--text-2); }
+  .dev-frame { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 6; }
+  .dev-lbl { fill: var(--muted); font: 600 13px var(--body); }
+  .dev-lbl.mid { text-anchor: middle; }
+  .dev-lbl.end { text-anchor: end; }
+  .dev-ar { stroke: currentColor; stroke-width: 1.6; }
+  .dev-ar.dash { stroke-dasharray: 5 4; }
+  .dev-bx { box-sizing: border-box; height: 100%; padding: 10px 14px; border-radius: 14px; background: var(--surface-2); box-shadow: inset 0 0 0 1.5px var(--line); display: grid; align-content: center; gap: 3px; font-family: var(--body); }
+  .dev-bx b { color: var(--text); font-size: 15.5px; line-height: 1.25; }
+  .dev-bx span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+  .dev-bx.hot { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent-line); }
+  .dev-bx.hot b { color: var(--accent); }
+  .dev-bx.soft { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); border-radius: 14px; }
+  .dev-bx.tall { align-content: start; padding-top: 16px; }
+  .dev-abi { display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; margin-bottom: 16px; color: var(--text-2); font-size: 15px; border-left: 3px solid var(--warn); }
+  .dev-abi .i { color: var(--warn); margin-top: 3px; }
+  .dev-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .dev-group { padding: 18px 20px; }
+  .dev-group h3 { font-size: 17px; margin-bottom: 10px; }
+  .dev-group ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .dev-group a { color: var(--text-2); text-decoration: none; }
+  .dev-group a:hover { color: var(--accent); }
+</style>

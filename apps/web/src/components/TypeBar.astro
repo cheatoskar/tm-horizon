@@ -1,0 +1,24 @@
+---
+import Icon from './Icon.astro';
+import { types, typeLabel } from '../data/site';
+import { t, lh, type Lang } from '../i18n';
+const { current, lang = 'en' } = Astro.props as { current: string; lang?: Lang };
+const found = types.find((x) => x.id === current);
+const cur = found ? { icon: found.icon, label: typeLabel(lang, found.id) } : { icon: 'library', label: t(lang, 'nav.directory') };
+---
+<nav class="typebar" aria-label={t(lang, 'nav.types')}>
+  <div class="type-pills">
+    {types.map((ty) => (
+      <a href={lh(lang, `/discover/${ty.id}/`)} class={ty.id === current ? 'on' : ''} aria-current={ty.id === current ? 'page' : undefined}>
+        <Icon name={ty.icon} size={17} />{typeLabel(lang, ty.id)}{ty.id === 'maps' && <Icon name="arrow-up-right" size={14} class="ext-i" />}
+      </a>
+    ))}
+  </div>
+  <details class="dd type-dd" data-dd>
+    <summary class="type-cur"><Icon name={cur.icon} />{cur.label}<Icon name="chevron-down" size={16} class="chev" /></summary>
+    <div class="menu wide">
+      {types.map((ty) => <a href={lh(lang, `/discover/${ty.id}/`)} class={ty.id === current ? 'on' : ''}><Icon name={ty.icon} />{typeLabel(lang, ty.id)}</a>)}
+      <a href={lh(lang, '/directory/')} class={current === 'directory' ? 'on' : ''}><Icon name="library" />{t(lang, 'nav.directory')}</a>
+    </div>
+  </details>
+</nav>

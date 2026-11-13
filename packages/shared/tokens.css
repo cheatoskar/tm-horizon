@@ -1,0 +1,79 @@
+/* TM Horizon design tokens, shared by the launcher and the website (same values as src/tokens.ts).
+   Apps map their own variables onto these, so a change here reaches both. */
+:root {
+  --tm-accent: #ff6b1a;
+  --tm-accent-2: #ff8a45;
+  --tm-accent-3: #ffb15e;
+  --tm-accent-ink: #1a0b02;
+  --tm-accent-soft: rgba(255, 107, 26, 0.14);
+  --tm-accent-line: rgba(255, 107, 26, 0.38);
+  --tm-ok: #3ddc84;
+  --tm-warn: #f2c14e;
+  --tm-bad: #ff5d5d;
+
+  --tm-app-bg: #0a0c11;
+  --tm-app-bg-2: #10131a;
+  --tm-site-bg: #121418;
+  --tm-site-surface: #1b1e24;
+  --tm-text: #eef0f3;
+  --tm-text-2: #c3c9d1;
+  --tm-muted: #8e97a3;
+
+  --tm-font-body: 'Inter Variable', 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --tm-font-display: 'Barlow Condensed', 'Barlow Semi Condensed', 'Arial Narrow', sans-serif;
+  --tm-font-mono: 'Cascadia Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+
+  --tm-r-sm: 10px;
+  --tm-r: 14px;
+  --tm-r-lg: 20px;
+
+  /* Spacing scale: gaps, paddings and margins use only these steps. */
+  --tm-s-1: 4px;
+  --tm-s-2: 8px;
+  --tm-s-3: 12px;
+  --tm-s-4: 16px;
+  --tm-s-5: 24px;
+  --tm-s-6: 32px;
+
+  /* Control heights: buttons, selects, inputs and segmented controls share one height; .sm is the small variant. */
+  --tm-ctl-h: 40px;
+  --tm-ctl-h-sm: 32px;
+
+  /* Accent colours the user can pick (launcher Settings): main, rgb triple, light, deep, text on light, ink. */
+  --tm-acc-orange: #ff8a45;
+  --tm-acc-orange-rgb: 255, 138, 61;
+  --tm-acc-orange-light: #ffb15e;
+  --tm-acc-orange-deep: #ff5d2b;
+  --tm-acc-orange-text: #c2410c;
+  --tm-acc-orange-ink: #1a0b02;
+  --tm-acc-blue: #4d8dff;
+  --tm-acc-blue-rgb: 77, 141, 255;
+  --tm-acc-blue-light: #9cc0ff;
+  --tm-acc-blue-deep: #2f6ae0;
+  --tm-acc-blue-text: #1d4ed8;
+  --tm-acc-blue-ink: #04122b;
+  --tm-acc-green: #2ec27e;
+  --tm-acc-green-rgb: 46, 194, 126;
+  --tm-acc-green-light: #86e8b5;
+  --tm-acc-green-deep: #1c9a5a;
+  --tm-acc-green-text: #15803d;
+  --tm-acc-green-ink: #03200f;
+  --tm-acc-purple: #9d6bff;
+  --tm-acc-purple-rgb: 157, 107, 255;
+  --tm-acc-purple-light: #c9b0ff;
+  --tm-acc-purple-deep: #7444e8;
+  --tm-acc-purple-text: #6d28d9;
+  --tm-acc-purple-ink: #14062e;
+  --tm-acc-red: #ff5468;
+  --tm-acc-red-rgb: 255, 84, 104;
+  --tm-acc-red-light: #ff9aa6;
+  --tm-acc-red-deep: #d92b41;
+  --tm-acc-red-text: #be123c;
+  --tm-acc-red-ink: #2a0408;
+  --tm-acc-teal: #22c1b0;
+  --tm-acc-teal-rgb: 34, 193, 176;
+  --tm-acc-teal-light: #7fe6da;
+  --tm-acc-teal-deep: #129484;
+  --tm-acc-teal-text: #0f766e;
+  --tm-acc-teal-ink: #021f1c;
+}

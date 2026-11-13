@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/EventsFile",
+  "definitions": {
+    "EventsFile": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1,
+          "description": "Format version of this file; bumped on breaking changes."
+        },
+        "generated": {
+          "$ref": "#/definitions/IsoDateTime"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceStatus"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HubEvent"
+          }
+        }
+      },
+      "required": [
+        "events",
+        "generated",
+        "schemaVersion",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "IsoDateTime": {
+      "type": "string",
+      "description": "ISO 8601 date-time in UTC, e.g. \"2026-11-10T16:00:00.000Z\"."
+    },
+    "SourceStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Source id, e.g. \"modloader:https://unlimiter.net/modloader/\" or \"tmx:tmnf\"."
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "count": {
+          "type": "number",
+          "description": "Items this source contributed."
+        },
+        "sample": {
+          "type": "boolean",
+          "description": "true when the items are made-up sample data (no token, no public source)."
+        },
+        "cached": {
+          "type": "boolean",
+          "description": "Served from the local cache instead of the network (fresh enough or the network failed)."
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "ok",
+        "count",
+        "sample"
+      ],
+      "additionalProperties": false,
+      "description": "How one source did during the build."
+    },
+    "HubEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "\"discord:<guild>:<event>\", \"submitted:<file id>\" or \"sample:<n>\"."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "discord",
+            "submitted",
+            "trackmania.io",
+            "tmtas",
+            "sample"
+          ],
+          "description": "\"discord\": Discord scheduled event; \"submitted\": approved through the event issue form (data/events/); \"trackmania.io\": TM2020 competition; \"tmtas\": TMTAS exchange event."
+        },
+        "tas": {
+          "type": "boolean",
+          "description": "TAS event: the launcher shows it in TAS mode only."
+        },
+        "sample": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start": {
+          "$ref": "#/definitions/IsoDateTime"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/IsoDateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "\"scheduled\" | \"active\" | \"completed\" | \"canceled\"."
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text location (external events), e.g. a URL or a tmtp:// link."
+        },
+        "join": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/JoinLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Parsed game join link from the location, if any."
+        },
+        "community": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "invite": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "invite"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Community hosting the event: the Discord server, or the host named in a submitted event."
+        },
+        "interested": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "games": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GameId"
+          }
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Link to the event (Discord event URL, the submitted link, or the sample's page)."
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Server address \"host:port\" when the game has no join link (ESWC, Original, Sunrise)."
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "sample",
+        "name",
+        "description",
+        "start",
+        "end",
+        "status",
+        "location",
+        "join",
+        "community",
+        "interested",
+        "image",
+        "games",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "JoinLink": {
+      "type": "object",
+      "properties": {
+        "raw": {
+          "type": "string",
+          "description": "Link as written, e.g. \"tmtp://#join=myserver\"."
+        },
+        "scheme": {
+          "type": "string",
+          "enum": [
+            "tmtp",
+            "maniaplanet",
+            "trackmania"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "description": "\"join\", \"spectate\", \"addfavourite\", ..."
+        },
+        "target": {
+          "type": "string",
+          "description": "Server login (Forever, ManiaPlanet) or address."
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ManiaPlanet title id after \"@\", e.g. \"TMStadium@nadeo\"."
+        },
+        "password": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Server password from \"join=login:password\", if present."
+        }
+      },
+      "required": [
+        "raw",
+        "scheme",
+        "action",
+        "target",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "GameId": {
+      "type": "string",
+      "enum": [
+        "tmo",
+        "tms",
+        "eswc",
+        "tmnf",
+        "tmuf",
+        "tm2-canyon",
+        "tm2-stadium",
+        "tm2-valley",
+        "tm2-lagoon",
+        "sm-storm",
+        "tm2020",
+        "turbo"
+      ],
+      "description": "Game ids shared with the catalog (packages/catalog/catalog.json)."
+    }
+  },
+  "$id": "https://cheatoskar.github.io/tm-hub/schema/events.json",
+  "title": "tm-hub events.json"
+}

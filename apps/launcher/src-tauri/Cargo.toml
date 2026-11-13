@@ -1,0 +1,91 @@
+[package]
+name = "tm-hub"
+version = "0.5.1"
+description = "TM Horizon: one launcher for every TrackMania"
+edition = "2021"
+license = "AGPL-3.0-only"
+publish = false
+
+[lib]
+name = "tm_hub_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["unstable", "protocol-asset", "tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-window-state = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-updater = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+sha2 = "0.10"
+# ModDB lists MD5 per file (TrackMania Highlands ZIP check, suggest.rs).
+md-5 = "0.10"
+hex = "0.4"
+semver = "1"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+ureq = { version = "2", default-features = false, features = ["native-tls", "json"] }
+native-tls = "0.2"
+dirs = "6"
+url = "2"
+base64 = "0.22"
+ed25519-dalek = "2.1.1"
+flate2 = "1"
+# Dolphin's Windows builds are 7z archives (emulators on demand, consoles.rs).
+sevenz-rust2 = { version = "0.25", default-features = false, features = ["util"] }
+# Random bytes: hub login (PKCE verifier, state) and own servers (secrets).
+getrandom = "0.3"
+# Own servers: UPnP port mappings for the game and P2P ports (sync API, no async runtime).
+igd-next = { version = "0.18", default-features = false, features = ["io_sync"] }
+# Media page: small JPEG previews of screenshots (BMP/PNG/JPG/WebP/TGA), made off the main thread (thumbs.rs).
+image = { version = "0.25", default-features = false, features = ["bmp", "jpeg", "png", "webp", "tga", "ico"] }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+# Browser add-ons in the embedded WebView2 profile (same versions as wry/tauri use).
+webview2-com = "0.39"
+windows-core = "0.62"
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_Storage_FileSystem",
+  "Win32_System_IO",
+  "Win32_Security_WinTrust",
+  "Win32_Security_Cryptography",
+  "Win32_Security_Cryptography_Catalog",
+  "Win32_Security_Cryptography_Sip",
+  "Win32_System_Threading",
+  "Win32_System_JobObjects",
+  "Win32_Security",
+  "Win32_Security_Credentials",
+  "Win32_UI_Shell",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[dev-dependencies]
+tempfile = "3"
+minisign-verify = "0.3"
+
+# Debug builds: the picture decoders are 10-30x slower unoptimized; previews would lag in dev builds.
+[profile.dev.package.image]
+opt-level = 3
+[profile.dev.package.zune-jpeg]
+opt-level = 3
+[profile.dev.package.png]
+opt-level = 3
+[profile.dev.package.fdeflate]
+opt-level = 3
+[profile.dev.package.image-webp]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

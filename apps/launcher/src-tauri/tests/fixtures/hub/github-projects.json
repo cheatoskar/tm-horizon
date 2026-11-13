@@ -1,0 +1,27 @@
+{
+  "total": 4,
+  "page": 1,
+  "items": [
+    {
+      "repo": "someone/tmnf-replay-tools", "name": "tmnf-replay-tools", "owner": "someone",
+      "description": "Command line tools to read and convert TrackMania Nations Forever replays. Exports inputs, checkpoints and ghost data to JSON so other programs can use them; works with every Forever replay version.",
+      "url": "https://github.com/someone/tmnf-replay-tools", "homepage": null, "language": "Python", "topics": ["trackmania"], "stars": 12, "license": "MIT",
+      "archived": false, "pushed": "2026-10-01T10:00:00Z", "games": ["tmnf", "tmuf"], "slug": "tmnf-replay-tools", "claimed": false,
+      "type": "tool", "summary": null, "openplanetPage": null, "link": "https://github.com/someone/tmnf-replay-tools"
+    },
+    {
+      "repo": "other/forever-stats", "name": "forever-stats", "owner": "other", "description": "Statistics for TMNF.",
+      "url": "https://github.com/other/forever-stats", "language": "Rust", "stars": 40, "games": ["tmnf"], "claimed": false,
+      "type": "tool", "summary": "Personal records and play time for TMNF.", "openplanetPage": null, "link": "https://github.com/other/forever-stats"
+    },
+    {
+      "repo": "op/BetterChat", "name": "Better Chat", "owner": "op", "description": "Chat plugin.", "url": "https://github.com/op/BetterChat",
+      "stars": 30, "games": ["tm2020", "tmnf"], "claimed": false, "type": "openplanet-plugin", "summary": "A better chat for Trackmania.",
+      "openplanetPage": "https://openplanet.dev/plugin/betterchat", "link": "https://openplanet.dev/plugin/betterchat"
+    },
+    {
+      "repo": "x/evil", "name": "evil-mirror", "description": "Hosted elsewhere.", "url": "https://example.com/evil",
+      "stars": 1, "games": ["tmnf"], "type": "tool", "summary": "x", "link": "http://example.com/evil"
+    }
+  ]
+}

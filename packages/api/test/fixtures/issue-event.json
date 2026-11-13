@@ -1,0 +1,9 @@
+{
+  "action": "labeled",
+  "label": { "name": "approved" },
+  "issue": {
+    "number": 43,
+    "labels": [{ "name": "event" }, { "name": "approved" }],
+    "body": "### Event name\n\nForever Night Cup #3\n\n### Game\n\nTrackMania Nations Forever (tmnf), TrackMania United Forever (tmuf)\n\n### Date\n\n2026-11-21\n\n### Start time\n\n19:00\n\n### Time zone\n\nEurope/Berlin\n\n### Duration\n\n2h\n\n### Host community\n\nNight Racers\n\n### Community link (optional)\n\nhttps://discord.gg/example\n\n### Server or join link (optional)\n\ntmtp://#join=nightcup\n\n### Description\n\nFive night maps.\n\n### Link (optional)\n\n_No response_"
+  }
+}

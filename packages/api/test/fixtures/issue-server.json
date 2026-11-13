@@ -1,0 +1,9 @@
+{
+  "action": "labeled",
+  "label": { "name": "approved" },
+  "issue": {
+    "number": 42,
+    "labels": [{ "name": "server" }, { "name": "approved" }],
+    "body": "### Game\n\nTrackMania Nations ESWC (eswc)\n\n### Server name\n\n100% TMX ESWC\n\n### Address\n\n203.0.113.40:2352\n\n### Server login\n\n_No response_\n\n### Mode\n\nTimeAttack\n\n### Language\n\nEN\n\n### Description\n\nRandom unfinished TMX maps.\r\nEvery finish helps.\n\n### Discord (optional)\n\nhttps://discord.gg/HRShWnzpK3\n\n### Website (optional)\n\n_No response_\n\n### Confirm\n\n- [X] I run this server or speak for the people who run it, and it is fine to check its game port every hour."
+  }
+}

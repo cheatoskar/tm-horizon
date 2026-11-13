@@ -1,0 +1,48 @@
+{
+  "about": "Public builds of the launcher (TMHUB_PUBLIC_BUILD=1 or TMHUB_RELEASE_PREVIEW=1) apply this list to catalog.json. Rules from docs/legal/permissions.md, checked 2026-11-12 (GitHub licences via the GitHub API). hide: the entry is not shown at all. linkOnly: shown, but the launcher does not download the file itself (no installSpec); the player opens the author's page. noShowcase: the showcase page (third-party pictures without permission) is not used. installLicences: GitHub repositories the launcher may download release files from (OSI licence or my own), checked by check-release.mjs.",
+  "checked": "2026-11-12",
+  "hide": {
+    "mod-simple-menu-enhance": "Discord attachment only, no licence",
+    "mod-bay-buildings": "Discord attachment only, no licence",
+    "mod-turbo2-blocks-eswc": "Discord attachment only, no licence",
+    "mod-tm-advertisements": "Discord attachment only, no licence",
+    "mod-custom-led-font": "Discord attachment only, no licence",
+    "mod-island-helipad": "Discord attachment only, no licence",
+    "mod-stadiumcar-para-skin": "Discord attachment only, no licence",
+    "mod-rally-pc3-shader-fix": "Discord attachment only, no licence",
+    "mod-tmo-online-patch": "Discord attachment only, no licence (and no longer works per its author)",
+    "mod-classic-advertising": "Discord attachment only, no licence",
+    "mod-no-forever-in-medals": "Discord attachment only, no licence",
+    "mod-nadeo-cup-restoration": "Discord attachment only, no licence",
+    "mod-rally-advertising-square-tower": "Discord attachment only, no licence",
+    "mod-tmf-stadium-clouds-fix": "Discord attachment only, no licence",
+    "mod-tm-wii-skin-pack": "Discord attachment only, no licence",
+    "mod-champion-mod": "Discord attachment only, no licence",
+    "mod-medal-cars": "Google Drive share posted on Discord, no licence, no public page",
+    "mod-old-in-one": "Yandex Disk share posted on Discord, no licence, no public page",
+    "mod-nf-to-mp3": "Google Drive share posted on Discord, no licence (the launcher downloaded it directly)",
+    "mod-trackmania-hub": "copy-protection workaround: removed from the catalog source for good, stays here so a re-import is hidden"
+  },
+  "removed": [
+    "mod-trackmania-hub"
+  ],
+  "linkOnly": {
+    "mod-newsnowcar": "author's own site (unlimiter.net), no licence: the player downloads it there",
+    "mod-openal-3d-audio": "author's own site (files.3zet.net), no licence: the player downloads it there",
+    "tas-shweetz-nosepos": "GitHub repository without a licence: link only, the player downloads from the author",
+    "tas-shweetz-drawfuture": "GitHub repository without a licence: link only, the player downloads from the author",
+    "tas-shweetz-lowinputbf": "GitHub repository without a licence: link only, the player downloads from the author"
+  },
+  "noShowcase": {
+    "mod-tmutp": "pictures from a repository whose licence GitHub cannot identify (NOASSERTION), no permission for the pictures"
+  },
+  "installLicences": {
+    "jiink/TrackManiaForeverOpenXR": "MIT",
+    "BigBang1112/always-official": "MIT",
+    "Sai-Moen/TMInterface-AS-SaiMoen": "MIT",
+    "cheatoskar/TM-Vibrant-Shaders": "own",
+    "cheatoskar/eswc-autosave": "MIT (own)",
+    "cheatoskar/100-TMX-Bingo-Plugin": "MIT (own)",
+    "cheatoskar/TMX-Downloader": "MIT (own)"
+  }
+}

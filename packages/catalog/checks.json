@@ -1,0 +1,1611 @@
+{
+ "tmnf-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmnf.exchange/"
+  }
+ },
+ "tmuf-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmuf.exchange/"
+  }
+ },
+ "tmnforever-tm-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmnf.exchange/"
+  }
+ },
+ "tmx-original": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://original.tm-exchange.com/"
+  }
+ },
+ "tmx-sunrise": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://sunrise.tm-exchange.com/"
+  }
+ },
+ "tmx-nations": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://nations.tm-exchange.com/"
+  }
+ },
+ "tmx-legacy-root": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.tm-exchange.com/"
+  }
+ },
+ "mania-exchange-tm2": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tm.mania.exchange/"
+  }
+ },
+ "mania-exchange-sm": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://sm.mania.exchange/"
+  }
+ },
+ "trackmania-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://trackmania.exchange/"
+  }
+ },
+ "mania-exchange-hub": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://mania.exchange/"
+  }
+ },
+ "item-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://item.exchange/"
+  }
+ },
+ "item-exchange-tm2": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://item.mania.exchange/"
+  }
+ },
+ "mania-exchange-blog": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://blog.mania.exchange/"
+  },
+  "archive": "http://web.archive.org/web/20260830080654/https://blog.mania.exchange/"
+ },
+ "mx-api-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://api.mania.exchange/"
+  }
+ },
+ "mx-api-old-docs": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://api.mania.exchange/documents/changes"
+  },
+  "archive": "http://web.archive.org/web/20210928041122/https://api.mania-exchange.com/documents/changes"
+ },
+ "steam-workshop-tm2-stadium": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://steamcommunity.com/app/232910/workshop/"
+  }
+ },
+ "steam-workshop-tm2-canyon": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://steamcommunity.com/app/228760/workshop/"
+  }
+ },
+ "steam-workshop-tm2-valley": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://steamcommunity.com/app/243360/workshop/"
+  }
+ },
+ "steam-workshop-tm2-lagoon": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://steamcommunity.com/app/600720/workshop/"
+  }
+ },
+ "100tmx": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://100tmx.com/resources"
+  }
+ },
+ "tmloader": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tomashu.pages.dev/software/tmloader/"
+  }
+ },
+ "tmloader-site": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tomashu.pages.dev/"
+  }
+ },
+ "tminterface": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://donadigo.com/tminterface/"
+  }
+ },
+ "tm-competition-patch": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://donadigo.com/tmcp"
+  }
+ },
+ "tmunlimiter": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmnf.exchange/threadshow/6517627"
+  }
+ },
+ "twinkie-forever": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/TwinkieTweaks/TwinkieForever"
+  }
+ },
+ "twinkie-site": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://twinkietweaks.github.io/"
+  }
+ },
+ "twinkie-org": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/TwinkieTweaks"
+  }
+ },
+ "bingoforever": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/manfromfms/BingoForever"
+  }
+ },
+ "tm-vibrant-shaders": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/cheatoskar/TM-Vibrant-Shaders"
+  }
+ },
+ "tmfoxr": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/jiink/TrackManiaForeverOpenXR"
+  }
+ },
+ "openplanet": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/"
+  }
+ },
+ "openplanet-plugins": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/plugins"
+  }
+ },
+ "openplanet-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/docs"
+  }
+ },
+ "openplanet-nl-old": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/"
+  }
+ },
+ "nations-converter": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://bigbang1112.eu/nc/"
+  }
+ },
+ "nations-converter-news": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.trackmania.com/clubs/21571/news/691778"
+  }
+ },
+ "gbx-net": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/BigBang1112/gbx-net"
+  }
+ },
+ "gbx-explorer": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20240422092419/http://gbxexplorer.net/"
+ },
+ "gbxdump": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://wiki.xaseco.org/wiki/GbxDump"
+  }
+ },
+ "tmtelemetry": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Electron-x/TMTelemetry"
+  }
+ },
+ "vscode-maniascript": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/MattMcFarland/vscode-maniascript"
+  }
+ },
+ "krzychor-campaign-maker": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://wiki.xaseco.org/wiki/File:Krzychor-campaign-maker.zip"
+  }
+ },
+ "tmf-net": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Laiteux/TMF.NET"
+  }
+ },
+ "tmx-api-nuget": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.nuget.org/packages/TmExchangeApi.NET"
+  }
+ },
+ "nadeo-api-py": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://pypi.org/project/nadeo-api/"
+  }
+ },
+ "nadeo-api-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://nadeo-api.readthedocs.io/en/latest/"
+  }
+ },
+ "tmnf-plugins": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Delorean12DMC/tmnf-plugins"
+  }
+ },
+ "foreverrpc": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/AroPix/ForeverRPC"
+  }
+ },
+ "mania-server-manager": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://hub.docker.com/r/bigbang1112/mania-server-manager"
+  }
+ },
+ "tm2020-dedicated": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://files.v04.maniaplanet.com/server/TrackmaniaServer_Latest.zip"
+  }
+ },
+ "tm2-dedicated": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://files.v04.maniaplanet.com/server/ManiaplanetServer_Latest.zip"
+  }
+ },
+ "tm2-dedicated-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://doc.maniaplanet.com/dedicated-server/getting-started"
+  }
+ },
+ "tmnf-dedicated": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20221208093059/https://www.tm-forum.com/viewtopic.php?t=14203"
+ },
+ "tmnf-dedicated-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.gamers.org/tmf/docs/readme_dedicated.html"
+  }
+ },
+ "docker-tm2020": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://hub.docker.com/r/evotm/trackmania"
+  },
+  "archive": "http://web.archive.org/web/20251203015309/https://hub.docker.com/r/evotm/trackmania"
+ },
+ "docker-tmnf": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://hub.docker.com/r/lduriez/tmserver"
+  }
+ },
+ "xaseco": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.xaseco.org/"
+  }
+ },
+ "uaseco": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.uaseco.org/"
+  }
+ },
+ "evosc": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/EvoEsports/EvoSC"
+  }
+ },
+ "evosc-old": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/EvoEsports/EvoSC"
+  }
+ },
+ "maniacontrol": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniacontrol.com/"
+  }
+ },
+ "pyplanet": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://pypla.net/en/latest/"
+  }
+ },
+ "expansion": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20250122064930/https://mp-expansion.com/"
+ },
+ "adminserv": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Chris92de/AdminServ"
+  }
+ },
+ "adminserv-neo": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://gitlab.com/Chris92de/AdminServ-Neo/"
+  }
+ },
+ "fancymanialinks": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/steeffeen-zz/FancyManiaLinks"
+  }
+ },
+ "tm-disassembler": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20260402233611/https://micolous.id.au/pages/disasm.html"
+ },
+ "trackstudio": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://web.archive.org/web/20160319194133/http://tossha.ru/trackstudio/"
+  }
+ },
+ "gbxedit": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [WinError 10060] Ein Verbindungsversuch ist fehlgeschlagen, da die Gegenstelle nach einer bestimmten Zeit"
+  }
+ },
+ "mapedit": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [WinError 10060] Ein Verbindungsversuch ist fehlgeschlagen, da die Gegenstelle nach einer bestimmten Zeit"
+  }
+ },
+ "gbx-tools-wolfgang": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://www.wolfgang-rolke.de/gbxdump/gbxconv.zip"
+  }
+ },
+ "maniapark": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniapark.com/"
+  }
+ },
+ "maniapark-old": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniapark.com/"
+  }
+ },
+ "trackmania-carpark": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniapark.com/?rsite=cp"
+  }
+ },
+ "southmoon-cars": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://trackmania.southmoon.net/cars/"
+  }
+ },
+ "marie-stuff": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://mariejuku.github.io/"
+  }
+ },
+ "tmnf-tracksigns": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmnf.exchange/tracksigns"
+  }
+ },
+ "skin-uploads-doc": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://doc.trackmania.com/club/activities/skin-uploads/"
+  }
+ },
+ "trackmania-skins-revamped": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://forums.pixeltailgames.com/t/trackmania-skins-revamped/34737"
+  }
+ },
+ "tmr-remastered": {
+  "status": "unclear",
+  "res": {
+   "code": 403,
+   "final": "https://www.patreon.com/posts/154048727",
+   "via": "curl"
+  }
+ },
+ "trackmania-io": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://trackmania.io/"
+  }
+ },
+ "nadeo-webservices-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://webservices.openplanet.dev/"
+  }
+ },
+ "nadeo-live-leaderboards": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://webservices.openplanet.dev/live/leaderboards/"
+  }
+ },
+ "nadeo-oauth-docs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://webservices.openplanet.dev/oauth/summary/"
+  }
+ },
+ "dedimania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://dedimania.net/"
+  }
+ },
+ "speedrun-tmnf": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/j1n4el6p",
+   "via_api": true
+  }
+ },
+ "speedrun-api": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/speedruncomorg/api"
+  }
+ },
+ "speedrun-tmuf": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/k6ql391g",
+   "via_api": true
+  }
+ },
+ "speedrun-tm2020": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/kdkz4zed",
+   "via_api": true
+  }
+ },
+ "tm-ladder": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20240324073605/https://en.tm-ladder.com/"
+ },
+ "statsmania": {
+  "status": "unclear",
+  "res": {
+   "code": 301,
+   "final": "https://c168.media/pages/editor",
+   "via": "curl"
+  }
+ },
+ "ultimate-medals": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/plugin/ultimatemedals"
+  }
+ },
+ "tm-masters": {
+  "status": "unclear",
+  "res": {
+   "code": 301,
+   "final": "https://www.tm-masters.com/",
+   "via": "curl"
+  }
+ },
+ "tm-live": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://trackmania.mania-actu.com/"
+  }
+ },
+ "servers-tmf-wrapper": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Laiteux/TMF.NET"
+  }
+ },
+ "steam-tmnf-discussion-servers": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://steamcommunity.com/app/7200/discussions/0/1729828401698331345"
+  }
+ },
+ "trackmania-official": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.trackmania.com/"
+  }
+ },
+ "maniaplanet-official": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.maniaplanet.com/"
+  }
+ },
+ "maniaplanet-forum": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [WinError 10060] Ein Verbindungsversuch ist fehlgeschlagen, da die Gegenstelle nach einer bestimmten Zeit"
+  }
+ },
+ "tm-forum": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20230206075626/https://www.tm-forum.com/"
+ },
+ "reddit-trackmania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.reddit.com/r/trackmania/"
+  }
+ },
+ "reddit-tmnf": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.reddit.com/r/TMNF/"
+  }
+ },
+ "liquipedia": {
+  "status": "unclear",
+  "res": {
+   "code": 403,
+   "final": "https://liquipedia.net/trackmania/Main_Page",
+   "via": "curl"
+  }
+ },
+ "liquipedia-tournaments": {
+  "status": "unclear",
+  "res": {
+   "code": 403,
+   "final": "https://liquipedia.net/trackmania/Portal:Tournaments",
+   "via": "curl"
+  }
+ },
+ "evo-wiki": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://evotm.com/wiki"
+  },
+  "archive": null
+ },
+ "xaseco-wiki": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://wiki.xaseco.org/wiki/Main_Page"
+  }
+ },
+ "gbx-wiki-gbx": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://wiki.xaseco.org/wiki/GBX"
+  }
+ },
+ "tmnf-hub-gamers": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.gamers.org/tmf/"
+  }
+ },
+ "maniascript-ref": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniaplanet.github.io/maniascript-reference/"
+  }
+ },
+ "maniaplanet-doc": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://doc.maniaplanet.com/manialink"
+  }
+ },
+ "trackmania-doc": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://doc.trackmania.com/"
+  }
+ },
+ "mania-actu": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://mania-actu.com/"
+  }
+ },
+ "maniacalendar": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniacalendar.com/"
+  }
+ },
+ "huntmania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://notavailable.goneo.de/"
+  }
+ },
+ "trackmania-open": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://trackmaniaopen.com/"
+  }
+ },
+ "trackmaniastars": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20210302111708/https://trackmaniastars.org/"
+ },
+ "smurfen": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.smurfen.net/"
+  }
+ },
+ "tm-world-team-cup": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20230319104347/https://tm-worldteamcup.de/"
+ },
+ "tm-grand-league": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20220119143004/https://www.trackmania-grand-league.com/"
+ },
+ "zrt-tmcup": {
+  "status": "unclear",
+  "res": {
+   "code": 302,
+   "final": "http://ascension-tournament.gg/",
+   "via": "curl"
+  }
+ },
+ "trackmania-rpg": {
+  "status": "dead",
+  "res": {
+   "code": null,
+   "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  "archive": "http://web.archive.org/web/20230925093213/http://trackmania-rpg.com/"
+ },
+ "rmc-openplanet": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://openplanet.dev/plugin/mxrandom"
+  }
+ },
+ "rmct-weekly": {
+  "status": "unclear",
+  "res": {
+   "code": 403,
+   "final": "https://liquipedia.net/trackmania/RMCT/2",
+   "via": "curl"
+  }
+ },
+ "kacky": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discordbotlist.com/servers/the-kacky-discord-615881817081249851"
+  }
+ },
+ "youtube-trackmania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.youtube.com/@trackmania?cbrd=1&ucbcb=1"
+  }
+ },
+ "twitch-trackmania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.twitch.tv/trackmania"
+  }
+ },
+ "ubisoft-nadeo-medium": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://medium.com/ubisoft-nadeo",
+   "via": "curl"
+  }
+ },
+ "awesome-trackmania": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/EvoEsports/awesome-trackmania"
+  }
+ },
+ "discord-trackmania-hub": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/trackmania?with_counts=true",
+   "invite": {
+    "guild": "Trackmania",
+    "members": 36070
+   }
+  }
+ },
+ "discord-evo": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/evoesports?with_counts=true",
+   "invite": {
+    "guild": "Evo Esports",
+    "members": 4451
+   }
+  }
+ },
+ "discord-openplanet": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/6JesQ6h?with_counts=true",
+   "invite": {
+    "guild": "Openplanet",
+    "members": 5608
+   }
+  }
+ },
+ "discord-mania-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/uRwvByS?with_counts=true",
+   "invite": {
+    "guild": "mania.exchange",
+    "members": 3379
+   }
+  }
+ },
+ "discord-maniapark": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/GudjUf9?with_counts=true",
+   "invite": {
+    "guild": "ManiaPark",
+    "members": 1780
+   }
+  }
+ },
+ "discord-developers": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/kG9TjxF?with_counts=true",
+   "invite": {
+    "guild": "Creators' Place",
+    "members": 318
+   }
+  }
+ },
+ "discord-speedrunning": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/yJ4G4r6?with_counts=true",
+   "invite": {
+    "guild": "TrackMania Speedruns",
+    "members": 589
+   }
+  }
+ },
+ "discord-news": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/wCmsgSm?with_counts=true",
+   "invite": {
+    "guild": "Trackmania News",
+    "members": 6646
+   }
+  }
+ },
+ "discord-rpg-trial": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/TrD3HXE?with_counts=true",
+   "invite": {
+    "guild": "Trackmania RPG & Trial",
+    "members": 1521
+   }
+  }
+ },
+ "discord-smurfen": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/invite/cqQrrwm36K"
+  }
+ },
+ "discord-fullspeed": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/6zGZU9P?with_counts=true",
+   "invite": {
+    "guild": "Fullspeed Major Series",
+    "members": 628
+   }
+  }
+ },
+ "discord-tm-open": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/qC5684m?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-liquipedia": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/dMaeEQE?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-tm-one": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/9w2uggH?with_counts=true",
+   "invite": {
+    "guild": "Trackmania One",
+    "members": 614
+   }
+  }
+ },
+ "discord-pursuit": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/BBHC3sT?with_counts=true",
+   "invite": {
+    "guild": "TrackMania² Galaxy",
+    "members": 237
+   }
+  }
+ },
+ "discord-esac": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/UrxH2SP?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-united-unicorns": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/457Bxpf?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-united-designers": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/v96Xq25?with_counts=true",
+   "invite": {
+    "guild": "United Designers",
+    "members": 85
+   }
+  }
+ },
+ "discord-nascar": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/xjBcAEM?with_counts=true",
+   "invite": {
+    "guild": "TrackMania - Nascar",
+    "members": 372
+   }
+  }
+ },
+ "discord-grand-league": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/BnKX24m?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-tm-open-comp": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/QNmVbws?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-dirt-league": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/VhFWRcb?with_counts=true",
+   "invite": {
+    "guild": "Trackmania Dirt League",
+    "members": 79
+   }
+  }
+ },
+ "discord-tmcs": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/zvSXSXM?with_counts=true",
+   "invite": {
+    "guild": "Trackmania  Championship Series",
+    "members": 401
+   }
+  }
+ },
+ "discord-world-team-cup": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/nyZRqnH?with_counts=true",
+   "invite": {
+    "guild": "World Team Cup Trackmania",
+    "members": 141
+   }
+  }
+ },
+ "discord-tmx-allround": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/SmdrVHt?with_counts=true",
+   "invite": {
+    "guild": "TMX AllRound Competition",
+    "members": 58
+   }
+  }
+ },
+ "discord-kackiest-kacky": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/VV46BqA?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-planet-dirt-cup": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/Uy2qhYf?with_counts=true",
+   "invite": {
+    "guild": null,
+    "members": null
+   }
+  }
+ },
+ "discord-spawncup": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://discord.com/api/v9/invites/c2z23tk?with_counts=true",
+   "invite": {}
+  },
+  "archive": null
+ },
+ "discord-trackmania-discovery": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/servers/trackmania-158349559959912448"
+  }
+ },
+ "discord-evo-discovery": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/servers/evo-esports-384138149686935562"
+  }
+ },
+ "discord-tma-discovery": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/servers/tma-trackmania-mapping-assembly-838391457688846337"
+  }
+ },
+ "discord-maji-discovery": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discord.com/api/v9/invites/maji?with_counts=true",
+   "invite": {
+    "guild": "Maji’s community",
+    "members": 4032
+   }
+  }
+ },
+ "discord-openplanet-botlist": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://discordbotlist.com/servers/openplanet"
+  }
+ },
+ "speedrun-tmo": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/j1nenwe1",
+   "via_api": true
+  }
+ },
+ "speedrun-tm2canyon": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/m1mnrxd2",
+   "via_api": true
+  }
+ },
+ "speedrun-tm2stadium": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/w6jlx4dj",
+   "via_api": true
+  }
+ },
+ "speedrun-tm2valley": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/46w2p96r",
+   "via_api": true
+  }
+ },
+ "speedrun-tm2lagoon": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/268q5k6p",
+   "via_api": true
+  }
+ },
+ "speedrun-tmturbo": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://www.speedrun.com/api/v1/games/nd290q60",
+   "via_api": true
+  }
+ },
+ "mod-simple-menu-enhance": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-bay-buildings": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-turbo2-blocks-eswc": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-medal-cars": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": null
+  }
+ },
+ "mod-tm-advertisements": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-custom-led-font": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-island-helipad": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-stadium-road-clip-removers": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "http://maniacdn.net/greffmaster/TMF/Blocks/StadiumRoadClipRemovers_v1.0.0.zip"
+  }
+ },
+ "mod-stadiumcar-para-skin": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-rally-pc3-shader-fix": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-tmo-online-patch": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-classic-advertising": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-no-forever-in-medals": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-nadeo-cup-restoration": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-rally-advertising-square-tower": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-tmf-stadium-clouds-fix": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-nando-banner": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-tm-wii-skin-pack": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-champion-mod": {
+  "status": "unclear",
+  "res": {
+   "code": null,
+   "error": "no public URL (Discord attachment only)"
+  }
+ },
+ "mod-old-in-one": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": null
+  }
+ },
+ "mod-trackmania-rtx-20th": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": null
+  },
+  "archive": null
+ },
+ "mod-mid-fight-masses": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": null
+  },
+  "archive": null
+ },
+ "mod-outrun-c2c-ost": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": null
+  },
+  "archive": null
+ },
+ "mod-nando-banners": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://archive.org/details/ad-8x-1-d"
+  }
+ },
+ "mod-nf-to-mp3": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": null
+  },
+  "mirrors": {
+   "https://tmnf.exchange/trackpackshow/12834275": {
+    "code": 200,
+    "final": "https://tmnf.exchange/trackpackshow/12834275",
+    "error": null
+   }
+  }
+ },
+ "mod-tmutp": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://pixelpickaxe.github.io/trackmania-united-transformation-pack/"
+  }
+ },
+ "mod-snowy-highland": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://maniapark.com/mod/PK_t88ghE0i0VSysIFfQHg"
+  },
+  "archive": null
+ },
+ "mod-cinnaventurer-space-station": {
+  "status": "dead",
+  "res": {
+   "code": 404,
+   "final": "https://maniapark.com/mod/pkjLI2Owd0-giDhjkk92FA"
+  },
+  "archive": null
+ },
+ "mod-newsnowcar": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://unlimiter.net/resources/NewSnowCar.zip"
+  }
+ },
+ "mod-hitbox-highlandscar": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://maniapark.com/skin/uZUqKYk-kEOWUbSxbXuL-w"
+  }
+ },
+ "mod-openal-3d-audio": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://files.3zet.net/Trackmania/OpenAL.zip"
+  }
+ },
+ "mod-tm-wii-block-collection": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://supercoby.fr/Unlimiter/united"
+  }
+ },
+ "mod-centerspeed": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://fullspeed.mooo.com/mod/"
+  },
+  "mirrors": {
+   "https://fullspeed.mooo.com/modloader/": {
+    "code": 403,
+    "final": "https://fullspeed.mooo.com/modloader/",
+    "error": null
+   }
+  }
+ },
+ "mod-kimmod": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://home.koyaanis.com/modloader/"
+  }
+ },
+ "mod-always-official": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/BigBang1112/always-official"
+  }
+ },
+ "mod-eswc-autosave": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/cheatoskar/eswc-autosave/releases/tag/v1.0.1"
+  }
+ },
+ "tmtas-exchange": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmtas.exchange/"
+  }
+ },
+ "tm-rpg-trial": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmrpgtrial.com"
+  }
+ },
+ "forevertas": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://github.com/Skycrafter-dev/ForeverTAS/"
+  }
+ },
+ "tick": {
+  "status": "alive",
+  "res": {
+   "code": 200,
+   "final": "https://tmtas.exchange/tas-tools"
+  }
+ }
+}

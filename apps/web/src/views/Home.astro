@@ -1,0 +1,191 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Thumb from '../components/Thumb.astro';
+import Capsule from '../components/Capsule.astro';
+import LauncherShots from '../components/LauncherShots.astro';
+import DevBlock from '../components/DevBlock.astro';
+import EventCard from '../components/EventCard.astro';
+import { gameById, cover } from '../data/games';
+import { mods, catalogMods, projects, catalog, events, eventsSample, servers, liveServers, modById, showcases, entryForMod, entryImage, modCatsFor, catalogCatsFor, playersOnline } from '../data/site';
+import { showcaseOf } from '@tm-hub/shared/showcase';
+import { webImg } from '@tm-hub/shared/extimg';
+import { compact, ago, tmName, pair } from '../lib/fmt';
+import { pickFeatured, featuredScores } from '@tm-hub/shared/featured';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const L = (p: string) => lh(lang, p);
+const modCats = modCatsFor(lang), catalogCats = catalogCatsFor(lang);
+
+const shelfOrder = ['tmnf', 'tmuf', 'tm2020', 'tm2-stadium', 'tm2-canyon', 'tm2-valley', 'tm2-lagoon', 'sm-storm', 'turbo', 'tm-turbo-ds', 'tm-wii', 'tm-ds', 'eswc', 'tms', 'tmo'];
+const shelf = shelfOrder.map((id) => gameById[id]);
+const modCount = (gid: string) => mods.filter((m) => m.games.includes(gid)).length;
+const wallIds = ['tm2020', 'tmnf', 'tm2-canyon', 'turbo', 'tm2-valley', 'tmuf', 'tm2-lagoon', 'sm-storm', 'tm2-stadium', 'tmo', 'tms', 'eswc'];
+const wall = Array.from({ length: 9 }, (_, c) => Array.from({ length: 4 }, (_, r) => wallIds[(c * 4 + r * 5) % wallIds.length]));
+// Featured: three mods by the shared rule (recently updated + popular, one per author; packages/shared/src/featured.ts).
+const featured = pickFeatured(mods.map((m) => ({ ...m, name: m.name, updated: m.updated, downloads: m.downloads, stars: m.stars })), 3);
+const featIds = new Set(featured.map((m) => m.id));
+const recent = mods.filter((m) => !featIds.has(m.id)).slice(0, 5);
+const live = liveServers.slice().sort((a, b) => b.players - a.players).slice(0, 5);
+// Open source: stars and recent updates mixed (same score as Featured), at most two projects per author, no archived ones.
+const projScore = featuredScores(projects.map((p) => ({ id: p.id, name: p.name, updated: p.release?.published ?? p.pushed, downloads: p.downloads, stars: p.stars })));
+const perOwner: Record<string, number> = {};
+const popular = projects.filter((p) => !p.archived).sort((a, b) => (projScore.get(b.id)! - projScore.get(a.id)!) || a.name.localeCompare(b.name))
+  .filter((p) => { const o = String(p.repo).split('/')[0].toLowerCase(); perOwner[o] = (perOwner[o] ?? 0) + 1; return perOwner[o] <= 2; }).slice(0, 4);
+const catCounts = Object.entries(catalogCats).map(([id, c]) => ({ id, ...c, n: catalog.filter((e) => e.category === id).length })).filter((c) => c.n).sort((a, b) => b.n - a.n);
+const upcoming = events.slice(0, 3);
+const publicServers = servers.filter((s) => !s.sample).length;
+---
+<Layout title="TM Horizon" lang={lang} flush>
+  <section class="home-hero">
+    <div class="hero-wall" aria-hidden="true">
+      {wall.map((col) => <div class="col">{col.map((id) => <img src={cover(id)} alt="" />)}</div>)}
+    </div>
+    <div class="wrap">
+      <div class="hero-in">
+        <img class="hero-mark" src="/img/brand/icon-large.png" alt="" width="84" height="84" />
+        <span class="kicker"><Icon name="flag" size={15} /> {t(lang, 'home.kicker')}</span>
+        <h1>{t(lang, 'home.h1a')}<br /><em>{t(lang, 'home.h1b')}</em></h1>
+        <p>{t(lang, 'home.lead')}</p>
+        <form class="hero-search" action={L('/discover/mods/')} method="get" role="search">
+          <label><Icon name="search" size={20} /><input name="q" type="search" placeholder={t(lang, 'home.searchPlaceholder')} aria-label={t(lang, 'home.searchLabel')} /></label>
+          <button class="btn primary lg" type="submit">{t(lang, 'btn.search')}</button>
+        </form>
+        <div class="hero-stats">
+          <div><b>{mods.length + catalogMods.length}</b><span>{t(lang, 'home.statMods')}</span></div>
+          <div><b class="liveb">{compact(playersOnline, lang)}</b><span>{t(lang, 'home.statPlayers')}</span></div>
+          <div><b>{publicServers}</b><span>{t(lang, 'home.statServers')}</span></div>
+          <div><b>{catalog.length}</b><span>{t(lang, 'home.statSites')}</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap home-body">
+    <section class="sec" style="margin-top:36px">
+      <div class="sec-h"><h2>{t(lang, 'nav.games')}</h2><span class="sub">{t(lang, 'home.gamesSub')}</span><a class="more" href={L('/games/#get')}>{t(lang, 'home.gamesMore')} <Icon name="arrow-right" size={16} /></a></div>
+      <div class="shelf">{shelf.map((g) => <Capsule g={g} mods={modCount(g.id)} lang={lang} />)}</div>
+    </section>
+
+    <LauncherShots lang={lang} />
+
+    <section class="sec">
+      <div class="sec-h"><h2>{t(lang, 'type.mods')}</h2><span class="sub">{t(lang, 'home.modsSub')}</span><a class="more" href={L('/discover/mods/')}>{t(lang, 'home.modsMore')} <Icon name="arrow-right" size={16} /></a></div>
+      <div class="duo">
+        {featured.length > 0 && (
+          <div class="feat-car" data-carousel aria-roledescription="carousel" aria-label={t(lang, 'home.featured')}>
+            {featured.map((m, i) => {
+              const [a, b] = pair(m.id);
+              const sc = showcaseOf(showcases, m.id, m.name);
+              const shot = webImg(entryImage(entryForMod(m)) ?? (sc?.blocks.find((b) => b.type === 'hero') as { image?: string } | undefined)?.image);
+              return (
+                <a class={`feat ${i === 0 ? 'on' : ''}`} href={L(`/mod/${m.id}/`)} data-slide={i} aria-roledescription="slide" aria-label={t(lang, 'home.featSlide', { n: i + 1, total: featured.length, name: m.name })} aria-hidden={i === 0 ? undefined : 'true'} tabindex={i === 0 ? undefined : -1}>
+                  {shot
+                    ? <img src={shot} alt="" loading={i === 0 ? 'eager' : 'lazy'} />
+                    : <span class="feat-gen" aria-hidden="true" style={`--a:${a};--b:${b}`}><Thumb src={null} seed={m.id} glyph={modCats[m.category]?.icon} size={260} /></span>}
+                  <div class="feat-body">
+                    <span class="kicker" style="color:#ffb27f"><Icon name="sparkles" size={15} /> {t(lang, 'home.featured')}</span>
+                    <div class="feat-row"><Thumb src={m.icon} seed={m.id} glyph={modCats[m.category]?.icon} size={64} /><div><h3>{m.name}</h3><span style="color:rgba(255,255,255,.75)">{t(lang, 'card.by')} {m.author}{m.latest ? ` · v${m.latest}` : ''}</span></div></div>
+                    <p>{(m.summary ?? '').split('. ').slice(0, 2).join('. ').replace(/\.?$/, '.')}</p>
+                  </div>
+                </a>
+              );
+            })}
+            {featured.length > 1 && (
+              <div class="feat-nav">
+                <button type="button" class="feat-arrow" data-prev aria-label={t(lang, 'home.featPrev')}><Icon name="chevron-left" size={20} /></button>
+                <div class="feat-dots" role="tablist">
+                  {featured.map((m, i) => <button type="button" class={`feat-dot ${i === 0 ? 'on' : ''}`} data-dot={i} role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={m.name}></button>)}
+                </div>
+                <button type="button" class="feat-arrow" data-next aria-label={t(lang, 'home.featNext')}><Icon name="chevron-right" size={20} /></button>
+              </div>
+            )}
+          </div>
+        )}
+        <div class="stack">
+          {recent.map((m) => (
+            <a class="mini" href={L(`/mod/${m.id}/`)}>
+              <Thumb src={m.icon} seed={m.id} glyph={modCats[m.category]?.icon} size={52} />
+              <span style="min-width:0"><b>{m.name}</b><small>{m.summary}</small></span>
+              <span class="end"><b><Icon name="tag" size={14} />v{m.latest}</b><span data-ago={m.updated}>{ago(m.updated, lang)}</span></span>
+            </a>
+          ))}
+          <a class="btn ghost block" href={L('/discover/mods/')}>{t(lang, 'home.allMods', { n: mods.length })} <Icon name="arrow-right" size={16} /></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="duo">
+        <div>
+          <div class="sec-h"><h2>{t(lang, 'home.liveNow')}</h2><span class="sub">{t(lang, 'home.liveSub')}</span><a class="more" href={L('/discover/servers/')}>{t(lang, 'home.allServers')} <Icon name="arrow-right" size={16} /></a></div>
+          <div class="stack">
+            {live.map((s) => (
+              <a class="mini" href={s.join ?? L('/discover/servers/')}>
+                <span class="thumb cover" style="--s:52px"><img src={cover(gameById[s.game] ? s.game : 'tm2-stadium')} alt="" loading="lazy" /></span>
+                <span style="min-width:0"><b class="tm-name" set:html={tmName(s.nameRaw ?? s.name)} /><small>{gameById[s.game]?.name ?? t(lang, 'home.titlePack')} · {s.mode}</small></span>
+                <span class="end"><b><Icon name="users" size={15} />{s.players}</b><span>{t(lang, 'home.of', { n: s.max })}</span></span>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="sec-h"><h2>{t(lang, 'nav.events')}</h2>{eventsSample && <span class="badge sample">{t(lang, 'chip.sample')}</span>}<a class="more" href={L('/events/')}>{t(lang, 'home.calendar')} <Icon name="arrow-right" size={16} /></a></div>
+          <div class="ev-list">{upcoming.map((e) => <EventCard e={e} compact lang={lang} />)}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>{t(lang, 'home.openSource')}</h2><span class="sub">{t(lang, 'home.openSourceSub')}</span><a class="more" href={L('/discover/projects/')}>{t(lang, 'home.allProjects')} <Icon name="arrow-right" size={16} /></a></div>
+      <div class="tiles4">
+        {popular.map((p) => (
+          <a class="ptile" href={p.url} rel="noopener">
+            <span class="ptile-h"><Thumb src={p.icon} seed={p.id} glyph="folder-git-2" size={48} /><span><b>{p.name}</b><small>{p.repo}</small></span></span>
+            <p>{p.description}</p>
+            <span class="stat-row"><span class="stat"><Icon name="star" size={16} /><b>{compact(p.stars, lang)}</b></span>{p.downloads != null && <span class="stat"><Icon name="download" size={16} /><b>{compact(p.downloads, lang)}</b></span>}{p.language && <span class="stat"><Icon name="code" size={16} />{p.language}</span>}</span>
+          </a>
+        ))}
+      </div>
+      <p class="sec-foot"><a href={L('/discover/github/')}>{t(lang, 'home.allGithub')} <Icon name="arrow-right" size={16} /></a></p>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>{t(lang, 'nav.directory')}</h2><span class="sub">{t(lang, 'home.dirSub', { n: catalog.length })}</span><a class="more" href={L('/directory/')}>{t(lang, 'home.dirMore')} <Icon name="arrow-right" size={16} /></a></div>
+      <div class="tiles4">
+        {catCounts.slice(0, 8).map((c) => (
+          <a class="ptile" href={L(`/directory/?cat=${c.id}`)}>
+            <span class="ptile-h"><Thumb seed={c.id + '-cat'} glyph={c.icon} size={48} /><span><b>{t(lang, `catplural.${c.id}`)}</b><small>{t(lang, 'home.entries', { n: c.n })}</small></span></span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <DevBlock lang={lang} />
+  </div>
+</Layout>
+
+<script is:inline>
+  // Featured carousel: advances every 7 s, pauses while hovered or focused, never moves on its own with reduced motion.
+  (function () {
+    var car = document.querySelector('[data-carousel]'); if (!car) return;
+    var slides = car.querySelectorAll('[data-slide]'), dots = car.querySelectorAll('[data-dot]');
+    if (slides.length < 2) return;
+    var i = 0, timer = null, paused = false;
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function show(n) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach(function (s, k) { var on = k === i; s.classList.toggle('on', on); if (on) { s.removeAttribute('aria-hidden'); s.removeAttribute('tabindex'); } else { s.setAttribute('aria-hidden', 'true'); s.setAttribute('tabindex', '-1'); } });
+      dots.forEach(function (d, k) { d.classList.toggle('on', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    }
+    function start() { if (still || timer) return; timer = setInterval(function () { if (!paused && !document.hidden) show(i + 1); }, 7000); }
+    car.querySelector('[data-prev]').addEventListener('click', function () { show(i - 1); });
+    car.querySelector('[data-next]').addEventListener('click', function () { show(i + 1); });
+    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.dataset.dot); }); });
+    car.addEventListener('mouseenter', function () { paused = true; });
+    car.addEventListener('mouseleave', function () { paused = false; });
+    car.addEventListener('focusin', function () { paused = true; });
+    car.addEventListener('focusout', function () { paused = false; });
+    start();
+  })();
+</script>

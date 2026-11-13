@@ -1,0 +1,115 @@
+/* Statistics page (pages/Stats.tsx): game tiles on their covers, then plain sections divided by thin
+   lines (no card around every chart), charts drawn in the accent colour. */
+.stats-page { --st-pb: #38bdf8; }
+:root[data-theme="light"] .stats-page { --st-pb: #0369a1; }
+
+/* Game tiles */
+.st-tiles-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 4px 0 8px; }
+.st-gt {
+  position: relative; display: block; height: 138px; padding: 0; border: 1px solid var(--line-2); border-radius: var(--r);
+  overflow: hidden; cursor: pointer; text-align: left; color: #fff; background: var(--h-14161b, #14161b); font: inherit;
+  transition: transform 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+}
+.st-gt:hover { transform: translateY(-1px); border-color: rgba(var(--tint), 0.24); }
+.st-gt:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.st-gt.on { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc) inset; }
+.st-gt.off { opacity: 0.55; }
+.st-gt .st-gt-bg.art { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; aspect-ratio: auto; }
+.st-gt .st-gt-bg.art img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transform: scale(1.04); }
+.st-gt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 8, 12, 0.25) 0%, rgba(6, 8, 12, 0.62) 45%, rgba(6, 8, 12, 0.9) 100%); }
+.st-gt-body { position: absolute; inset: auto 0 0 0; display: flex; flex-direction: column; gap: 1px; padding: 12px 14px; }
+.st-gt-name { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255, 255, 255, 0.78); }
+.st-gt-time { font-family: var(--head-font); font-size: 30px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
+.st-gt-nums { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: rgba(255, 255, 255, 0.8); }
+.st-gt-nums b { color: #fff; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+/* Sections */
+.st-sec { padding: 18px 0 20px; border-top: 1px solid var(--line); min-width: 0; }
+.st-tiles-row + .st-sec { border-top: 0; padding-top: 12px; }
+.st-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.st-head h2 { margin: 0 0 2px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+.st-info { display: inline-flex; color: var(--dim); cursor: help; border-radius: 50%; }
+.st-info:hover, .st-info:focus-visible { color: var(--fg); outline: none; }
+.st-empty { margin: 4px 0; }
+.st-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; border-top: 1px solid var(--line); }
+.st-two > .st-sec { border-top: 0; }
+@media (max-width: 1180px) { .st-two { grid-template-columns: 1fr; } .st-two > .st-sec + .st-sec { border-top: 1px solid var(--line); } }
+
+/* Charts */
+.st-chart, .st-cal { position: relative; }
+.st-chart svg, .st-cal svg { display: block; overflow: visible; max-width: 100%; }
+.st-grid { stroke: var(--line); stroke-width: 1; }
+.st-axis { fill: var(--dim); font-size: 11px; font-variant-numeric: tabular-nums; }
+.st-bar { fill: var(--acc); }
+.st-bar.on { fill: var(--acc-2, var(--acc)); }
+.st-bar.pb { fill: var(--st-pb); }
+.st-tip {
+  position: absolute; top: 0; pointer-events: none; z-index: 2;
+  display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border-radius: 8px;
+  background: var(--glass-strong, rgba(20, 24, 33, 0.95)); border: 1px solid var(--line-2, var(--line)); color: var(--fg);
+  font-size: 12px; white-space: nowrap; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
+}
+.st-legend { display: flex; gap: 14px; align-items: center; color: var(--dim); }
+.st-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.st-key { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--acc); }
+.st-key.pbs { background: var(--st-pb); }
+
+/* Year calendar */
+.st-cal-c { fill: rgba(var(--tint), 0.07); }
+.st-cal-c.l1 { fill: color-mix(in srgb, var(--acc) 28%, transparent); }
+.st-cal-c.l2 { fill: color-mix(in srgb, var(--acc) 50%, transparent); }
+.st-cal-c.l3 { fill: color-mix(in srgb, var(--acc) 75%, transparent); }
+.st-cal-c.l4 { fill: var(--acc); }
+.st-cal rect.on { stroke: var(--fg); stroke-width: 1.5; }
+.st-cal-legend { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 8px; }
+.st-cal-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2.5px; background: rgba(var(--tint), 0.07); }
+.st-cal-legend i.l1 { background: color-mix(in srgb, var(--acc) 28%, transparent); }
+.st-cal-legend i.l2 { background: color-mix(in srgb, var(--acc) 50%, transparent); }
+.st-cal-legend i.l3 { background: color-mix(in srgb, var(--acc) 75%, transparent); }
+.st-cal-legend i.l4 { background: var(--acc); }
+
+/* Most played maps */
+.st-topgrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.st-tm { display: flex; flex-direction: column; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; border-radius: var(--r-sm); min-width: 0; }
+button.st-tm { cursor: pointer; }
+button.st-tm:hover .st-tm-pic { border-color: rgba(var(--tint), 0.24); }
+button.st-tm:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
+.st-tm-pic { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--line-2); background: rgba(var(--tint), 0.05); }
+.st-tm-pic .cimg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.st-tm-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.st-tm-ph { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 8px 10px; font-size: 11px; color: var(--dim); background: linear-gradient(135deg, rgba(var(--tint), 0.06), rgba(var(--tint), 0.02)); }
+.st-tm-rank { position: absolute; top: 6px; left: 6px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; background: rgba(6, 8, 12, 0.72); }
+.st-tm-text { display: flex; flex-direction: column; gap: 3px; padding: 8px 2px 0; min-width: 0; }
+.st-tm-text .st-map { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.st-tm-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--dim); }
+.st-tm-meta b { color: var(--fg); font-variant-numeric: tabular-nums; }
+.st-tm-bar { height: 3px; border-radius: 2px; background: rgba(var(--tint), 0.07); overflow: hidden; }
+.st-tm-bar i { display: block; height: 100%; background: var(--acc); }
+
+/* Map table */
+.st-table-wrap { overflow-x: auto; }
+.st-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.st-table th, .st-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+.st-table td:first-child { white-space: normal; min-width: 180px; }
+.st-table th { font-weight: 600; color: var(--dim); font-size: 12px; }
+.st-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.st-table.compact { max-width: 360px; }
+.st-sort { background: none; border: 0; color: inherit; font: inherit; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; }
+.st-sort:focus-visible { outline: 2px solid var(--acc); border-radius: 3px; }
+.st-map { font-weight: 600; }
+.st-more { margin-top: 12px; }
+.st-foot { margin: 4px 0 16px; max-width: 110ch; }
+.st-progress { display: inline-flex; align-items: center; gap: 6px; }
+
+/* 0.5.1: map pictures (own .Gbx, else TMX through the image proxy), copy filter, respawn filter */
+.st-pic { position: relative; display: block; overflow: hidden; background: rgba(var(--tint), 0.05); }
+.st-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.st-pic img.flip { transform: scaleY(-1); }
+.st-tm-pic .st-pic { position: absolute; inset: 0; }
+.st-cell-map { display: flex; align-items: center; gap: 10px; }
+.st-cell-map .st-pic { flex: none; width: 56px; height: 32px; border-radius: 4px; border: 1px solid var(--line); }
+.st-cell-map .st-pic .st-tm-ph { padding: 2px 4px; font-size: 9px; align-items: center; justify-content: center; }
+.st-copy select { max-width: 280px; }
+/* 0.5.1-c: campaign badge, play time from the TMNF/TMUF profiles before TM Horizon */
+.st-gt-before { display: block; margin-top: 4px; font-size: 11.5px; color: rgba(255, 255, 255, 0.78); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
+.st-campaign { color: var(--fg-2); }

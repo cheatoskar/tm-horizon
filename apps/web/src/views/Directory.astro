@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Discover from '../components/Discover.astro';
+import TypeBar from '../components/TypeBar.astro';
+import Icon from '../components/Icon.astro';
+import { catalog, catalogItem, catalogCatsFor, sources } from '../data/site';
+import { day } from '../lib/fmt';
+import { t, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const rank: Record<string, number> = { alive: 0, unclear: 1, dead: 2 };
+const items = [...catalog].sort((a, b) => (rank[a.status] ?? 1) - (rank[b.status] ?? 1) || a.name.localeCompare(b.name)).map((e) => catalogItem(e, lang));
+const alive = catalog.filter((e) => e.status === 'alive').length;
+---
+<Layout title={t(lang, 'nav.directory')} desc={t(lang, 'dir.desc')} lang={lang}>
+  <TypeBar current="directory" lang={lang} />
+  <Discover kind="directory" lang={lang} items={items} placeholder={t(lang, 'dir.search', { n: catalog.length })} cats={catalogCatsFor(lang)} catTitle={t(lang, 'dir.type')} sorts={[['relevance', t(lang, 'sort.status')], ['name', t(lang, 'sort.name')]]} promo={false} perPage={25}>
+    <Fragment slot="above">
+      <div class="note-bar">
+        <Icon name="shield-check" />
+        <span><span set:html={t(lang, 'dir.note', { alive: `<b>${alive}</b>`, total: catalog.length, date: day(sources.catalog.updated, lang) })} />{sources.catalog.sample && <span class="badge sample" style="margin-left:6px">{t(lang, 'dir.sampleCatalog')}</span>}</span>
+      </div>
+    </Fragment>
+  </Discover>
+</Layout>

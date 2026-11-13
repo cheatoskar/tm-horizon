@@ -1,0 +1,50 @@
+/* News page and the recording card on the Clips page */
+.nw-live { margin-bottom: 22px; }
+.nw-live-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 10px; }
+.nw-filters { margin-bottom: 18px; }
+.nw-loading { margin-top: 14px; }
+
+.nw-cover { position: relative; overflow: hidden; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; background: rgba(var(--tint), 0.05); }
+.nw-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nw-cover.ph { display: grid; place-items: center; color: var(--dim); }
+.nw-cover.hero { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; }
+
+.nw-lead { position: relative; display: block; width: 100%; min-height: 340px; border-radius: var(--r); overflow: hidden; text-align: left; border: 1px solid var(--line); margin-bottom: 22px; cursor: pointer; color: #fff; }
+.nw-lead:hover .nw-cover img { transform: scale(1.02); }
+.nw-lead .nw-cover img { transition: transform 0.4s; }
+.nw-lead-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 20%, rgba(0, 0, 0, 0.82) 100%); }
+.nw-lead-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 30px; display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
+.nw-lead-body h2 { font-family: var(--head-font); font-size: 34px; line-height: 1.08; font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; }
+.nw-lead-body p { color: rgba(255, 255, 255, 0.85); font-size: 14.5px; line-height: 1.45; }
+.nw-lead .nw-foot { color: rgba(255, 255, 255, 0.7); }
+.nw-lead .nw-tag { color: var(--acc-2); }
+
+.nw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.nw-card { display: flex; flex-direction: column; gap: 12px; padding: 10px 10px 14px; border-radius: var(--r); background: var(--glass); border: 1px solid var(--line); cursor: pointer; transition: border-color 0.15s, background 0.15s; min-width: 0; }
+.nw-card:hover, .nw-card:focus-visible { border-color: var(--line-2); background: rgba(var(--tint), 0.05); outline: 0; }
+.nw-card-body { display: flex; flex-direction: column; gap: 5px; padding: 0 6px; min-width: 0; flex: 1; }
+.nw-card-body b { font-size: 16px; line-height: 1.25; }
+.nw-tag { font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.08em; color: var(--acc-2); }
+.nw-foot { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 6px; min-width: 0; }
+.clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Clips: recording status card */
+.rec-card { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+.rec-card h2 { font-size: 17px; }
+.rec-rows { display: flex; flex-direction: column; gap: 8px; }
+.rec-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(var(--tint), 0.04); border: 1px solid var(--line); flex-wrap: wrap; }
+.rec-row .rec-state { display: flex; flex-direction: column; min-width: 0; flex: 1 1 260px; }
+.rec-keys { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.rec-keys span { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; }
+.rec-keys kbd { font: 650 12px var(--tm-font-mono, ui-monospace, monospace); padding: 2px 8px; border-radius: 6px; background: rgba(var(--tint), 0.1); border: 1px solid var(--line-2); }
+.ok-text { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--good); }
+.nw-filters .fchip.zero:not(.on) { opacity: 0.55; }
+.mt-sites { display: flex; flex-wrap: wrap; gap: 8px; }
+.mt-sites .btn { gap: 8px; }
+.mt-card { display: flex; gap: 14px; align-items: flex-start; padding: 12px; border-radius: 12px; background: rgba(var(--tint), 0.04); border: 1px solid var(--line); }
+.mt-thumb { width: 160px; height: 160px; object-fit: cover; border-radius: 8px; flex: none; transform: scaleY(-1); }
+.mt-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; align-items: flex-start; }
+
+/* The date range chips are exactly as tall as the search field next to them (one control height). */
+.nw-toolbar .seg.small-seg { height: var(--ctl-h); margin: 0; padding: 3px; align-self: center; flex-wrap: nowrap; }
+.nw-toolbar .seg.small-seg button { height: calc(var(--ctl-h) - 8px); padding: 0 12px; font-size: 13px; line-height: 1; white-space: nowrap; }

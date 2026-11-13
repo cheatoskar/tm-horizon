@@ -1,0 +1,35 @@
+/* Server console + log (src/ui/hosting/Console.tsx). */
+.hc-root { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.hc-head { display: flex; align-items: center; gap: 8px; }
+.hc-headline { min-width: 0; overflow-wrap: anywhere; }
+.hc-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
+@media (min-width: 1000px) { .hc-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.hc-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.hc-sec { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hc-title { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-2); }
+.hc-btns { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hc-btns .btn { display: inline-flex; align-items: center; gap: 5px; }
+
+.hc-player, .hc-map { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 6px 10px; border-radius: 9px; background: rgba(var(--tint), 0.03); min-width: 0; }
+.hc-who { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.hc-who .pill { margin-left: 0; }
+.hc-map.is-cur { background: rgba(var(--tint), 0.07); box-shadow: inset 2px 0 0 var(--acc-2); }
+.hc-map .btn { display: inline-flex; align-items: center; gap: 5px; }
+.hc-idx { min-width: 18px; text-align: right; }
+.hc-maps { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; overflow-x: hidden; }
+
+.hc-chat { display: flex; flex-direction: column; gap: 2px; max-height: 220px; min-height: 80px; overflow-y: auto; overflow-x: hidden; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: rgba(var(--tint), 0.03); font-size: 13px; }
+.hc-chatline { overflow-wrap: anywhere; }
+.hc-send { display: flex; gap: 6px; align-items: center; }
+.hc-send .btn { display: inline-flex; align-items: center; gap: 5px; }
+.hc-num { width: 100px; }
+.hc-limit { overflow-wrap: anywhere; }
+
+.hc-log { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hc-logbar { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.hc-logbar .btn { display: inline-flex; align-items: center; gap: 5px; }
+.hc-logbar .text-in { min-width: 140px; }
+.hc-follow { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--fg-2); cursor: pointer; }
+.hc-pre { margin: 0; max-height: 360px; overflow-y: auto; overflow-x: hidden; white-space: pre-wrap; overflow-wrap: anywhere; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: rgba(var(--tint), 0.03); color: var(--fg); font: 12px/1.45 ui-monospace, Consolas, monospace; }
+.hc-l-bad { color: var(--bad, #f87171); }
+.hc-l-warn { color: var(--warn, #f5b942); }

@@ -1,0 +1,23 @@
+/* Installed skins and mods (pages/SkinLibrary.tsx); cards and list follow the mod list (.modlist / .as-list). */
+.sl-page .toolbar { margin-bottom: 16px; }
+.sl-list { margin-bottom: 16px; }
+.sl-card { cursor: default; }
+.sl-card:hover { transform: none; }
+.sl-card.off { opacity: 0.62; }
+.sl-card.off:hover { opacity: 0.85; }
+.sl-thumb { object-fit: cover; border-radius: 14px; border: 1px solid var(--line); flex: none; }
+.sl-thumb.none { display: grid; place-items: center; color: var(--dim); background: linear-gradient(135deg, rgba(var(--tint), 0.07), rgba(var(--tint), 0.02)); }
+.sl-thumb.none.mod { color: var(--fg-2); }
+.sl-card .modcard-text p { margin: 2px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-card .modcard-tags { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.sl-card .modcard-tags .pill.tiny { margin-left: 0; }
+.sl-src { cursor: pointer; border: 0; font: inherit; font-size: 11px; color: var(--fg-2); }
+.sl-src:hover { color: var(--fg); background: rgba(var(--tint), 0.12); }
+.sl-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.sl-toggle { display: inline-flex; align-items: center; gap: 8px; }
+.sl-btns { display: inline-flex; gap: 6px; }
+.sl-btns .btn.icon.sm { width: 32px; }
+.modlist.as-list .sl-actions { flex-direction: row; gap: 12px; }
+.modlist.as-list > .sl-card { grid-template-columns: 40px minmax(0, 1.25fr) minmax(0, 1fr) auto; }
+.modlist.as-list .sl-thumb { width: 40px !important; height: 40px !important; border-radius: 10px; }
+.modlist.as-list .sl-thumb svg { width: 18px; height: 18px; }

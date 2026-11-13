@@ -1,0 +1,115 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "orange"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Openplanet",
+      "tagline": "Extension platform for Trackmania, ManiaPlanet and TrackMania Turbo, with a plugin manager and the AngelScript scripting language.",
+      "badges": [
+        "TM2020, TM2, Turbo",
+        "Plugin platform",
+        "By Miss"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "puzzle",
+          "title": "Community plugins",
+          "text": "Many plugins and tools by the community, installed and kept up to date from an in-game plugin manager."
+        },
+        {
+          "icon": "code-2",
+          "title": "AngelScript",
+          "text": "Write your own plugins in the AngelScript scripting language."
+        },
+        {
+          "icon": "eye",
+          "title": "Game internals",
+          "text": "The overlay lets you explore the internals of the game."
+        },
+        {
+          "icon": "package",
+          "title": "Pack and pak files",
+          "text": "Browse and extract files from Pack.Gbx and .pak files."
+        },
+        {
+          "icon": "map",
+          "title": "Bigger maps",
+          "text": "Unlimited item embed size for maps and map decor sizes of 64 x 64 and beyond."
+        },
+        {
+          "icon": "message-circle",
+          "title": "Discord Rich Presence",
+          "text": "Full Rich Presence integration for Trackmania, ManiaPlanet and Turbo."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "Openplanet has a separate download for Trackmania, ManiaPlanet and TrackMania Turbo on the downloads page of the site. The documentation covers installing the platform and the first plugins.\n\nPlugins are listed on the plugin page of the site."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tm2020",
+          "status": "works"
+        },
+        {
+          "game": "tm2-stadium",
+          "status": "works"
+        },
+        {
+          "game": "tm2-canyon",
+          "status": "works"
+        },
+        {
+          "game": "tm2-valley",
+          "status": "works"
+        },
+        {
+          "game": "tm2-lagoon",
+          "status": "works"
+        },
+        {
+          "game": "turbo",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Openplanet is developed by Miss. The description on this page follows the project site at openplanet.dev."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Openplanet",
+          "url": "https://openplanet.dev/"
+        },
+        {
+          "kind": "link",
+          "label": "Plugins",
+          "url": "https://openplanet.dev/plugins",
+          "style": "ghost"
+        },
+        {
+          "kind": "link",
+          "label": "Documentation",
+          "url": "https://openplanet.dev/docs",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

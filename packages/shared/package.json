@@ -1,0 +1,27 @@
+{
+  "name": "@tm-hub/shared",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Hub data types (the shapes of packages/api/dist) and the design tokens of the launcher and the website.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" },
+    "./types": { "types": "./src/types.ts", "default": "./src/types.ts" },
+    "./tokens": { "types": "./src/tokens.ts", "default": "./src/tokens.ts" },
+    "./tokens.css": "./tokens.css",
+    "./links": { "types": "./src/links.ts", "default": "./src/links.ts" },
+    "./showcase": { "types": "./src/showcase.ts", "default": "./src/showcase.ts" },
+    "./showcase.schema.json": "./showcase.schema.json",
+    "./hub": { "types": "./src/hub.ts", "default": "./src/hub.ts" },
+    "./logo": { "types": "./src/logo.ts", "default": "./src/logo.ts" },
+    "./modicon": { "types": "./src/modicon.ts", "default": "./src/modicon.ts" },
+    "./featured": { "types": "./src/featured.ts", "default": "./src/featured.ts" },
+    "./brandmarks": { "types": "./src/brandmarks.ts", "default": "./src/brandmarks.ts" },
+    "./covers": { "types": "./src/covers.ts", "default": "./src/covers.ts" },
+    "./extimg": { "types": "./src/extimg.ts", "default": "./src/extimg.ts" }
+  }
+}

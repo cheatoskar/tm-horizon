@@ -1,0 +1,17 @@
+{
+  "hh.mods": "Mods",
+  "hh.noMods": "Aucun mod installé. Les mods sont des plugins séparés, par exemple le Legacy Randomizer.",
+  "hh.clipsOnly": "Clips : TMNF et TMUF uniquement.",
+  "hh.srcLine": "Source : {what}",
+  "hh.srcRelease": "version GitHub",
+  "hh.srcFolder": "dossier perso",
+  "hh.srcChange": "changer",
+  "hh.folderIs": "Dossier : {dir}",
+  "play.mapInDownloaded": "La map est sous Downloaded – ouvrez-la dans le jeu.",
+  "tmxup.linkText": "Envoie automatiquement vos nouveaux records personnels à TMX. Le module « TMX Upload » doit être activé dans le jeu.",
+  "tmxup.linkOpen": "Ouvrir les réglages",
+  "hh.oneLine": "Menu en jeu avec des modules.",
+  "hh.nextStart": "S'applique au prochain lancement.",
+  "hh.switchFailed": "Impossible de changer {name}.",
+  "hh.inProfile": "dans {profile}"
+}

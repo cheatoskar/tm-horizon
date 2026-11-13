@@ -1,0 +1,105 @@
+---
+import { cover } from '../data/games';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { downloads, downloadsOpen, releasePage, checksums, arch, version } from '../data/download';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const art = ['tmnf', 'tm2020', 'tm2-canyon', 'tmuf', 'tm2-stadium'];
+const win = downloads.find((d) => d.id === 'windows')!;
+const linux = downloads.filter((d) => d.os === 'linux');
+const sub = (id: string) => t(lang, `download.${id}Sub`);
+---
+<Layout title={t(lang, 'nav.download')} desc={t(lang, 'download.lead')} lang={lang}>
+  <section class="launch dl-hero">
+    <div class="launch-art" aria-hidden="true">{art.map((g) => <img src={cover(g)} alt="" />)}</div>
+    <img class="launch-mark" src="/img/brand/icon-large.png" alt="" width="120" height="120" />
+    <span class="kicker" style="color:#ffb27f"><Icon name="rocket" size={15} /> {t(lang, 'promo.kicker')}</span>
+    <h1>{t(lang, 'download.h1')}</h1>
+    <p>{t(lang, 'download.lead')}</p>
+    <div class="dl-cta">
+      {downloadsOpen
+        ? <a class="btn primary lg" href={win.url}><Icon name="download" />{t(lang, 'download.windows')}</a>
+        : <span class="btn primary lg" aria-disabled="true"><Icon name="download" />{t(lang, 'download.windows')}</span>}
+      <span class="badge">{t(lang, 'download.version', { v: version })}</span>
+      {!downloadsOpen && <span class="badge sample">{t(lang, 'download.soon')}</span>}
+    </div>
+  </section>
+
+  <div class="dl-grid">
+    <section class="card dl-card">
+      <h2><Icon name="monitor" size={22} />{t(lang, 'download.windows')}</h2>
+      <p class="muted">{t(lang, 'download.windowsSub')}</p>
+      <div class="dl-file">
+        <span class="dl-name"><Icon name="file-down" size={18} /><code>{win.file}</code></span>
+        {downloadsOpen
+          ? <a class="btn primary" href={win.url}><Icon name="download" size={16} />{t(lang, 'btn.download')}</a>
+          : <span class="btn primary" aria-disabled="true"><Icon name="download" size={16} />{t(lang, 'btn.download')}</span>}
+      </div>
+    </section>
+
+    <section class="card dl-card">
+      <h2><Icon name="terminal" size={22} />{t(lang, 'download.linux')}</h2>
+      {linux.map((d) => (
+        <div class="dl-file">
+          <span class="dl-name"><Icon name={d.icon} size={18} /><span><b>{t(lang, `download.${d.id}`)}</b><small>{sub(d.id)}</small><code>{d.file}</code></span></span>
+          {downloadsOpen
+            ? <a class="btn" href={d.url}><Icon name="download" size={16} />{t(lang, 'btn.download')}</a>
+            : <span class="btn" aria-disabled="true"><Icon name="download" size={16} />{t(lang, 'btn.download')}</span>}
+        </div>
+      ))}
+    </section>
+
+    <section class="card dl-card wide">
+      <h2><Icon name="package-open" size={22} />{t(lang, 'download.arch')}</h2>
+      <p class="muted">{t(lang, 'download.archLead')}</p>
+      <div class="dl-two">
+        {[[arch.bin, 'archBin'], [arch.source, 'archSrc']].map(([pkg, id]) => (
+          <div>
+            <b>{t(lang, `download.${id}`)}</b>
+            <small class="muted">{t(lang, `download.${id}Sub`)}</small>
+            <div class="cmd">
+              <pre><code>{arch.commands(pkg)}</code></pre>
+              <button class="btn sm" type="button" data-copy={arch.commands(pkg)}><Icon name="copy" size={15} /><span data-copy-l>{t(lang, 'btn.copy')}</span></button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p class="muted" style="font-size:13.5px">PKGBUILD: <code>packaging/arch/</code>{downloadsOpen ? <> · <a href={arch.folder} rel="noopener">GitHub</a></> : null}</p>
+    </section>
+
+    <section class="card dl-card">
+      <h2><Icon name="shield-check" size={22} />{t(lang, 'download.checks')}</h2>
+      <p class="muted">{t(lang, 'download.checksText')}</p>
+      <div class="dl-file">
+        <span class="dl-name"><Icon name="file-text" size={18} /><code>{checksums.file}</code></span>
+        {downloadsOpen
+          ? <a class="btn" href={checksums.url}><Icon name="download" size={16} />{t(lang, 'btn.download')}</a>
+          : <span class="btn" aria-disabled="true"><Icon name="download" size={16} />{t(lang, 'btn.download')}</span>}
+      </div>
+      {downloadsOpen
+        ? <a class="btn ghost" href={releasePage} rel="noopener"><Icon name="external-link" size={16} />{t(lang, 'download.releases')}</a>
+        : <span class="btn ghost" aria-disabled="true"><Icon name="external-link" size={16} />{t(lang, 'download.releases')}</span>}
+    </section>
+
+    <section class="card dl-card">
+      <h2><Icon name="wine" size={22} />{t(lang, 'download.wineH')}</h2>
+      <p class="muted">{t(lang, 'download.wineText')}</p>
+      <div class="chips">
+        <span class="chip sys"><Icon name="gamepad-2" size={14} />{t(lang, 'download.winePrefix')}</span>
+        <span class="chip sys"><Icon name="boxes" size={14} />{t(lang, 'download.wineLutris')}</span>
+        <span class="chip sys"><Icon name="folder" size={14} />{t(lang, 'download.wineDir')}</span>
+      </div>
+    </section>
+
+    <section class="card dl-card wide">
+      <h2><Icon name="flag" size={22} />{t(lang, 'download.stepsH')}</h2>
+      <ol class="dl-steps">
+        <li>{t(lang, 'download.s1')}</li>
+        <li>{t(lang, 'download.s2')}</li>
+        <li>{t(lang, 'download.s3')}</li>
+      </ol>
+      <a class="btn ghost" href={lh(lang, '/discover/mods/')}>{t(lang, 'type.mods')} <Icon name="arrow-right" size={16} /></a>
+    </section>
+  </div>
+</Layout>

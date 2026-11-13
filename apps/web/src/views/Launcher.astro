@@ -1,0 +1,28 @@
+---
+import { cover } from '../data/games';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { modItems } from '../data/site';
+import { downloadsOpen } from '../data/download';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const art = ['tmnf', 'tm2020', 'tm2-canyon', 'tmuf', 'tm2-stadium'];
+---
+<Layout title={t(lang, 'nav.launcher')} lang={lang}>
+  <section class="launch">
+    <div class="launch-art" aria-hidden="true">{art.map((g) => <img src={cover(g)} alt="" />)}</div>
+    <img class="launch-mark" src="/img/brand/icon-large.png" alt="" width="120" height="120" />
+    <span class="kicker" style="color:#ffb27f"><Icon name="rocket" size={15} /> {t(lang, 'promo.kicker')}</span>
+    <h1>{t(lang, 'launcher.h1')}</h1>
+    <p>{t(lang, 'launcher.lead')}</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn primary lg" href={lh(lang, '/download/')}><Icon name="download" />{t(lang, 'launcher.download')}</a>
+      {!downloadsOpen && <span class="badge sample" style="align-self:center">{t(lang, 'launcher.notReleased')}</span>}
+    </div>
+  </section>
+  <div class="feat-list">
+    <div class="card"><Icon name="puzzle" size={26} /><b>{t(lang, 'launcher.f1t', { n: modItems(lang).length })}</b><p>{t(lang, 'launcher.f1')}</p></div>
+    <div class="card"><Icon name="shield-check" size={26} /><b>{t(lang, 'launcher.f2t')}</b><p>{t(lang, 'launcher.f2')}</p></div>
+    <div class="card"><Icon name="server" size={26} /><b>{t(lang, 'launcher.f3t')}</b><p>{t(lang, 'launcher.f3')}</p></div>
+  </div>
+</Layout>

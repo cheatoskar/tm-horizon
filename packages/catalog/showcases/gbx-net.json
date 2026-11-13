@@ -1,0 +1,91 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "green"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "GBX.NET",
+      "tagline": "C# library for reading and writing Gbx files: maps, replays, items and more.",
+      "badges": [
+        "All Nadeo games",
+        "C# / .NET library",
+        "Open source"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "code-2",
+          "title": "500+ classes",
+          "text": "High-performance serialization and deserialization of more than 500 Gbx classes."
+        },
+        {
+          "icon": "layers",
+          "title": "All Nadeo games",
+          "text": "Connects data of Trackmania, ShootMania and the older games."
+        },
+        {
+          "icon": "wrench",
+          "title": "Bulk processing",
+          "text": "Suited to bulk changes, for example fixing broken sign URLs on hundreds of maps."
+        },
+        {
+          "icon": "package",
+          "title": "NuGet",
+          "text": "Available as a NuGet package; the repository also holds templates and tools."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Good to know",
+      "markdown": "GBX.NET is a developer library, not a game mod. Questions go to the issue tracker or the GameBox Sandbox Discord server."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        },
+        {
+          "game": "tm2020",
+          "status": "works"
+        },
+        {
+          "game": "turbo",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "GBX.NET is made by BigBang1112."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/BigBang1112/gbx-net"
+        },
+        {
+          "kind": "link",
+          "label": "NuGet",
+          "url": "https://www.nuget.org/packages/GBX.NET/",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

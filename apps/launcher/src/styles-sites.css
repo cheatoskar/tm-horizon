@@ -1,0 +1,13 @@
+/* Title-bar wordmark: readable size (was 24 px), title bar a little taller to fit it. */
+:root { --title: 42px; }
+.brand-word { height: 30px; }
+
+/* Site icons in the switcher: keep the logo's proportions. */
+.site-ico { object-fit: contain; }
+
+/* Mods browser: view switch (All / TMLoader / Community-listed / Openplanet) and the community block. */
+.view-seg { align-self: flex-start; margin-bottom: var(--s3, 12px); flex-wrap: wrap; }
+.view-seg .dim, .small-seg .dim { margin-left: 4px; font-size: 11px; }
+.small-seg { margin: 4px 0 var(--s3, 12px); flex-wrap: wrap; align-self: flex-start; }
+.community-mods { margin-bottom: var(--s5, 24px); }
+.catalog-btns { display: flex; flex-direction: column; gap: 6px; flex: none; }

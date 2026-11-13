@@ -1,0 +1,40 @@
+{
+  "api": 1,
+  "game": "TmForever",
+  "products": {
+    "CenterSpeed": {
+      "name": "CenterSpeed",
+      "author": "OneCredit",
+      "type": "modification",
+      "description": "Draws speedometer at center screen. (F8 for config)",
+      "icon_link": "https://fullspeed.mooo.com/G2_rim_grad_med_32.png",
+      "homepage": "https://fullspeed.mooo.com",
+      "versions": {
+        "1.4.2": {
+          "executable": "CenterSpeed.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.7"
+            }
+          ],
+          "download_link": "https://fullspeed.mooo.com/modloader/dl.php?v=1.4.2",
+          "hash_sha256": "50c00d3927e197feb22b4a9eb736e8f23658111644d81e05a596d722921466c4",
+          "changelog": "- Public release."
+        },
+        "1.4.3": {
+          "executable": "CenterSpeed.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.7"
+            }
+          ],
+          "download_link": "https://fullspeed.mooo.com/modloader/dl.php?v=1.4.3",
+          "hash_sha256": "6cb3c1a554a6b100228d51bbc985bfb1cd576fdd9743a22091b924643d2ba8d3",
+          "changelog": "- Added plate speed\n- Added gears display\n- Added live tracking\n- Added tune audio\n- Added skid swap"
+        }
+      }
+    }
+  }
+}

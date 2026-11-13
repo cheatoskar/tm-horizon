@@ -1,0 +1,288 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource/barlow-condensed/latin-700-italic.css';
+import '@fontsource/barlow-condensed/latin-800-italic.css';
+import '@tm-hub/shared/tokens.css';
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { types, typeLabel } from '../data/site';
+import { games } from '../data/games';
+import { IGDB_COVERS } from '@tm-hub/shared/covers';
+// IGDB image id -> game id, for the browser's fallback to our own covers.
+const igdbIds = Object.fromEntries(Object.entries(IGDB_COVERS).filter(([, p]) => p.startsWith('t_original/')).map(([g, p]) => [p.slice(11).split('.')[0], g]));
+import { t, lh, unprefix, langs, langNames, locales, type Lang } from '../i18n';
+interface Props { title: string; desc?: string; flush?: boolean; lang?: Lang }
+const { title, desc, flush = false, lang = 'en' } = Astro.props;
+const L = (p: string) => lh(lang, p);
+const portalUrl = String(import.meta.env.PUBLIC_PORTAL_URL ?? '').replace(/\/?$/, '/').replace(/^\/$/, ''); // developer portal (login), build-time
+const base = unprefix(Astro.url.pathname); // path without the language prefix
+const on = (p: string) => base.startsWith(p);
+const description = desc ?? t(lang, 'meta.desc');
+const js = {
+  now: t(lang, 'time.now'), soon: t(lang, 'time.soon'), live: t(lang, 'event.liveNow'), ended: t(lang, 'event.ended'),
+  copy: t(lang, 'btn.copy'), copied: t(lang, 'btn.copied'), locale: locales[lang], lang,
+};
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === 'TM Horizon' ? 'TM Horizon' : `${title} · TM Horizon`}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark light" />
+    {langs.map((l) => <link rel="alternate" hreflang={l} href={lh(l, base)} />)}
+    <link rel="alternate" hreflang="x-default" href={base} />
+    <link rel="icon" type="image/png" href="/img/brand/icon-64.png" />
+    <link rel="apple-touch-icon" href="/img/brand/icon-180.png" />
+    <script is:inline>
+      try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
+      // Language: English pages go to the saved choice, else to the browser language when it is de, pl or fr.
+      (function () {
+        try {
+          if (document.documentElement.lang !== 'en') return;
+          var pick = null, known = { en: 1, de: 1, pl: 1, fr: 1 };
+          try { pick = localStorage.getItem('lang'); } catch (e) {}
+          if (!known[pick]) {
+            pick = null;
+            var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+            for (var i = 0; i < list.length; i++) { var c = String(list[i] || '').slice(0, 2).toLowerCase(); if (known[c]) { pick = c; break; } }
+          }
+          if (pick && pick !== 'en') location.replace('/' + pick + location.pathname + location.search + location.hash);
+        } catch (e) {}
+      })();
+    </script>
+    <script is:inline define:vars={{ igdbIds }}>
+      // Official art comes same-origin through our image proxy (/ext-img/igdb/..., /ext-img/steam/...; deploy/ext-img.conf).
+      // When one fails (astro dev without the proxy, upstream down), our own cover takes its place.
+      (function () {
+        var ids = { '11020': 'tmnf', '7200': 'tmuf', '232910': 'tm2-stadium', '228760': 'tm2-canyon', '243360': 'tm2-valley', '600720': 'tm2-lagoon', '229870': 'sm-storm', '375900': 'turbo', '2225070': 'tm2020' };
+        var igdb = igdbIds;
+        document.addEventListener('error', function (e) {
+          var i = e.target;
+          if (!i || i.tagName !== 'IMG' || i.dataset.fb || !/\/ext-img\//.test(i.src)) return;
+          i.dataset.fb = '1';
+          var g = /\/ext-img\/igdb\/([a-z0-9]+)\./.exec(i.src);
+          if (g && igdb[g[1]]) { i.src = '/img/covers/' + igdb[g[1]] + '-cover.svg'; return; }
+          var m = /\/ext-img\/steam\/(\d+)\/(\w+)/.exec(i.src), id = m && ids[m[1]];
+          if (!id || m[2] === 'logo') { i.style.visibility = 'hidden'; return; }
+          i.src = '/img/covers/' + id + '-' + (m[2] === 'library_600x900' ? 'cover' : 'hero') + '.svg';
+        }, true);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{t(lang, 'nav.skip')}</a>
+    <header class="top">
+      <div class="wrap top-in">
+        <a class="brand" href={L('/')} aria-label={t(lang, 'nav.home')}><img class="brand-word dark" src="/img/brand/wordmark-transparent.png" alt="TM Horizon" width="164" height="36" /><img class="brand-word light" src="/img/brand/wordmark-light-transparent.png" alt="" width="164" height="36" /></a>
+
+        <nav class="top-nav" aria-label={t(lang, 'nav.main')}>
+          <details class="dd discover-dd" data-dd>
+            <summary class={`pill-btn accent ${on('/discover') || on('/mod/') || on('/directory') ? 'on' : ''}`}><Icon name="compass" /> {t(lang, 'nav.discover')} <Icon name="chevron-down" size={16} class="chev" /></summary>
+            <div class="menu">
+              {types.map((ty) => <a href={L(`/discover/${ty.id}/`)}><Icon name={ty.icon} />{typeLabel(lang, ty.id)}{ty.id === 'maps' && <span class="menu-note">TMX</span>}</a>)}
+              <hr />
+              <a href={L('/directory/')}><Icon name="library" />{t(lang, 'nav.directory')}</a>
+              <a href={L('/games/')}><Icon name="gamepad-2" />{t(lang, 'nav.allGames')}</a>
+            </div>
+          </details>
+          <a class={`nav-link ${on('/discover/servers') ? 'on' : ''}`} href={L('/discover/servers/')}><Icon name="server" />{t(lang, 'nav.servers')}</a>
+          <a class={`nav-link ${on('/events') ? 'on' : ''}`} href={L('/events/')}><Icon name="calendar-days" />{t(lang, 'nav.events')}</a>
+          <a class={`nav-link ${on('/dev') ? 'on' : ''}`} href={L('/dev/')}><Icon name="code" />{t(lang, 'nav.dev')}</a>
+          <a class={`nav-link ${on('/launcher') || on('/download') ? 'on' : ''}`} href={L('/download/')}><Icon name="download" />{t(lang, 'nav.download')}</a>
+        </nav>
+
+        <div class="top-end">
+          <a class="btn primary signin" href={portalUrl ? `${portalUrl}login` : L('/authors/#sign-in')}><Icon name="log-in" /> <span>{t(lang, 'nav.signIn')}</span></a>
+          <details class="dd lang-dd" data-dd>
+            <summary class="icon-btn lang-btn" aria-label={t(lang, 'lang.label')} title={t(lang, 'lang.label')}><Icon name="languages" /><span class="lang-code">{lang.toUpperCase()}</span></summary>
+            <div class="menu right">
+              <div class="menu-h">{t(lang, 'lang.label')}</div>
+              {langs.map((l) => <a href={lh(l, base)} hreflang={l} lang={l} data-lang-set={l} class={l === lang ? 'on' : ''} aria-current={l === lang ? 'true' : undefined}>{langNames[l]}</a>)}
+            </div>
+          </details>
+          <details class="dd settings-dd" data-dd>
+            <summary class="icon-btn" aria-label={t(lang, 'nav.settings')}><Icon name="settings" /></summary>
+            <div class="menu right">
+              <div class="menu-h">{t(lang, 'theme.label')}</div>
+              <button type="button" data-theme-set="system"><Icon name="monitor" />{t(lang, 'theme.system')}</button>
+              <button type="button" data-theme-set="dark"><Icon name="moon" />{t(lang, 'theme.dark')}</button>
+              <button type="button" data-theme-set="light"><Icon name="sun" />{t(lang, 'theme.light')}</button>
+            </div>
+          </details>
+          <details class="dd phone-menu" data-dd>
+            <summary class="icon-btn" aria-label={t(lang, 'nav.menu')}><Icon name="menu" class="open-i" /><Icon name="x" class="close-i" /></summary>
+            <div class="sheet">
+              <div class="sheet-h">{t(lang, 'nav.discover')}</div>
+              <div class="sheet-grid">
+                {types.map((ty) => <a href={L(`/discover/${ty.id}/`)}><Icon name={ty.icon} />{typeLabel(lang, ty.id)}</a>)}
+                <a href={L('/directory/')}><Icon name="library" />{t(lang, 'nav.directory')}</a>
+                <a href={L('/games/')}><Icon name="gamepad-2" />{t(lang, 'nav.games')}</a>
+              </div>
+              <div class="sheet-h">TM Horizon</div>
+              <div class="sheet-list">
+                <a href={L('/events/')}><Icon name="calendar-days" />{t(lang, 'nav.events')}</a>
+                <a href={L('/download/')}><Icon name="download" />{t(lang, 'nav.download')}</a>
+                <a href={L('/launcher/')}><Icon name="rocket" />{t(lang, 'nav.launcher')}</a>
+                <a href={L('/authors/')}><Icon name="pen-tool" />{t(lang, 'nav.authors')}</a>
+                <a href={L('/dev/')}><Icon name="code" />{t(lang, 'nav.dev')}</a>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class={flush ? 'flush' : 'wrap page'}><slot /></main>
+
+    <footer class="foot">
+      <div class="wrap foot-in">
+        <div class="foot-brand">
+          <a class="brand" href={L('/')}><img class="brand-word dark" src="/img/brand/wordmark-transparent.png" alt="TM Horizon" width="164" height="36" /><img class="brand-word light" src="/img/brand/wordmark-light-transparent.png" alt="" width="164" height="36" /></a>
+          <p>{t(lang, 'foot.tagline')}</p>
+          <p class="proto-note"><Icon name="flask-conical" size={15} /> <span set:html={t(lang, 'foot.proto', { badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} /></p>
+        </div>
+        <div>
+          <h4>{t(lang, 'nav.discover')}</h4>
+          {types.filter((ty) => ty.id !== 'maps').map((ty) => <a href={L(`/discover/${ty.id}/`)}>{typeLabel(lang, ty.id)}</a>)}
+        </div>
+        <div>
+          <h4>{t(lang, 'nav.games')}</h4>
+          {games.slice(0, 9).map((g) => <a href={L(`/game/${g.id}/`)}>{g.name}</a>)}
+          <a href={L('/games/')}>{t(lang, 'nav.allGames')}</a>
+        </div>
+        <div>
+          <h4>{t(lang, 'foot.hub')}</h4>
+          <a href={L('/directory/')}>{t(lang, 'nav.directory')}</a>
+          <a href={L('/events/')}>{t(lang, 'nav.events')}</a>
+          <a href={L('/launcher/')}>{t(lang, 'foot.launcher')}</a>
+          <a href={L('/authors/')}>{t(lang, 'nav.authors')}</a>
+          <a href={L('/dev/')}>{t(lang, 'foot.dev')}</a>
+        </div>
+      </div>
+      <div class="wrap foot-legal">
+        <nav class="foot-legal-links" aria-label={t(lang, 'legal.imprint')}>
+          <a href={L('/impressum/')}>{t(lang, 'legal.imprint')}</a>
+          <a href={L('/datenschutz/')}>{t(lang, 'legal.privacy')}</a>
+          <a href={L('/nutzungsbedingungen/')}>{t(lang, 'legal.terms')}</a>
+        </nav>
+        <p>{t(lang, 'foot.legal')}</p>
+      </div>
+    </footer>
+
+    <script is:inline define:vars={{ S: js }}>
+      (function () {
+        // language: remember the choice (the links go to the same page in the other language)
+        document.querySelectorAll('[data-lang-set]').forEach(function (a) {
+          a.addEventListener('click', function () {
+            try { localStorage.setItem('lang', a.dataset.langSet); } catch (e) {}
+            a.href = a.getAttribute('href').split('#')[0] + location.search + location.hash;
+          });
+        });
+        // theme
+        var root = document.documentElement;
+        function setTheme(t) { try { if (t === 'system') localStorage.removeItem('theme'); else localStorage.setItem('theme', t); } catch (e) {} if (t === 'system') delete root.dataset.theme; else root.dataset.theme = t; mark(); }
+        function mark() { var cur = root.dataset.theme || 'system'; document.querySelectorAll('[data-theme-set]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.themeSet === cur ? 'true' : 'false'); }); }
+        document.querySelectorAll('[data-theme-set]').forEach(function (b) { b.addEventListener('click', function () { setTheme(b.dataset.themeSet); }); });
+        mark();
+        // dropdowns: one open at a time, close on outside click / Escape
+        var dds = document.querySelectorAll('[data-dd]');
+        dds.forEach(function (d) { d.addEventListener('toggle', function () { if (d.open) dds.forEach(function (o) { if (o !== d) o.open = false; }); document.body.classList.toggle('sheet-open', !!document.querySelector('.phone-menu[open]')); }); });
+        document.addEventListener('click', function (e) { dds.forEach(function (d) { if (d.open && !d.contains(e.target)) d.open = false; }); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') dds.forEach(function (d) { d.open = false; }); });
+        // relative times (same units and locale as the build-time text)
+        var rtf = new Intl.RelativeTimeFormat(S.locale, { numeric: 'auto' });
+        var rtfShort = new Intl.RelativeTimeFormat(S.locale, { numeric: 'always', style: 'short' });
+        var units = [[60, 'second'], [60, 'minute'], [24, 'hour'], [30, 'day'], [12, 'month'], [1e9, 'year']];
+        function ago(iso) { var v = Math.round((Date.now() - Date.parse(iso)) / 1000); if (v < 0) return S.soon; for (var i = 0; i < units.length; i++) { if (v < units[i][0]) { if (i === 0) return S.now; return rtf.format(-v, units[i][1]); } v = Math.floor(v / units[i][0]); } return ''; }
+        document.querySelectorAll('[data-ago]').forEach(function (el) { var t = ago(el.dataset.ago); if (t) el.textContent = (el.dataset.prefix || '') + t; });
+        // events: local time, live state, join, calendar file
+        var fmtD = new Intl.DateTimeFormat(S.locale, { weekday: 'short', day: 'numeric', month: 'short' });
+        var fmtT = new Intl.DateTimeFormat(S.locale, { hour: '2-digit', minute: '2-digit', hour12: false });
+        var fmtDay = new Intl.DateTimeFormat(S.locale, { day: 'numeric' }), fmtMon = new Intl.DateTimeFormat(S.locale, { month: 'short' });
+        var nf = function (n, unit, disp) { return new Intl.NumberFormat(S.locale, { style: 'unit', unit: unit, unitDisplay: disp }).format(n); };
+        function dur(min) {
+          var d = Math.floor(min / 1440), h = Math.floor((min % 1440) / 60), m = Math.round(min % 60), p = [];
+          if (d) { p.push(nf(d, 'day', 'long')); if (h) p.push(nf(h, 'hour', 'short')); }
+          else if (h) { p.push(nf(h, 'hour', 'short')); if (m) p.push(nf(m, 'minute', 'short')); }
+          else p.push(nf(m, 'minute', 'short'));
+          return p.join(' ');
+        }
+        // events page: live first, then upcoming (soonest first), past ones folded away
+        function groupEvents() {
+          var g = document.querySelector('[data-ev-groups]'); if (!g) return;
+          var all = Array.prototype.slice.call(g.querySelectorAll('[data-ev]'));
+          var by = function (st) { return all.filter(function (e) { return e.dataset.state === st; }); };
+          var st = function (a, b) { return Date.parse(a.dataset.start) - Date.parse(b.dataset.start); };
+          var put = function (sel, list) { var box = g.querySelector(sel); list.forEach(function (e) { box.appendChild(e); }); };
+          put('[data-ev-live]', by('live').sort(st));
+          put('[data-ev-soon]', by('soon').sort(st));
+          var past = by('past').sort(function (a, b) { return st(b, a); });
+          put('[data-ev-past]', past);
+          var box = g.querySelector('[data-ev-pastbox]'); box.hidden = !past.length;
+          g.querySelector('[data-ev-pastn]').textContent = past.length ? '(' + past.length + ')' : '';
+        }
+        // description: 3 lines, "More" only when it is longer
+        function clampNotes() {
+          document.querySelectorAll('.ev-note').forEach(function (n) {
+            var p = n.querySelector('[data-note]'), b = n.querySelector('.ev-more');
+            if (!n.classList.contains('open')) b.hidden = !(p.scrollHeight > p.clientHeight + 1);
+          });
+        }
+        document.addEventListener('click', function (ev) {
+          var b = ev.target.closest('.ev-more'); if (!b) return;
+          var n = b.parentNode, open = n.classList.toggle('open');
+          b.textContent = open ? b.dataset.less : b.dataset.more; b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        function tick() {
+          var now = Date.now();
+          document.querySelectorAll('[data-ev]').forEach(function (el) {
+            var s = Date.parse(el.dataset.start), e = s + (+el.dataset.minutes) * 60000, d = new Date(s);
+            var st = now >= e ? 'past' : now >= s ? 'live' : 'soon';
+            el.dataset.state = st;
+            var q = function (sel) { return el.querySelector(sel); };
+            if (q('[data-t]')) q('[data-t]').textContent = fmtT.format(d);
+            if (q('[data-day]')) q('[data-day]').textContent = fmtDay.format(d);
+            if (q('[data-mon]')) q('[data-mon]').textContent = fmtMon.format(d);
+            if (q('[data-d]')) { var mins = Math.round((s - now) / 60000); q('[data-d]').textContent = st === 'live' ? S.live : st === 'past' ? S.ended : mins < 60 ? rtfShort.format(mins, 'minute') : mins < 1440 ? rtfShort.format(Math.floor(mins / 60), 'hour') : fmtD.format(d); }
+            if (q('[data-dur]')) q('[data-dur]').textContent = dur(+el.dataset.minutes);
+            var j = q('[data-join]');
+            if (j) { if (st === 'live' && j.dataset.href) { j.href = j.dataset.href; j.removeAttribute('aria-disabled'); } else { j.removeAttribute('href'); j.setAttribute('aria-disabled', 'true'); } }
+          });
+          groupEvents(); clampNotes();
+        }
+        tick(); setInterval(tick, 30000); window.addEventListener('resize', clampNotes);
+        document.querySelectorAll('[data-ev-pastbox]').forEach(function (d) { d.addEventListener('toggle', clampNotes); });
+        document.addEventListener('click', function (ev) {
+          var b = ev.target.closest('[data-ics]'); if (!b) return;
+          var el = b.closest('[data-ev]');
+          var z = function (d) { return new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d+/, ''); };
+          var s = Date.parse(el.dataset.start), e = s + (+el.dataset.minutes) * 60000;
+          var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//TM Horizon//EN', 'BEGIN:VEVENT', 'UID:' + el.dataset.id + '@tmhub.local', 'DTSTAMP:' + z(Date.now()), 'DTSTART:' + z(s), 'DTEND:' + z(e), 'SUMMARY:' + el.dataset.title, 'DESCRIPTION:' + (el.dataset.host || ''), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+          var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'event.ics'; a.click();
+        });
+        // copy buttons: <button data-copy="host:port"><span data-copy-l>Copy</span></button>
+        document.addEventListener('click', function (ev) {
+          var b = ev.target.closest('[data-copy]'); if (!b) return;
+          var done = function () { var l = b.querySelector('[data-copy-l]'); if (!l) return; l.textContent = S.copied; setTimeout(function () { l.textContent = S.copy; }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(b.dataset.copy).then(done, function () {});
+          else { var ta = document.createElement('textarea'); ta.value = b.dataset.copy; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.remove(); }
+        });
+        // tabs (game page, mod page): [data-tabs] with buttons [data-tab] and panels [data-panel]
+        document.querySelectorAll('[data-tabs]').forEach(function (box) {
+          var btns = box.querySelectorAll('[data-tab]'), panels = box.querySelectorAll('[data-panel]');
+          function show(id, push) {
+            var ok = false; btns.forEach(function (b) { if (b.dataset.tab === id) ok = true; }); if (!ok) id = btns[0].dataset.tab;
+            btns.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === id ? 'true' : 'false'); });
+            panels.forEach(function (p) { p.hidden = p.dataset.panel !== id; });
+            if (push) history.replaceState(null, '', '#' + id);
+          }
+          btns.forEach(function (b) { b.addEventListener('click', function (e) { e.preventDefault(); show(b.dataset.tab, true); }); });
+          box.querySelectorAll('[data-goto]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); show(a.dataset.goto, true); }); });
+          show(location.hash.slice(1), false);
+        });
+      })();
+    </script>
+  </body>
+</html>

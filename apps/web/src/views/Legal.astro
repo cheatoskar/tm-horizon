@@ -1,0 +1,73 @@
+---
+// Impressum, Datenschutz, Nutzungsbedingungen. One source for website and portal: docs/hub/legal/*.md
+// (German, binding) and docs/hub/legal/en/*.md (English translation). pl and fr show the English text.
+// Open placeholders stay visible as [ ... ] and are highlighted; `npm run check-legal` lists them.
+import Layout from '../layouts/Layout.astro';
+import { mdDoc } from '../lib/md';
+import { t, lh, type Lang } from '../i18n';
+
+export type LegalDoc = 'impressum' | 'datenschutz' | 'nutzungsbedingungen';
+const { lang = 'en', doc } = Astro.props as { lang?: Lang; doc: LegalDoc };
+
+const de = import.meta.glob('../../../../docs/hub/legal/{impressum,datenschutz,nutzungsbedingungen}.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const en = import.meta.glob('../../../../docs/hub/legal/en/{impressum,datenschutz,nutzungsbedingungen}.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const pick = (files: Record<string, string>) => Object.entries(files).find(([p]) => p.endsWith(`/${doc}.md`))?.[1];
+const german = lang === 'de';
+const src = (german ? pick(de) : pick(en) ?? pick(de)) ?? '';
+const showsGerman = german || !pick(en);
+
+// Title from the first "# " line; the rest is the body.
+const lines = src.replace(/\r/g, '').split('\n');
+const titleLine = lines.findIndex((l) => /^#\s/.test(l));
+const title = titleLine >= 0 ? lines[titleLine].replace(/^#\s+/, '').trim() : doc;
+// CommonMark hard breaks (trailing backslash) -> marker that survives mdDoc, turned into <br> below.
+const BR = '%%BR%%';
+const body = lines.filter((_, i) => i !== titleLine).map((l) => l.replace(/\\$/, BR)).join('\n');
+
+const slug = (s: string) => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, '').replace(/§/g, 'p').replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '');
+let html = mdDoc(body)
+  .split(BR + ' ').join('<br>').split(BR).join('<br>')
+  // headings: explicit {#id} wins, otherwise an id from the text (deep links like #launcher, #p-8-...)
+  .replace(/<h(\d)>(.*?)<\/h\1>/g, (_, n, inner: string) => {
+    const m = inner.match(/^(.*?)\s*\{#([a-z0-9-]+)\}\s*$/);
+    const text = m ? m[1] : inner;
+    return `<h${n} id="${m ? m[2] : slug(text)}">${text}</h${n}>`;
+  });
+// Highlight open placeholders outside <code>.
+html = html.split(/(<code>[\s\S]*?<\/code>)/).map((part) => (part.startsWith('<code>') ? part : part.replace(/\[([^\]<>]{1,200})\]/g, '<mark class="ph">[$1]</mark>'))).join('');
+const open = (html.match(/class="ph"/g) ?? []).length;
+
+const docs: LegalDoc[] = ['impressum', 'datenschutz', 'nutzungsbedingungen'];
+const label = (d: LegalDoc) => t(lang, d === 'impressum' ? 'legal.imprint' : d === 'datenschutz' ? 'legal.privacy' : 'legal.terms');
+---
+<Layout title={title} lang={lang}>
+  <div class="phead">
+    <div>
+      <h1>{title}</h1>
+      <p class="lead legal-tabs">
+        {docs.map((d) => (d === doc ? <b>{label(d)}</b> : <a href={lh(lang, `/${d}/`)}>{label(d)}</a>))}
+      </p>
+    </div>
+  </div>
+  <section class="card prose readme legal">
+    <p class="muted legal-lang">
+      {german
+        ? <a href={`/${doc}/`} hreflang="en">{t(lang, 'legal.english')}</a>
+        : <>{t(lang, lang === 'en' ? 'legal.translation' : 'legal.onlyDeEn')} <a href={`/de/${doc}/`} hreflang="de">{t(lang, 'legal.german')}</a></>}
+      {!german && showsGerman && <span> · {t(lang, 'legal.noTranslation')}</span>}
+    </p>
+    {open > 0 && <p class="legal-open">{t(lang, 'legal.open', { n: open })}</p>}
+    <div set:html={html} />
+  </section>
+</Layout>
+
+<style>
+  .legal { max-width: 920px; padding: 22px 28px; }
+  @media (max-width: 720px) { .legal { padding: 16px; } }
+  .legal-tabs { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legal-lang { font-size: 13.5px; margin-bottom: 14px; }
+  .legal-open { font-size: 13.5px; margin-bottom: 14px; padding: 8px 12px; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--accent); }
+  .legal :global(mark.ph) { background: color-mix(in srgb, var(--accent) 22%, transparent); color: inherit; padding: 0 3px; border-radius: 4px; }
+  .legal :global(h3) { scroll-margin-top: 90px; }
+  .legal :global(td) { vertical-align: top; }
+</style>

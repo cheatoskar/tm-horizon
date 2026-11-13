@@ -1,0 +1,17 @@
+{
+  "hh.mods": "Mods",
+  "hh.noMods": "Keine Mods installiert. Mods sind eigene Plugins, zum Beispiel der Legacy Randomizer.",
+  "hh.clipsOnly": "Clips: nur TMNF und TMUF.",
+  "hh.srcLine": "Quelle: {what}",
+  "hh.srcRelease": "GitHub-Release",
+  "hh.srcFolder": "eigener Ordner",
+  "hh.srcChange": "ändern",
+  "hh.folderIs": "Ordner: {dir}",
+  "play.mapInDownloaded": "Map liegt unter Downloaded – im Spiel öffnen.",
+  "tmxup.linkText": "Lädt neue persönliche Bestzeiten automatisch zu TMX hoch. Dafür muss das Modul „TMX Upload“ im Spiel an sein.",
+  "tmxup.linkOpen": "Einstellungen öffnen",
+  "hh.oneLine": "Ingame-Menü mit Modulen.",
+  "hh.nextStart": "Gilt ab dem nächsten Start.",
+  "hh.switchFailed": "{name} ließ sich nicht schalten.",
+  "hh.inProfile": "in {profile}"
+}

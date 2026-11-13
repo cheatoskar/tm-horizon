@@ -1,0 +1,63 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": { "accent": "violet" },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TrackMania Forever OpenXR",
+      "tagline": "Play TrackMania Nations Forever and United Forever in VR, with a 3D world behind the menus.",
+      "badges": ["TMNF, TMUF", "VR headset with OpenXR", "TMLoader mod"]
+    },
+    {
+      "type": "features",
+      "items": [
+        { "icon": "monitor", "title": "Real VR", "text": "Stereo rendering through OpenXR for Steam Link, Virtual Desktop, SteamVR and other runtimes." },
+        { "icon": "eye", "title": "First person", "text": "Press 3 to drive from the cockpit. For United, the HD car skins from UVME look much better inside." },
+        { "icon": "settings", "title": "Settings in VR", "text": "F10 opens the VR settings menu while you play." },
+        { "icon": "check", "title": "One click on or off", "text": "With TMLoader you switch the mod on and off without touching the game folder." }
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Installation video",
+      "url": "https://www.youtube.com/watch?v=xMwuuWqYHf8",
+      "caption": "How to install the mod, by the author."
+    },
+    {
+      "type": "text",
+      "title": "Before you start",
+      "markdown": "In the game options **turn off fullscreen and anti-aliasing**, and make sure the whole game window fits on your monitor. The mod checks this, shows a warning and stays on the desktop when something is wrong.\n\nSet your OpenXR runtime (VDXR for Virtual Desktop, SteamVR's runtime for SteamVR). OpenXR layers that are not 32-bit, like ReShade, can cause trouble. The author notes that the mod crashes with Meta Horizon Link since v8: use Steam Link or Virtual Desktop instead.\n\nThe code of this mod is written entirely by an AI. The author says so in the README.\n\nA fork with one patch by wial663 lets TM Vibrant Shaders run in VR: its menu shows in the headset, shading in VR is experimental. It is offered to this mod as a pull request; once merged, use the original."
+    },
+    {
+      "type": "hotkeys",
+      "rows": [
+        { "keys": "3", "action": "First person mode (default controls)" },
+        { "keys": "F10", "action": "Open the VR settings menu" }
+      ]
+    },
+    {
+      "type": "compat",
+      "rows": [
+        { "game": "tmuf", "status": "works" },
+        { "game": "tmnf", "status": "works" }
+      ]
+    },
+    { "type": "changelog", "count": 1 },
+    {
+      "type": "faq",
+      "items": [
+        { "q": "The game stays on the desktop.", "a": "Fullscreen or anti-aliasing is still on, or the game window does not fit on the monitor. Fix the options and start again." },
+        { "q": "Shadows take very long when a map loads.", "a": "Cancel the calculation after a couple of seconds. CoreMod, which comes with TMLoader, makes it much faster." },
+        { "q": "Does it work with TM Vibrant Shaders?", "a": "Yes, the author shows it in a video in the README." }
+      ]
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        { "kind": "install", "label": "Install" },
+        { "kind": "link", "label": "README and releases", "url": "https://github.com/jiink/TrackManiaForeverOpenXR", "style": "ghost" }
+      ]
+    }
+  ]
+}

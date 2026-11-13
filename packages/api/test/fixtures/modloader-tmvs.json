@@ -1,0 +1,40 @@
+{
+  "api": 1,
+  "game": "TmForever",
+  "products": {
+    "TM Vibrant Shaders": {
+      "name": "TM Vibrant Shaders",
+      "author": "cheatoskar",
+      "type": "modification",
+      "description": "Real-time lighting and weather mod for TrackMania Nations/United Forever and TrackMania 2. Features include dynamic lighting, night mode, long shadows, neon effects, rain, clouds, improved water, MP4 video export, and customizable hotkeys. Open the menu with F8.",
+      "icon_link": "https://cheatoskar.github.io/TM-Vibrant-Shaders/modloader/icon.png",
+      "homepage": "https://github.com/cheatoskar/TM-Vibrant-Shaders",
+      "versions": {
+        "1.4.1": {
+          "executable": "TMVibrantShaders.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://cheatoskar.github.io/TM-Vibrant-Shaders/modloader/files/1.4.1/TMVS-modloader.zip",
+          "hash_sha256": "6a6fa113bd7bd4f9f2cec30295e00af28fb0e65346cfe8f3ef05617f3f4845cf",
+          "changelog": "The first release for TrackMania 2 (ManiaPlanet 4) as well, with a new menu and the game's own light. It follows 1.4.0-preview (2026-10-12) and its release candidates (there is no plain 1.4.0); this list covers everything since 1.3.0.\n\nNew:\n- TrackMania 2 (ManiaPlanet 4) support (see the end of this..."
+        },
+        "1.4.2": {
+          "executable": "TMVibrantShaders.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://cheatoskar.github.io/TM-Vibrant-Shaders/modloader/files/1.4.2/TMVS-modloader.zip",
+          "hash_sha256": "d3da8fec388f79f4acdd810132f54b0b1908b8b97a7a0cd80a20f4d18cfac0c7",
+          "changelog": "A new video export, resource packs, the Horror look with car headlights, clear water and splashes, a fix for overlapped blocks, photo mode in the MediaTracker, and the Misc page (TrackMania Nations/United); car spray, menu windows, the Horror look and car headlights also in TrackMania 2.\n\nNew:\n- Pho..."
+        }
+      }
+    }
+  }
+}

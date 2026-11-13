@@ -1,0 +1,65 @@
+{
+  "More": true,
+  "Results": [
+    {
+      "MapId": 244149,
+      "Name": "Four Seasons",
+      "Uploader": {
+        "Name": "C:.."
+      },
+      "Authors": [
+        {
+          "User": {
+            "UserId": 151056,
+            "Name": "C:.."
+          },
+          "Role": ""
+        }
+      ],
+      "AwardCount": 8,
+      "UploadedAt": "2024-04-27T15:10:42.8",
+      "TitlePack": "TMStadium",
+      "HasThumbnail": true
+    },
+    {
+      "MapId": 267569,
+      "Name": "²SM - Non-stop NASCAR November",
+      "Uploader": {
+        "Name": "Beluga71"
+      },
+      "Authors": [
+        {
+          "User": {
+            "UserId": 40773,
+            "Name": "Beluga71"
+          },
+          "Role": ""
+        }
+      ],
+      "AwardCount": 1,
+      "UploadedAt": "2026-11-10T01:54:54.987",
+      "TitlePack": "TMStadium",
+      "HasThumbnail": true
+    },
+    {
+      "MapId": 253070,
+      "Name": "short x076",
+      "Uploader": {
+        "Name": "pave66"
+      },
+      "Authors": [
+        {
+          "User": {
+            "UserId": 25527,
+            "Name": "pave66"
+          },
+          "Role": ""
+        }
+      ],
+      "AwardCount": 1,
+      "UploadedAt": "2025-04-26T20:48:04.211",
+      "TitlePack": "TMStadium",
+      "HasThumbnail": true
+    }
+  ]
+}

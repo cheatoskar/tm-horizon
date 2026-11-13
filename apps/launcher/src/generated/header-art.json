@@ -1,0 +1,58 @@
+{
+  "sites": {
+    "tmnf.exchange": {
+      "day": "header-art/banner-tmnf-day.webp",
+      "night": "header-art/banner-tmnf-night.webp",
+      "artist": "shortz"
+    },
+    "tmuf.exchange": {
+      "day": "header-art/banner-tmuf-day.webp",
+      "night": "header-art/banner-tmuf-night.webp",
+      "artist": "Dule"
+    }
+  },
+  "envs": {
+    "bay": {
+      "day": "header-art/env-bay-day.webp",
+      "night": "header-art/env-bay-night.webp",
+      "small": "header-art/env-bay-small.webp",
+      "artist": "Dule"
+    },
+    "coast": {
+      "day": "header-art/env-coast-day.webp",
+      "night": "header-art/env-coast-night.webp",
+      "small": "header-art/env-coast-small.webp",
+      "artist": "Dule"
+    },
+    "desert": {
+      "day": "header-art/env-desert-day.webp",
+      "night": "header-art/env-desert-night.webp",
+      "small": "header-art/env-desert-small.webp",
+      "artist": "Dule"
+    },
+    "island": {
+      "day": "header-art/env-island-day.webp",
+      "night": "header-art/env-island-night.webp",
+      "small": "header-art/env-island-small.webp",
+      "artist": "Dule"
+    },
+    "rally": {
+      "day": "header-art/env-rally-day.webp",
+      "night": "header-art/env-rally-night.webp",
+      "small": "header-art/env-rally-small.webp",
+      "artist": "Dule"
+    },
+    "snow": {
+      "day": "header-art/env-snow-day.webp",
+      "night": "header-art/env-snow-night.webp",
+      "small": "header-art/env-snow-small.webp",
+      "artist": "Dule"
+    },
+    "stadium": {
+      "day": "header-art/env-stadium-day.webp",
+      "night": "header-art/env-stadium-night.webp",
+      "small": "header-art/env-stadium-small.webp",
+      "artist": "Dule"
+    }
+  }
+}

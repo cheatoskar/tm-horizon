@@ -1,0 +1,115 @@
+/* Layout pass: full-width fluid pages, one control height, image skeletons. Loaded last. */
+:root { --ctl-h: var(--tm-ctl-h, 40px); --ctl-h-sm: var(--tm-ctl-h-sm, 32px); --page-pad: 26px; }
+
+/* ---------- fluid pages: no max-width caps, one padding ---------- */
+.page, .page.wide { max-width: none; margin-left: 0; margin-right: 0; padding: 30px var(--page-pad) 40px; }
+.home-grid, .game-grid { max-width: none; margin-left: 0; margin-right: 0; padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.hero-content { left: var(--page-pad); right: var(--page-pad); }
+.back { left: var(--page-pad); }
+.switcher { right: var(--page-pad); }
+.maps { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.settings-grid { grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); }
+.tools-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.events.row4 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.skin-grid.compact { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.lead, .modcard-text p, .detail-title p { max-width: 80ch; }
+
+/* ---------- one control height ---------- */
+.btn, .select, .search, input.input, select.input, .preset { height: var(--ctl-h); }
+.btn.sm, .text-in, .fchip, .tabs button, .ov-tabs button, .tas-chips li { height: var(--ctl-h-sm); }
+.btn.play.sm, .btn.get.sm { height: var(--ctl-h-sm); }
+.seg { box-sizing: border-box; height: var(--ctl-h); align-items: center; padding: 3px; }
+.seg button { height: calc(var(--ctl-h) - 8px); }
+.seg.small-seg { height: var(--ctl-h-sm); padding: 2px; }
+.seg.small-seg button { height: calc(var(--ctl-h-sm) - 6px); }
+.btn.icon:not(.tiny) { min-width: var(--ctl-h); }
+.pd-mod { min-height: calc(var(--ctl-h-sm) + 16px); }
+:root[data-density="compact"] .btn { height: var(--ctl-h-sm); }
+
+/* ---------- image skeleton ---------- */
+.cimg { position: relative; display: block; overflow: hidden; background: rgba(var(--tint), 0.04); }
+.cimg > img { display: block; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s; }
+.cimg-skel { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgba(var(--tint), 0.09) 50%, transparent 80%) 0 0 / 200% 100%; animation: cimg-shimmer 1.3s linear infinite; }
+.cimg-fail { position: absolute; inset: 0; background: rgba(var(--tint), 0.03); }
+@keyframes cimg-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .cimg-skel { animation: none; } }
+
+/* Wide windows: the mod list becomes a grid (2 columns from ~1700 px, 3 on 2560). */
+@media (min-width: 1700px) {
+  .modlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 640px), 1fr)); gap: 14px; align-items: stretch; }
+  .modlist > .modcard { height: 100%; align-content: start; }
+  .modlist > :not(.modcard) { grid-column: 1 / -1; }
+}
+
+/* ---------- Play button next to the profile switcher: one height, one centre line ---------- */
+/* Start panel (Home) and TAS corner: both 48 px, also in compact density. */
+.app .gs-row .psel-btn, .app .gs-row .btn.play, .app .gs-row .btn.get, .app .tas-play .psel-btn, .app .tas-play .btn.play, .app .tas-play .btn.get { height: 48px; border-radius: 12px; }
+.app .gs-row .btn.play, .app .tas-play .btn.play { min-width: 150px; font-size: 17px; padding: 0 20px; gap: 9px; }
+.gs-row, .tas-play { align-items: center; }
+.gs-row .psel, .tas-play .psel { display: flex; }
+/* Game heroes: 60 px stays 60 px in compact density too. */
+.app .hero-actions .btn.play.lg, .app .hero-actions .btn.get, .app .hero-actions .psel-btn, .app .hero-actions .btn.glass { height: 60px; }
+
+/* ---------- secondary buttons: readable label (WCAG AA 4.5:1) and a visible edge in every theme ---------- */
+.btn.ghost { color: var(--fg); background: rgba(var(--tint), 0.08); border: 1px solid rgba(var(--tint), 0.22); }
+.btn.ghost:hover { background: rgba(var(--tint), 0.14); border-color: rgba(var(--tint), 0.32); }
+.btn.glass { color: var(--fg); border-color: rgba(var(--tint), 0.22); }
+:root[data-theme="light"] .btn.ghost { color: #141820; background: #ffffff; border-color: rgba(20, 26, 38, 0.26); }
+:root[data-theme="light"] .btn.ghost:hover { background: #f1f3f6; border-color: rgba(20, 26, 38, 0.38); }
+/* Over game art (heroes) the light theme keeps the dark glass look, see styles-r7.css. */
+:root[data-theme="light"] .hero .btn.ghost { color: #f4f6fa; background: rgba(8, 10, 16, 0.55); border-color: rgba(255, 255, 255, 0.28); }
+.bbtn { color: var(--fg); }
+/* Text links in the light theme: the accent text colour, a bit darker so it stays above 4.5:1 on tinted panels. */
+:root[data-theme="light"] .linkish, :root[data-theme="light"] .more-tip { color: color-mix(in srgb, var(--acc-text) 80%, #000); }
+
+/* ---------- game pages: one grid, one top line, tidy side cards ---------- */
+.game-grid { align-items: start; }
+.game-grid > .col > .panel { margin: 0; }
+/* Even 2-column button grid (Install card). */
+.btn-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.btn-grid2 > .btn { width: 100%; justify-content: flex-start; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.btn-grid2 > .btn > svg { flex: none; }
+/* A long command or path on one line, full text in the tooltip, copy button after it. */
+.one-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.one-line code { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; padding: 4px 8px; border-radius: 7px; background: rgba(var(--tint), 0.05); }
+/* Mods section of a game page. */
+.gm-sub { margin: 14px 0 8px; font-size: 12px; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.gm-sub:first-of-type { margin-top: 4px; }
+.gm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 8px; }
+.gm-row { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(var(--tint), 0.03); cursor: pointer; }
+.gm-row:hover { border-color: var(--line-2); background: rgba(var(--tint), 0.06); }
+.gm-row .grow { display: flex; flex-direction: column; gap: 1px; }
+.gm-row .mod-icon, .gm-row .tile-icon { border-radius: 9px; }
+.min0 { min-width: 0; }
+/* Installations card. */
+.inst-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.inst-row { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); }
+.inst-row.on { border-color: rgba(var(--acc-rgb), 0.45); background: var(--acc-soft); }
+.inst-row .grow { display: flex; flex-direction: column; gap: 1px; }
+
+/* 0.5.1: "More projects" (link-only GitHub projects from the hub), collapsible under the available mods */
+.gm-moreproj { margin-top: 6px; }
+.gm-toggle { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit; }
+.gm-toggle:hover { color: var(--fg); }
+.gm-moreproj .gm-row .pill { flex: none; }
+
+/* 0.5.1: Openplanet plugins one click (OpPluginActions): rows per game, game page list */
+.op-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.op-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.op-row .grow { min-width: 0; }
+.op-installed { display: flex; flex-direction: column; gap: 8px; }
+.op-installed-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); }
+.op-installed-row > .pd-mod { flex: 1 1 220px; min-width: 0; }
+.op-installed-row > .op-row { flex: 0 1 auto; }
+.op-have { color: var(--fg); }
+
+/* 0.5.1: .Gbx open dialog */
+.gbxo-head { display: flex; gap: 14px; align-items: center; margin-bottom: 12px; }
+.gbxo-thumb { width: 160px; height: 90px; object-fit: cover; border-radius: var(--r-sm, 8px); transform: scaleY(-1); flex: none; border: 1px solid var(--line); }
+.gbxo-thumb.ph { transform: none; display: flex; align-items: flex-end; padding: 6px 8px; font-size: 11px; color: var(--dim); background: rgba(var(--tint), 0.05); }
+.gbxo-facts { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gbxo-name { font-size: 16px; }
+.gbxo-list { display: flex; flex-direction: column; gap: 6px; }
+.gbxo-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); }
+.gbxo-row .grow { display: flex; flex-direction: column; }
+.gbxo-dir { font-family: var(--mono, monospace); font-size: 11px; }

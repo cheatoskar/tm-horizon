@@ -1,0 +1,83 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "red"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TrackMania Competition Patch",
+      "tagline": "Anti-cheat patch for TrackMania Nations and United Forever, with server validation of runs.",
+      "badges": [
+        "TMNF, TMUF",
+        "ModLoader mod",
+        "Anti-cheat"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "shield",
+          "title": "Anti-cheat",
+          "text": "Prevents cheating such as replaying pre-made runs and slowing down the game time."
+        },
+        {
+          "icon": "check",
+          "title": "Validated runs",
+          "text": "Runs driven with the patch and a stable connection are validated by the server and eligible for TMX."
+        },
+        {
+          "icon": "timer",
+          "title": "Red timer",
+          "text": "Without a connection the game timer turns red and the replay is not validated."
+        },
+        {
+          "icon": "lock",
+          "title": "Little data",
+          "text": "It sends only a small amount of data at the start and at the end of a race, not continuously."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install and requirements",
+      "markdown": "The patch is installed through the TrackMania ModLoader. It needs the newest game version (2.11.26 or later) and a stable internet connection. For the Steam version, the page recommends installing the standalone game first.\n\nIf the connection drops during a run, the patch waits a few seconds at the end of the race and tries to validate again.\n\nThe patch is meant to give better protection against cheating and extra validation of records on important TMX categories such as Official Campaigns and Classic tracks."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Initially developed by donadigo. Competition Patch 2.0 was developed by Tomashu, the developer of ModLoader."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Competition Patch",
+          "url": "https://donadigo.com/tmcp"
+        },
+        {
+          "kind": "link",
+          "label": "ModLoader",
+          "url": "https://tomashu.pages.dev/software/tmloader",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

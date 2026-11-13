@@ -1,0 +1,9 @@
+# 100% TMX project server (public game address from the project's deploy notes, 2026-11-11).
+id: 100tmx-tmnf
+game: tmnf
+name: 100% TMX (Nations Forever)
+address: game.100tmx.com:2350
+language: multi
+description: Server of the 100% TMX project (tracks from TMX, played through the randomizer).
+homepage: https://100tmx.com
+added: 2026-11-11

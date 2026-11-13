@@ -1,0 +1,105 @@
+---
+// "All TrackMania projects on GitHub": every repository the hub knows (catalog, plus those found by the daily GitHub search,
+// 0-star ones included), with filters for game, language and last update. Static page, filtering runs in the browser.
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Thumb from '../components/Thumb.astro';
+import TypeBar from '../components/TypeBar.astro';
+import { githubProjects } from '../data/github';
+import { gameName, byOrder } from '../data/games';
+import { compact, ago } from '../lib/fmt';
+import { t, lh, nf, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const items = githubProjects;
+const gameIds = [...new Set(items.flatMap((i) => i.games))].sort(byOrder);
+const languages = [...new Set(items.map((i) => i.language).filter((l): l is string => !!l))].sort((a, b) => items.filter((i) => i.language === b).length - items.filter((i) => i.language === a).length);
+const js = { more: t(lang, 'gh.more'), none: t(lang, 'gh.none'), count: t(lang, 'gh.count') };
+---
+<Layout title={t(lang, 'gh.title')} desc={t(lang, 'gh.desc')} lang={lang}>
+  <TypeBar current="projects" lang={lang} />
+  <div class="phead">
+    <div>
+      <h1>{t(lang, 'gh.title')}</h1>
+      <p class="lead">{t(lang, 'gh.lead')}</p>
+    </div>
+  </div>
+
+  <div class="gh" data-gh data-i18n={JSON.stringify(js)}>
+    <div class="gh-bar">
+      <label class="facet-search"><Icon name="search" size={16} /><input type="search" data-q placeholder={t(lang, 'gh.search', { n: nf(lang, items.length) })} aria-label={t(lang, 'gh.searchLabel')} /></label>
+      <span class="sel"><select data-game aria-label={t(lang, 'disc.game')}><option value="">{t(lang, 'gh.allGames')}</option>{gameIds.map((g) => <option value={g}>{gameName(g)}</option>)}</select><Icon name="chevron-down" size={14} class="i" /></span>
+      <span class="sel"><select data-lang aria-label={t(lang, 'gh.language')}><option value="">{t(lang, 'gh.allLanguages')}</option>{languages.map((l) => <option value={l}>{l}</option>)}</select><Icon name="chevron-down" size={14} class="i" /></span>
+      <span class="sel"><select data-upd aria-label={t(lang, 'gh.updated')}>
+        <option value="">{t(lang, 'gh.anyTime')}</option><option value="30">{t(lang, 'gh.30d')}</option><option value="365">{t(lang, 'gh.1y')}</option>
+      </select><Icon name="chevron-down" size={14} class="i" /></span>
+      <span class="sel"><select data-sort aria-label={t(lang, 'disc.sort')}>
+        <option value="updated">{t(lang, 'sort.updated')}</option><option value="stars">{t(lang, 'sort.stars')}</option><option value="name">{t(lang, 'sort.name')}</option>
+      </select><Icon name="chevron-down" size={14} class="i" /></span>
+    </div>
+    <p class="gh-count muted" data-count aria-live="polite"></p>
+
+    <div class="tiles4 gh-grid" data-grid>
+      {items.map((p) => (
+        <a class="ptile" href={p.url} rel="noopener" data-repo={p.repo.toLowerCase()} data-text={`${p.repo} ${p.description ?? ''} ${p.topics.join(' ')}`.toLowerCase()} data-games={p.games.join(' ')} data-language={p.language ?? ''}
+          data-pushed={p.pushed ?? ''} data-stars={p.stars} data-name={p.name.toLowerCase()}>
+          <span class="ptile-h"><Thumb seed={p.repo} glyph="folder-git-2" size={48} /><span><b>{p.name}</b><small>{p.repo}</small></span></span>
+          <p>{p.description ?? ''}</p>
+          <span class="stat-row">
+            <span class="stat"><Icon name="star" size={16} /><b>{compact(p.stars, lang)}</b></span>
+            {p.language && <span class="stat"><Icon name="code" size={16} />{p.language}</span>}
+            {p.pushed && <span class="stat" title={p.pushed}><Icon name="clock" size={16} />{ago(p.pushed, lang)}</span>}
+            {p.archived && <span class="chip">{t(lang, 'gh.archived')}</span>}
+          </span>
+        </a>
+      ))}
+    </div>
+    <div class="gh-more"><button type="button" class="btn" data-more hidden></button></div>
+    <p class="muted gh-note"><Icon name="info" size={16} /> {t(lang, 'gh.note')} <a href={lh(lang, '/dev/docs/public-api/')}>{t(lang, 'gh.noteApi')}</a></p>
+  </div>
+</Layout>
+
+<style>
+  .gh-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .gh-bar .facet-search { flex: 1 1 260px; max-width: 420px; }
+  .gh-count { margin: 0 0 14px; font-size: 14.5px; }
+  .gh-more { display: flex; justify-content: center; margin: 24px 0 8px; }
+  .gh-note { display: flex; align-items: center; gap: 8px; margin-top: 28px; font-size: 14px; }
+  .gh-grid [hidden] { display: none; }
+  .gh-grid .stat-row { flex-wrap: wrap; row-gap: 6px; column-gap: 14px; }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-gh]');
+  if (root) {
+    const i18n = JSON.parse(root.dataset.i18n || '{}') as { more: string; none: string; count: string };
+    const grid = root.querySelector<HTMLElement>('[data-grid]')!;
+    const cards = [...grid.children] as HTMLElement[];
+    const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const q = $<HTMLInputElement>('[data-q]'), game = $<HTMLSelectElement>('[data-game]'), lang = $<HTMLSelectElement>('[data-lang]'), upd = $<HTMLSelectElement>('[data-upd]'), sort = $<HTMLSelectElement>('[data-sort]');
+    const count = $('[data-count]'), more = $<HTMLButtonElement>('[data-more]');
+    const PAGE = 60;
+    let shown = PAGE;
+    const apply = () => {
+      const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+      const cutoff = upd.value ? Date.now() - Number(upd.value) * 86400000 : 0;
+      const hit = cards.filter((c) =>
+        words.every((w) => c.dataset.text!.includes(w)) && (!game.value || c.dataset.games!.split(' ').includes(game.value)) && (!lang.value || c.dataset.language === lang.value) &&
+        (!cutoff || (c.dataset.pushed && Date.parse(c.dataset.pushed) >= cutoff)));
+      const by = sort.value;
+      hit.sort((a, b) => by === 'stars' ? Number(b.dataset.stars) - Number(a.dataset.stars) : by === 'name' ? a.dataset.name!.localeCompare(b.dataset.name!) : (b.dataset.pushed || '').localeCompare(a.dataset.pushed || ''));
+      for (const c of cards) c.hidden = true;
+      hit.forEach((c, i) => { c.hidden = i >= shown; grid.appendChild(c); });
+      count.textContent = hit.length ? i18n.count.replace('{n}', String(hit.length)) : i18n.none;
+      more.hidden = hit.length <= shown;
+      more.textContent = i18n.more.replace('{n}', String(Math.min(PAGE, hit.length - shown)));
+    };
+    for (const el of [q, game, lang, upd, sort]) el.addEventListener('input', () => { shown = PAGE; apply(); });
+    more.addEventListener('click', () => { shown += PAGE; apply(); });
+    // Deep links: ?game=tmnf&language=AngelScript&q=speed
+    const p = new URLSearchParams(location.search);
+    if (p.get('q')) q.value = p.get('q')!;
+    if (p.get('game')) game.value = p.get('game')!;
+    if (p.get('language')) lang.value = p.get('language')!;
+    apply();
+  }
+</script>

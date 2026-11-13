@@ -1,0 +1,78 @@
+name: Add your server
+description: List a game server in the TM Horizon launcher and on the website.
+title: "Server: "
+labels: [server]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Everything you enter here is public. A maintainer checks the entry and adds the label `approved`;
+        a pull request with `data/servers/<id>.yaml` follows automatically. Each hourly build then checks
+        whether the game port answers (a TCP connect, nothing is sent and no login is tried).
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - TrackMania Nations Forever (tmnf)
+        - TrackMania United Forever (tmuf)
+        - TrackMania Nations ESWC (eswc)
+        - TrackMania Sunrise (tms)
+        - TrackMania Original (tmo)
+        - TrackMania 2 Stadium (tm2-stadium)
+        - TrackMania 2 Canyon (tm2-canyon)
+        - TrackMania 2 Valley (tm2-valley)
+        - TrackMania 2 Lagoon (tm2-lagoon)
+        - ShootMania Storm (sm-storm)
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Server name
+      description: Without $-colour codes, up to 80 characters.
+    validations:
+      required: true
+  - type: input
+    id: address
+    attributes:
+      label: Address
+      description: Public IP or host name and game port, e.g. 203.0.113.7:2350. Required for ESWC, Sunrise and Original (players join by address).
+      placeholder: 203.0.113.7:2350
+  - type: input
+    id: login
+    attributes:
+      label: Server login
+      description: TMNF, TMUF and ManiaPlanet servers. With a login the join button uses tmtp://#join=login (or maniaplanet://).
+  - type: input
+    id: mode
+    attributes:
+      label: Mode
+      placeholder: TimeAttack, Rounds, Cup, RPG, ...
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: A code like en, de, fr, or "multi".
+      placeholder: en
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Up to 500 characters.
+  - type: input
+    id: contact
+    attributes:
+      label: Discord (optional)
+      description: A Discord invite link or your Discord user name. Public.
+  - type: input
+    id: homepage
+    attributes:
+      label: Website (optional)
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: I run this server or speak for the people who run it, and it is fine to check its game port every hour.
+          required: true

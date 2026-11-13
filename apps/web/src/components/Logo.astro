@@ -1,0 +1,5 @@
+---
+// TM Horizon icon (public/img/brand/icon-*.png).
+const { size = 30 } = Astro.props;
+---
+<img class="logo" src={size > 64 ? '/img/brand/icon-512.png' : '/img/brand/icon-64.png'} width={size} height={size} alt="" />

@@ -1,0 +1,92 @@
+name: Submit event
+description: Announce a cup, league round or showcase in the TM Horizon launcher and on the website.
+title: "Event: "
+labels: [event]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Everything you enter here is public. A maintainer checks the event and adds the label `approved`;
+        a pull request with `data/events/<id>.yaml` follows automatically. The event disappears from the
+        lists once it is over.
+  - type: input
+    id: name
+    attributes:
+      label: Event name
+    validations:
+      required: true
+  - type: dropdown
+    id: games
+    attributes:
+      label: Game
+      multiple: true
+      options:
+        - TrackMania Nations Forever (tmnf)
+        - TrackMania United Forever (tmuf)
+        - TrackMania Nations ESWC (eswc)
+        - TrackMania Sunrise (tms)
+        - TrackMania Original (tmo)
+        - TrackMania 2 Stadium (tm2-stadium)
+        - TrackMania 2 Canyon (tm2-canyon)
+        - TrackMania 2 Valley (tm2-valley)
+        - TrackMania 2 Lagoon (tm2-lagoon)
+        - ShootMania Storm (sm-storm)
+        - Trackmania (2020) (tm2020)
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date
+      placeholder: 2026-11-21
+    validations:
+      required: true
+  - type: input
+    id: time
+    attributes:
+      label: Start time
+      description: 24-hour clock.
+      placeholder: "19:00"
+    validations:
+      required: true
+  - type: input
+    id: timezone
+    attributes:
+      label: Time zone
+      description: A zone name like Europe/Berlin or America/New_York, or UTC, UTC+2.
+      placeholder: Europe/Berlin
+    validations:
+      required: true
+  - type: input
+    id: duration
+    attributes:
+      label: Duration
+      placeholder: 2h, 90 min
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: Host community
+    validations:
+      required: true
+  - type: input
+    id: host_link
+    attributes:
+      label: Community link (optional)
+      description: Discord invite or website.
+  - type: input
+    id: join
+    attributes:
+      label: Server or join link (optional)
+      description: tmtp://#join=login, maniaplanet://#join=login@TMStadium@nadeo, or host:port for ESWC, Sunrise and Original.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Up to 2000 characters.
+  - type: input
+    id: link
+    attributes:
+      label: Link (optional)
+      description: Rules, sign-up or stream page.

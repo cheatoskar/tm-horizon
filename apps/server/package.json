@@ -1,0 +1,39 @@
+{
+  "name": "@tm-hub/server",
+  "version": "0.5.1",
+  "private": true,
+  "description": "TM Horizon Hub backend: projects, versions, upload checks, signed index, developer portal API.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --watch src/main.ts",
+    "start": "node --disable-warning=ExperimentalWarning src/main.ts",
+    "seed": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/seed.ts",
+    "import-catalog": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/import-catalog.ts",
+    "generate-key": "node scripts/generate-key.ts",
+    "openapi": "node scripts/write-openapi.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"test/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/helmet": "^13.0.1",
+    "@fastify/multipart": "^9.0.3",
+    "@fastify/rate-limit": "^10.3.0",
+    "@tm-hub/shared": "*",
+    "aws4fetch": "^1.0.20",
+    "fastify": "^5.6.1",
+    "kysely": "^0.28.8",
+    "pg": "^8.16.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.5",
+    "pg-mem": "^3.0.14",
+    "typescript": "^5.7.0"
+  }
+}

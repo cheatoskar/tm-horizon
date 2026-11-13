@@ -1,0 +1,94 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "amber"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TrackMania United Transformation Pack",
+      "tagline": "Unofficial visual and sound update for TrackMania United Forever; textures from TrackMania 2 and ManiaPlanet.",
+      "image": "https://raw.githubusercontent.com/PixelPickaxe/trackmania-united-transformation-pack/HEAD/images/sda200268.png",
+      "badges": [
+        "TMUF",
+        "Texture pack",
+        "By PixelPickaxe"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "palette",
+          "title": "Environment textures",
+          "text": "Textures from TrackMania 2 for every environment except Snow, Island and Coast."
+        },
+        {
+          "icon": "monitor",
+          "title": "Menu textures",
+          "text": "Menu textures replaced with those of ManiaPlanet 3."
+        },
+        {
+          "icon": "gauge",
+          "title": "HUD",
+          "text": "The TrackMania 2 vignette overlay and no background behind the level name."
+        },
+        {
+          "icon": "volume-2",
+          "title": "Sounds",
+          "text": "New menu, engine, surface, impact and environment sounds, some taken from TrackMania 2."
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "title": "Screenshots from the project",
+      "images": [
+        {
+          "url": "https://raw.githubusercontent.com/PixelPickaxe/trackmania-united-transformation-pack/HEAD/images/sda200268.png",
+          "caption": "In-game screenshot from the project repository"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/PixelPickaxe/trackmania-united-transformation-pack/HEAD/images/about-img.jpg",
+          "caption": "Night driving, the about image of the project"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "The pack replaces textures and sounds. Download, installation help and legal notes are on the project site."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by PixelPickaxe."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Project site",
+          "url": "https://pixelpickaxe.github.io/trackmania-united-transformation-pack/"
+        },
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/PixelPickaxe/trackmania-united-transformation-pack",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

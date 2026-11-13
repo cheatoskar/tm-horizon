@@ -1,0 +1,13 @@
+{
+  "stats.campaign": "Campaign",
+  "stats.campaignTip": "One of the game's own maps (author Nadeo).",
+  "stats.beforeHorizon": "{time} before TM Horizon",
+  "stats.beforeTip": "Play time the game counted in your profiles ({list}), minus the time TM Horizon counted.",
+  "host.presetName.100tmx": "Unfinished TMX maps",
+  "host.presetName.short_lol": "All TMX maps: Short & LOL",
+  "host.presetName.lunatic": "All TMX maps: Lunatic",
+  "host.presetName.rpg": "All TMX maps: RPG",
+  "host.presetName.fullspeed": "All TMX maps: Fullspeed",
+  "host.presetName.tech": "All TMX maps: Tech",
+  "host.presetName.multilap": "All TMX maps: Multilap"
+}

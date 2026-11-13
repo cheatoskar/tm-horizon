@@ -1,0 +1,72 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "slate"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "OpenAL 1.25.1 with 3D audio",
+      "tagline": "Drop-in OpenAL replacement for TrackMania Forever with more voices and head-related audio.",
+      "badges": [
+        "TMNF, TMUF",
+        "Sound",
+        "By 3z"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "headphones",
+          "title": "HRTF",
+          "text": "Native HRTF calibrated on a Neumann KU100."
+        },
+        {
+          "icon": "volume-2",
+          "title": "256 voices",
+          "text": "256 voices instead of the default 64."
+        },
+        {
+          "icon": "package",
+          "title": "Drop-in",
+          "text": "Replaces OpenAL32.dll next to the game exe; the old one is backed up first."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "The package replaces `OpenAL32.dll` and adds `alsoft.ini` and the HRTF file `D1.mhr`. The launcher backs up the original DLL before replacing it."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by 3z."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Download",
+          "url": "https://files.3zet.net/Trackmania/OpenAL.zip"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "slate"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "DeltaZero",
+      "tagline": "Research project: a driving AI for TrackMania Nations Forever trained by imitation and reinforcement learning.",
+      "badges": [
+        "TMNF",
+        "Research project",
+        "MIT"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "cpu",
+          "title": "Learns from replays",
+          "text": "Pretrained with behaviour cloning on replays, then improved with reinforcement learning."
+        },
+        {
+          "icon": "eye",
+          "title": "Track geometry",
+          "text": "The policy sees nearby blocks and a planned route instead of screen pixels."
+        },
+        {
+          "icon": "rocket",
+          "title": "Headless physics",
+          "text": "Uses the TMNF-C simulator to re-simulate runs without the game client."
+        },
+        {
+          "icon": "route",
+          "title": "Script export",
+          "text": "Exports runs as TMInterface scripts for replay in the game."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Status",
+      "markdown": "DeltaZero is a research project written in Python with PyTorch. It talks to the game through TMInterface 2.x and an AngelScript plugin, so it runs from source and is not installed into the game."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by cheatoskar. Uses TMInterface by donadigo and TMNF-C by adonis-singh."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/cheatoskar/DeltaZero"
+        }
+      ]
+    }
+  ]
+}

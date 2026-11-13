@@ -1,0 +1,20 @@
+{
+  "updp.tip": "Ein neues TM Horizon ist bereit",
+  "updp.label": "Update {v}",
+  "updp.title": "TM Horizon {v}",
+  "updp.restartNow": "Jetzt neu starten",
+  "updp.noNotes": "Keine Versionshinweise.",
+  "updp.readyAuto": "Heruntergeladen. Wird beim Schließen von TM Horizon oder beim nächsten Start installiert.",
+  "updp.ready": "Heruntergeladen und bereit.",
+  "updp.downloadingAuto": "Lädt im Hintergrund und wird beim Schließen von TM Horizon installiert.",
+  "updp.manual": "Installieren lädt es und startet TM Horizon neu.",
+  "updp.readyShort": "Version {v} ist heruntergeladen",
+  "updw.title": "Neu in {v}",
+  "updw.news": "News",
+  "updw.noNotes": "TM Horizon wurde aktualisiert. Die Hinweise stehen auf der News-Seite und auf GitHub.",
+  "upd.auto": "Updates automatisch installieren",
+  "upd.autoNote": "Lädt im Hintergrund, installiert beim nächsten Start oder beim Schließen. Nie während ein Spiel läuft.",
+  "news.horizon": "TM Horizon",
+  "updp.startTitle": "TM Horizon wird auf {v} aktualisiert…",
+  "updp.startText": "Gleich übernimmt der Installer und öffnet TM Horizon wieder."
+}

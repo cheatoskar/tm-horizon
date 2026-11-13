@@ -1,0 +1,290 @@
+---
+// Discover layout: facet sidebar, search, sort, view, pagination. Filtering runs in the browser on the static list.
+import Icon from './Icon.astro';
+import ResultCard from './ResultCard.astro';
+import { games, byOrder, cover } from '../data/games';
+import { statusLabelFor, systemsFor, type Item } from '../data/site';
+import { t, lh, type Lang } from '../i18n';
+interface Props {
+  kind: string; items: Item[]; placeholder: string; cats: Record<string, { label: string; icon: string }>; catTitle?: string;
+  online?: boolean; regions?: Record<string, { label: string; icon: string }>; archive?: boolean; sorts?: [string, string][]; perPage?: number; promo?: boolean; lang?: Lang;
+}
+const { kind, items, placeholder, cats, catTitle = '', online = false, regions = {}, archive = false, perPage = 20, promo = true, lang = 'en',
+  sorts = [['relevance', t(lang, 'sort.relevance')], ['downloads', t(lang, 'sort.downloads')], ['updated', t(lang, 'sort.updated')], ['name', t(lang, 'sort.name')]] } = Astro.props;
+const statusLabel = statusLabelFor(lang);
+const systems = systemsFor(lang);
+const hasSys = (i: Item, s: string) => (i.sys ?? '').split(' ').includes(s);
+const js = { results: {} as Record<string, string>, onlineChip: t(lang, 'disc.allowedOnline'), archiveChip: t(lang, 'comm.showArchive'), clearAll: t(lang, 'disc.clearAll'), locale: lang };
+for (const k of ['one', 'few', 'many', 'other']) js.results[k] = t(lang, `disc.results.${k}`);
+// With an archive toggle the counts are those of the active entries.
+const count = (f: (i: Item) => boolean) => items.filter((i) => !archive || i.active !== false).filter(f).length;
+const gameIds = [...new Set(items.flatMap((i) => i.games))].sort(byOrder);
+const catIds = [...new Set(items.filter((i) => !archive || i.active !== false).map((i) => i.cat))].sort((a, b) => count((i) => i.cat === b) - count((i) => i.cat === a));
+const sysIds = Object.keys(systems).filter((s) => items.some((i) => hasSys(i, s)));
+const statusIds = [...new Set(items.filter((i) => !archive || i.active !== false).map((i) => i.status))];
+const regionIds = Object.keys(regions).filter((r) => count((i) => i.region === r) > 0);
+const dotOf: Record<string, string> = { alive: 'alive', unclear: 'unclear', dead: 'dead', expired: 'dead', unchecked: 'unclear' };
+const gname = (id: string) => games.find((g) => g.id === id)?.name ?? id;
+const server = kind === 'servers';
+---
+<div class="discover" data-discover data-per={perPage} data-i18n={JSON.stringify(js)}>
+  <aside class="facets" data-facets aria-label={t(lang, 'disc.filters')}>
+    <div class="facets-head">
+      <b>{t(lang, 'disc.filters')}</b>
+      <button type="button" class="icon-btn" data-close-facets aria-label={t(lang, 'disc.closeFilters')}><Icon name="x" /></button>
+    </div>
+
+    {promo && (
+      <a class="promo" href={lh(lang, '/launcher/')}>
+        <div class="promo-art" aria-hidden="true">
+          <img src={cover('tmnf')} alt="" /><img src={cover('tm2-stadium')} alt="" /><img src={cover('tm2020')} alt="" />
+        </div>
+        <div class="promo-txt">
+          <span class="promo-k"><Icon name="rocket" size={14} /> {t(lang, 'promo.kicker')}</span>
+          <b>{t(lang, 'promo.title')}</b>
+          <span>{t(lang, 'promo.text')}</span>
+        </div>
+      </a>
+    )}
+
+    {gameIds.length > 1 && (
+      <details class="facet" open>
+        <summary>{t(lang, 'disc.game')} <Icon name="chevron-down" class="chev" /></summary>
+        {gameIds.length > 6 && <label class="facet-search"><Icon name="search" size={16} /><input type="search" data-gsearch placeholder={t(lang, 'disc.searchGames')} aria-label={t(lang, 'disc.searchGamesLabel')} /></label>}
+        <div class="opts">
+          {gameIds.map((g) => (
+            <label class="opt" data-gname={gname(g).toLowerCase()}>
+              <input type="checkbox" data-f="games" value={g} />
+              <img class="opt-cover" src={cover(g)} alt="" loading="lazy" />
+              <span class="opt-l">{gname(g)}</span><span class="cnt">{count((i) => i.games.includes(g))}</span>
+            </label>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {sysIds.length > 0 && (
+      <details class="facet" open>
+        <summary>{t(lang, 'disc.installType')} <Icon name="chevron-down" class="chev" /></summary>
+        <div class="opts">
+          {sysIds.map((s) => (
+            <label class="opt"><input type="checkbox" data-f="sys" value={s} /><Icon name={systems[s].icon} class="opt-i" /><span class="opt-l">{systems[s].label}</span><span class="cnt">{count((i) => hasSys(i, s))}</span></label>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {catIds.length > 1 && (
+      <details class="facet" open>
+        <summary>{catTitle} <Icon name="chevron-down" class="chev" /></summary>
+        <div class="opts">
+          {catIds.map((c) => (
+            <label class="opt"><input type="checkbox" data-f="cat" value={c} /><Icon name={cats[c]?.icon ?? 'tag'} class="opt-i" /><span class="opt-l">{cats[c]?.label ?? c}</span><span class="cnt">{count((i) => i.cat === c)}</span></label>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {regionIds.length > 0 && (
+      <details class="facet" open>
+        <summary>{t(lang, 'comm.region')} <Icon name="chevron-down" class="chev" /></summary>
+        <div class="opts">
+          {regionIds.map((r) => (
+            <label class="opt"><input type="checkbox" data-f="region" value={r} /><Icon name={regions[r].icon} class="opt-i" /><span class="opt-l">{regions[r].label}</span><span class="cnt">{count((i) => i.region === r)}</span></label>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {archive && (
+      <details class="facet" open>
+        <summary>{t(lang, 'comm.archive')} <Icon name="chevron-down" class="chev" /></summary>
+        <label class="switch">
+          <input type="checkbox" data-archive />
+          <span class="sw" aria-hidden="true"></span>
+          <span><b>{t(lang, 'comm.showArchive')}</b><small>{t(lang, 'comm.archiveNote')}</small></span>
+        </label>
+      </details>
+    )}
+
+    {online && (
+      <details class="facet" open>
+        <summary>{t(lang, 'disc.onlinePlay')} <Icon name="chevron-down" class="chev" /></summary>
+        <label class="switch">
+          <input type="checkbox" data-online />
+          <span class="sw" aria-hidden="true"></span>
+          <span><b>{t(lang, 'disc.allowedOnline')}</b><small>{t(lang, 'disc.allowedOnlineNote')}</small></span>
+        </label>
+      </details>
+    )}
+
+    {statusIds.length > 1 && (
+      <details class="facet" open>
+        <summary>{server ? t(lang, 'disc.players') : t(lang, 'disc.status')} <Icon name="chevron-down" class="chev" /></summary>
+        <div class="opts">
+          {statusIds.map((s) => (
+            <label class="opt"><input type="checkbox" data-f="status" value={s} />
+              {dotOf[s] ? <span class={`dot st-${dotOf[s]}`}></span> : <Icon name={s === 'pre' ? 'flask-conical' : s === 'stable' ? 'badge-check' : s === 'archived' ? 'archive' : s === 'empty' ? 'circle-dashed' : s === 'community' ? 'users' : 'activity'} class="opt-i" />}
+              <span class="opt-l">{s === 'active' && server ? t(lang, 'server.playersOnline') : s === 'empty' ? t(lang, 'server.empty') : statusLabel[s] ?? s}</span><span class="cnt">{count((i) => i.status === s)}</span></label>
+          ))}
+        </div>
+      </details>
+    )}
+    <button type="button" class="btn block phone-only" data-close-facets>{t(lang, 'disc.showResults')}</button>
+  </aside>
+
+  <div class="results-col">
+    <label class="search-big">
+      <Icon name="search" size={20} />
+      <input type="search" data-q placeholder={placeholder} aria-label={placeholder} />
+      <kbd>/</kbd>
+    </label>
+    <div class="controls">
+      <label class="sel"><span>{t(lang, 'disc.sortBy')}</span>
+        <select data-sort>{sorts.map(([v, l]) => <option value={v}>{l}</option>)}</select>
+        <Icon name="chevron-down" size={16} />
+      </label>
+      <div class="seg" role="group" aria-label={t(lang, 'disc.view')}>
+        <button type="button" data-view="list" aria-pressed="true" title={t(lang, 'disc.list')}><Icon name="layout-list" /></button>
+        <button type="button" data-view="grid" aria-pressed="false" title={t(lang, 'disc.grid')}><Icon name="layout-grid" /></button>
+      </div>
+      <button type="button" class="btn filters-btn" data-open-facets><Icon name="sliders-horizontal" />{t(lang, 'disc.filters')}<span class="nbadge" data-nfilters hidden></span></button>
+      <span class="result-count" data-count></span>
+      <nav class="pager" data-pager aria-label={t(lang, 'disc.pages')}></nav>
+    </div>
+    <div class="active" data-active></div>
+    <slot name="above" />
+    <div class="results list" data-results>
+      {items.map((it) => <ResultCard it={it} kind={kind} lang={lang} />)}
+    </div>
+    <div class="empty" data-empty hidden>
+      <Icon name="search-x" size={40} />
+      <b>{t(lang, 'disc.nothing')}</b>
+      <span>{t(lang, 'disc.nothingHint')}</span>
+      <button type="button" class="btn" data-clear>{t(lang, 'disc.clearFilters')}</button>
+    </div>
+    <nav class="pager bottom" data-pager aria-label={t(lang, 'disc.pages')}></nav>
+    <slot name="below" />
+  </div>
+  <div class="facets-scrim" data-close-facets></div>
+</div>
+
+<script is:inline>
+  (function () {
+    var box = document.querySelector('[data-discover]'); if (!box) return;
+    var S = JSON.parse(box.dataset.i18n || '{}');
+    var plural = new Intl.PluralRules(S.locale || 'en');
+    var per = +box.dataset.per || 20;
+    var list = box.querySelector('[data-results]');
+    var items = Array.prototype.slice.call(list.querySelectorAll('[data-item]'));
+    items.forEach(function (el, i) { el._i = i; });
+    var q = box.querySelector('[data-q]'), sort = box.querySelector('[data-sort]'), onl = box.querySelector('[data-online]'), arch = box.querySelector('[data-archive]');
+    var checks = box.querySelectorAll('[data-f]');
+    var pagers = box.querySelectorAll('[data-pager]');
+    var page = 1;
+    var P = new URLSearchParams(location.search);
+    if (P.get('q')) q.value = P.get('q');
+    if (P.get('sort')) sort.value = P.get('sort');
+    if (onl && P.get('online')) onl.checked = true;
+    if (arch && P.get('archive')) arch.checked = true;
+    checks.forEach(function (c) { var v = (P.get(c.dataset.f) || '').split(','); if (v.indexOf(c.value) >= 0) c.checked = true; });
+    page = +P.get('page') || 1;
+    var view = P.get('view') || (function () { try { return localStorage.getItem('view') || 'list'; } catch (e) { return 'list'; } })();
+
+    function setView(v) {
+      view = v; list.classList.toggle('grid', v === 'grid'); list.classList.toggle('list', v !== 'grid');
+      box.querySelectorAll('[data-view]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.view === v ? 'true' : 'false'); });
+      try { localStorage.setItem('view', v); } catch (e) {}
+    }
+    box.querySelectorAll('[data-view]').forEach(function (b) { b.addEventListener('click', function () { setView(b.dataset.view); sync(); }); });
+    setView(view);
+
+    function selected() { var s = {}; checks.forEach(function (c) { if (c.checked) (s[c.dataset.f] = s[c.dataset.f] || []).push(c.value); }); return s; }
+    function score(el, t) { if (!t) return 0; var n = el.dataset.name; return n === t ? 4 : n.indexOf(t) === 0 ? 3 : n.indexOf(t) >= 0 ? 2 : 1; }
+
+    function run(keepPage) {
+      var t = q.value.trim().toLowerCase(), s = selected(), shown = [];
+      items.forEach(function (el) {
+        var ok = !t || el.dataset.text.indexOf(t) >= 0;
+        if (ok && s.games) ok = el.dataset.games.split(' ').some(function (g) { return s.games.indexOf(g) >= 0; });
+        if (ok && s.sys) ok = el.dataset.sys.split(' ').some(function (v) { return s.sys.indexOf(v) >= 0; });
+        if (ok && s.cat) ok = s.cat.indexOf(el.dataset.cat) >= 0;
+        if (ok && s.region) ok = s.region.indexOf(el.dataset.region) >= 0;
+        if (ok && s.status) ok = s.status.indexOf(el.dataset.status) >= 0;
+        if (ok && onl && onl.checked) ok = el.dataset.online === 'yes';
+        if (ok && arch && !arch.checked) ok = el.dataset.active !== 'no';
+        if (ok) shown.push(el);
+      });
+      var k = sort.value;
+      shown.sort(function (a, b) {
+        if (k === 'downloads' || k === 'players') return (+b.dataset.downloads - +a.dataset.downloads) || (+b.dataset.stars - +a.dataset.stars) || a._i - b._i;
+        if (k === 'members') return (+b.dataset.members - +a.dataset.members) || a._i - b._i;
+        if (k === 'presence') return (+b.dataset.presence - +a.dataset.presence) || a._i - b._i;
+        if (k === 'stars') return (+b.dataset.stars - +a.dataset.stars) || a._i - b._i;
+        if (k === 'updated') return (b.dataset.updated || '').localeCompare(a.dataset.updated || '') || a._i - b._i;
+        if (k === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+        return (score(b, t) - score(a, t)) || a._i - b._i;
+      });
+      var pages = Math.max(1, Math.ceil(shown.length / per));
+      if (!keepPage) page = 1;
+      page = Math.min(Math.max(1, page), pages);
+      items.forEach(function (el) { el.hidden = true; });
+      shown.forEach(function (el, i) { list.appendChild(el); el.hidden = i < (page - 1) * per || i >= page * per; });
+      box.querySelector('[data-count]').textContent = (S.results[plural.select(shown.length)] || S.results.other).replace('{n}', shown.length);
+      box.querySelector('[data-empty]').hidden = shown.length > 0;
+      drawPager(pages);
+      drawActive(s, t);
+      sync();
+    }
+    function drawPager(pages) {
+      pagers.forEach(function (p) {
+        p.innerHTML = ''; if (pages < 2) { p.hidden = true; return; } p.hidden = false;
+        var nums = [];
+        for (var i = 1; i <= pages; i++) if (i === 1 || i === pages || Math.abs(i - page) <= 1) nums.push(i); else if (nums[nums.length - 1] !== '...') nums.push('...');
+        function btn(label, to, cls, dis) { var b = document.createElement(to ? 'button' : 'span'); b.className = cls || ''; b.innerHTML = label; if (to) { b.type = 'button'; if (dis) b.disabled = true; b.addEventListener('click', function () { page = to; run(true); box.scrollIntoView({ block: 'start' }); }); } return b; }
+        p.appendChild(btn('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>', Math.max(1, page - 1), 'pg arrow', page === 1));
+        nums.forEach(function (n) { if (n === '...') p.appendChild(btn('&hellip;', 0, 'pg gap')); else { var b = btn(String(n), n, 'pg' + (n === page ? ' on' : '')); if (n === page) b.setAttribute('aria-current', 'page'); p.appendChild(b); } });
+        p.appendChild(btn('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>', Math.min(pages, page + 1), 'pg arrow', page === pages));
+      });
+    }
+    function drawActive(s, t) {
+      var a = box.querySelector('[data-active]'); a.innerHTML = ''; var n = 0;
+      checks.forEach(function (c) {
+        if (!c.checked) return; n++;
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'achip';
+        b.innerHTML = '<span></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+        b.firstChild.textContent = c.closest('label').querySelector('.opt-l').textContent;
+        b.addEventListener('click', function () { c.checked = false; run(); }); a.appendChild(b);
+      });
+      if (onl && onl.checked) { n++; var b = document.createElement('button'); b.type = 'button'; b.className = 'achip'; b.textContent = S.onlineChip; b.addEventListener('click', function () { onl.checked = false; run(); }); a.appendChild(b); }
+      if (arch && arch.checked) { n++; var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'achip'; b2.textContent = S.archiveChip; b2.addEventListener('click', function () { arch.checked = false; run(); }); a.appendChild(b2); }
+      if (n > 1) { var c = document.createElement('button'); c.type = 'button'; c.className = 'achip clear'; c.textContent = S.clearAll; c.addEventListener('click', clear); a.appendChild(c); }
+      a.hidden = n === 0;
+      var nb = box.querySelector('[data-nfilters]'); nb.textContent = n; nb.hidden = n === 0;
+    }
+    function clear() { checks.forEach(function (c) { c.checked = false; }); if (onl) onl.checked = false; if (arch) arch.checked = false; q.value = ''; run(); }
+    function sync() {
+      var u = new URLSearchParams(), s = selected();
+      if (q.value.trim()) u.set('q', q.value.trim());
+      Object.keys(s).forEach(function (k) { u.set(k, s[k].join(',')); });
+      if (onl && onl.checked) u.set('online', '1');
+      if (arch && arch.checked) u.set('archive', '1');
+      if (sort.value !== sort.options[0].value) u.set('sort', sort.value);
+      if (page > 1) u.set('page', page);
+      var str = u.toString(); history.replaceState(null, '', location.pathname + (str ? '?' + str : ''));
+    }
+    q.addEventListener('input', function () { run(); });
+    sort.addEventListener('change', function () { run(); });
+    checks.forEach(function (c) { c.addEventListener('change', function () { run(); }); });
+    if (onl) onl.addEventListener('change', function () { run(); });
+    if (arch) arch.addEventListener('change', function () { run(); });
+    box.querySelectorAll('[data-clear]').forEach(function (b) { b.addEventListener('click', clear); });
+    var gs = box.querySelector('[data-gsearch]');
+    if (gs) gs.addEventListener('input', function () { var t = gs.value.trim().toLowerCase(); box.querySelectorAll('[data-gname]').forEach(function (l) { l.hidden = t && l.dataset.gname.indexOf(t) < 0; }); });
+    document.addEventListener('keydown', function (e) { if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); q.focus(); } });
+    // phone filter drawer
+    box.querySelectorAll('[data-open-facets]').forEach(function (b) { b.addEventListener('click', function () { box.classList.add('facets-open'); document.body.classList.add('sheet-open'); }); });
+    box.querySelectorAll('[data-close-facets]').forEach(function (b) { b.addEventListener('click', function () { box.classList.remove('facets-open'); document.body.classList.remove('sheet-open'); }); });
+    run(true);
+  })();
+</script>

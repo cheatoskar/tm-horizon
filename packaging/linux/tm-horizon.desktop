@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=TM Horizon
+GenericName=TrackMania launcher
+Comment=One launcher for every TrackMania
+Exec=tm-horizon
+Icon=tm-horizon
+Terminal=false
+Categories=Game;
+Keywords=trackmania;tmnf;tmuf;maniaplanet;tmloader;
+StartupWMClass=tm-hub

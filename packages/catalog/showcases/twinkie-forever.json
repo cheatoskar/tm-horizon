@@ -1,0 +1,44 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": { "accent": "pink" },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TwinkieForever",
+      "tagline": "Modular overlays and patches for TrackMania Nations Forever and United Forever, with Lua scripting.",
+      "image": "https://raw.githubusercontent.com/TwinkieTweaks/TwinkieForever/HEAD/Media/tAd.png",
+      "badges": ["TMNF, TMUF", "TMLoader mod", "Discontinued"]
+    },
+    {
+      "type": "features",
+      "items": [
+        { "icon": "code-2", "title": "Lua scripting", "text": "Write your own modules in Lua." },
+        { "icon": "gauge", "title": "Dashboard", "text": "Input display and gear display with a tachometer, with options for every part." },
+        { "icon": "flag", "title": "Checkpoint counter and medals", "text": "A checkpoint counter and a window with the medal times." },
+        { "icon": "target", "title": "Grinding stats", "text": "Keeps track of your progress on every map." },
+        { "icon": "wrench", "title": "Ghost editor", "text": "Opens the ghost editor without the cheat code." },
+        { "icon": "check", "title": "Map validator", "text": "Validate your maps from the overlay." }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Good to know",
+      "markdown": "TwinkieForever is a **discontinued** fork of Twinkie. It needs the TrackMania ModLoader. The release is a Windows installer plus loose DLLs, not a zip, so the launcher can link to it but not install it with one click.\n\nHiding the in-game HUD can hide the Twinkie windows or make them look odd. Changing the shader quality usually fixes that. If you record with Medal.tv, turn on \"Force Window Capture\" there."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        { "game": "tmnf", "status": "works" },
+        { "game": "tmuf", "status": "works" }
+      ]
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        { "kind": "link", "label": "Releases", "url": "https://github.com/TwinkieTweaks/TwinkieForever/releases" },
+        { "kind": "link", "label": "Twinkie site", "url": "https://twinkietweaks.github.io/", "style": "ghost" }
+      ]
+    }
+  ]
+}

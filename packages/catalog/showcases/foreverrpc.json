@@ -1,0 +1,72 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "violet"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "ForeverRPC",
+      "tagline": "Discord Rich Presence for TrackMania Nations and United Forever, as a ModLoader mod.",
+      "badges": [
+        "TMNF, TMUF",
+        "ModLoader mod",
+        "By AroPix"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "message-circle",
+          "title": "Rich Presence",
+          "text": "Shows what you play on Discord: map, environment, server and player count."
+        },
+        {
+          "icon": "settings",
+          "title": "Own texts",
+          "text": "A ForeverRPC.toml next to TmForever.exe sets the message for each game state."
+        },
+        {
+          "icon": "code-2",
+          "title": "Rust",
+          "text": "Written in Rust and built as a 32-bit DLL."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Config",
+      "markdown": "The TOML file supports placeholders such as the server name, nickname, map name, environment name, player count, account type (Nations or United) and online mode name."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "ForeverRPC is made by AroPix for the ModLoader of Tomashu."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/AroPix/ForeverRPC"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+---
+// Launcher screenshot carousel for the home page. The pictures are plain files in public/img/launcher/ (English UI)
+// and public/img/launcher/de/ (German UI, used on the /de/ pages): 1440 x 810 webp from a 1920 x 1080 window,
+// named <number>-<name>.webp; to swap one, drop a new file with the same name.
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const shots = ['1-library', '2-game', '3-mods', '4-servers', '5-news', '6-media'];
+const dir = lang === 'de' ? '/img/launcher/de/' : '/img/launcher/';
+---
+<section class="sec shots" data-shots aria-roledescription="carousel" aria-label={t(lang, 'home.shots.label')}>
+  <div class="sec-h"><h2>{t(lang, 'home.shots.h')}</h2><span class="sub">{t(lang, 'home.shots.sub')}</span></div>
+  <div class="shots-stage" tabindex="0">
+    <div class="shots-track">
+      {shots.map((s, i) => (
+        <figure class={`shot ${i === 0 ? 'on' : ''}`} data-shot aria-roledescription="slide" aria-label={t(lang, 'home.shots.slide', { n: i + 1, total: shots.length })} aria-hidden={i === 0 ? undefined : 'true'}>
+          <img src={`${dir}${s}.webp`} width="1440" height="810" alt={t(lang, `home.shot${i + 1}`)} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" draggable="false" />
+          <figcaption>{t(lang, `home.shot${i + 1}`)}</figcaption>
+        </figure>
+      ))}
+    </div>
+    <button class="shots-nav prev" type="button" data-prev aria-label={t(lang, 'home.shots.prev')}><Icon name="arrow-left" size={20} /></button>
+    <button class="shots-nav next" type="button" data-next aria-label={t(lang, 'home.shots.next')}><Icon name="arrow-right" size={20} /></button>
+  </div>
+  <div class="shots-dots" role="tablist">
+    {shots.map((_, i) => <button type="button" role="tab" data-dot={i} class={i === 0 ? 'on' : ''} aria-selected={i === 0 ? 'true' : 'false'} aria-label={t(lang, 'home.shots.slide', { n: i + 1, total: shots.length })}></button>)}
+  </div>
+</section>
+
+<style>
+  .shots-stage { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow), 0 0 0 1px var(--line-soft); touch-action: pan-y; outline-offset: 3px; }
+  .shots-track { display: grid; }
+  .shot { grid-area: 1 / 1; margin: 0; opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s; }
+  .shot.on { opacity: 1; visibility: visible; }
+  .shot img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #0e1015; user-select: none; }
+  .shot figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 22px 16px; color: #fff; font-size: 16px; font-weight: 600; background: linear-gradient(transparent, rgba(0, 0, 0, .78)); }
+  .shots-nav { position: absolute; top: 50%; translate: 0 -50%; width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; color: #fff; background: rgba(0, 0, 0, .55); backdrop-filter: blur(6px); }
+  .shots-nav:hover { background: rgba(0, 0, 0, .75); }
+  .shots-nav.prev { left: 12px; }
+  .shots-nav.next { right: 12px; }
+  .shots-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .shots-dots button { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: var(--line); position: relative; }
+  .shots-dots button::after { content: ''; position: absolute; inset: -8px; }
+  .shots-dots button.on { background: var(--accent); width: 26px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) { .shot { transition: none; } }
+  @media (max-width: 640px) { .shot figcaption { font-size: 13.5px; padding: 28px 14px 10px; } .shots-nav { width: 38px; height: 38px; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-shots]').forEach((box) => {
+    const slides = Array.from(box.querySelectorAll<HTMLElement>('[data-shot]'));
+    const dots = Array.from(box.querySelectorAll<HTMLElement>('[data-dot]'));
+    const stage = box.querySelector<HTMLElement>('.shots-stage')!;
+    let i = 0, paused = false, timer: number | undefined;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const show = (n: number) => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => { s.classList.toggle('on', k === i); if (k === i) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true'); });
+      dots.forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    };
+    box.querySelector('[data-prev]')!.addEventListener('click', () => show(i - 1));
+    box.querySelector('[data-next]')!.addEventListener('click', () => show(i + 1));
+    dots.forEach((d) => d.addEventListener('click', () => show(Number(d.dataset.dot))));
+    stage.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') { show(i - 1); e.preventDefault(); } else if (e.key === 'ArrowRight') { show(i + 1); e.preventDefault(); } });
+    // swipe
+    let x0 = 0, y0 = 0, down = false;
+    stage.addEventListener('pointerdown', (e) => { down = true; x0 = e.clientX; y0 = e.clientY; });
+    stage.addEventListener('pointerup', (e) => { if (!down) return; down = false; const dx = e.clientX - x0, dy = e.clientY - y0; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(i + (dx < 0 ? 1 : -1)); });
+    stage.addEventListener('pointercancel', () => { down = false; });
+    // autoplay: not with reduced motion, paused while hovered, focused or the tab is hidden
+    box.addEventListener('mouseenter', () => { paused = true; });
+    box.addEventListener('mouseleave', () => { paused = false; });
+    box.addEventListener('focusin', () => { paused = true; });
+    box.addEventListener('focusout', () => { paused = false; });
+    if (!still) timer = window.setInterval(() => { if (!paused && !document.hidden) show(i + 1); }, 6000);
+    void timer;
+  });
+</script>

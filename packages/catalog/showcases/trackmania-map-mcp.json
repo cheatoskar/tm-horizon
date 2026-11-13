@@ -1,0 +1,74 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "slate"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Trackmania Map MCP",
+      "tagline": "Experimental prototype that lets AI assistants build Trackmania Forever maps through the Model Context Protocol.",
+      "badges": [
+        "TMNF, TMUF",
+        "Experiment",
+        "Developer tool"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "route",
+          "title": "Turtle DSL",
+          "text": "A relative movement language (forward, turn, slope, checkpoint) instead of absolute coordinates."
+        },
+        {
+          "icon": "code-2",
+          "title": "GBX bridge",
+          "text": "Writes .Challenge.Gbx files with GBX.NET into a template Stadium map."
+        },
+        {
+          "icon": "puzzle",
+          "title": "MCP tools",
+          "text": "Tools to inspect maps, search blocks, validate and compile tracks."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Limits",
+      "markdown": "The README calls it an experimental proof of concept. The generated maps are very basic and mostly unsuitable for real driving: there is no physics or momentum validation and no library of track segments.\n\nIt needs Node.js 20 or later and .NET 8."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "partial",
+          "note": "prototype"
+        },
+        {
+          "game": "tmuf",
+          "status": "partial",
+          "note": "prototype"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by cheatoskar. Uses GBX.NET by BigBang1112."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/cheatoskar/trackmania-map-mcp"
+        }
+      ]
+    }
+  ]
+}

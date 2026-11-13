@@ -1,0 +1,5 @@
+.live-masters { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 12px; }
+.live-master { display: flex; align-items: center; gap: 8px; }
+
+/* Servers toolbar: the "Add your server" button is as tall as the search, the chips and the sort control. */
+.srv-toolbar > .btn { height: var(--ctl-h); }

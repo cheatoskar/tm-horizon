@@ -1,0 +1,12 @@
+# test fixture
+id: example-tmnf-rpg
+game: tmnf
+name: Example RPG server
+login: example_rpg
+address: 203.0.113.10:2350
+mode: TimeAttack
+language: en
+description: Test entry with login and address.
+contact: https://discord.gg/example
+added: 2026-11-10
+issue: 1

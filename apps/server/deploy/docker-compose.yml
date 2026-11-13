@@ -1,0 +1,40 @@
+# docker compose -f apps/server/deploy/docker-compose.yml --env-file /etc/tm-hub/hub.env up -d
+# Hub API + its own Postgres. nginx stays on the host (shared with the other sites, own server block).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tmhub
+      POSTGRES_USER: tmhub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - tmhub-db:/var/lib/postgresql/data
+    networks: [tmhub]
+    mem_limit: 512m
+  hub:
+    build:
+      context: ../../..
+      dockerfile: apps/server/deploy/Dockerfile
+    restart: unless-stopped
+    depends_on: [db]
+    env_file: /etc/tm-hub/hub.env
+    environment:
+      HOST: 0.0.0.0
+      DATABASE_URL: postgres://tmhub:${POSTGRES_PASSWORD}@db:5432/tmhub
+      TRUST_PROXY: "1"
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - tmhub-data:/var/lib/tm-hub
+    networks: [tmhub]
+    mem_limit: 1200m
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+volumes:
+  tmhub-db:
+  tmhub-data:
+networks:
+  tmhub:

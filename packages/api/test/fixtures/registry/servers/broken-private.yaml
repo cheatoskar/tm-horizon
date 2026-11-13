@@ -1,0 +1,4 @@
+id: broken-private
+game: tmuf
+name: Private address
+address: 192.168.1.20:2350

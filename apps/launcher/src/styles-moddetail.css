@@ -1,0 +1,68 @@
+/* Mod detail page: hero banner, README rendering, GitHub releases. */
+.detail-head.md-hero { position: relative; overflow: hidden; isolation: isolate; min-height: 190px; }
+.detail-head.md-hero > :not(.md-hero-bg) { position: relative; z-index: 1; }
+.md-hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.md-hero-img { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(24px) saturate(1.15); transform: scale(1.1); }
+.md-hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8, 10, 15, 0.86) 0%, rgba(8, 10, 15, 0.6) 55%, rgba(8, 10, 15, 0.42) 100%), linear-gradient(0deg, rgba(8, 10, 15, 0.7), transparent 55%); }
+.detail-head.md-hero h1 { color: #fff; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55); }
+.detail-head.md-hero .dim, .detail-head.md-hero .detail-stats { color: rgba(255, 255, 255, 0.78); }
+
+.md-panel { display: flex; flex-direction: column; gap: 14px; }
+.md-gh { align-self: flex-start; }
+
+.rd.md-notes { font-size: 13.5px; }
+
+.md-rel-section { margin-top: 4px; }
+.versions + .md-rel-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.md-rel-title { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--fg-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.md-releases { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.md-releases > li { border-radius: 10px; border: 1px solid var(--line); background: rgba(var(--tint), 0.02); }
+.md-releases > li.on { background: rgba(var(--tint), 0.05); }
+.md-rel-head { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px; text-align: left; }
+.md-rel-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+.md-assets { display: flex; flex-wrap: wrap; gap: 6px; }
+.md-asset { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(var(--tint), 0.05); color: var(--fg); font-size: 12.5px; text-decoration: none; }
+.md-asset:hover { background: rgba(var(--tint), 0.1); }
+
+/* Related links ("Dazu gehört") and companion buttons on the game page */
+/* the links block sits between the showcase and the pictures: room below it, like the gallery has */
+.panel.related { margin-bottom: var(--s4, 16px); }
+.related-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.related-main { min-width: 260px; justify-content: flex-start; padding: 14px 18px; gap: 12px; text-align: left; }
+.related-main .grow { display: flex; flex-direction: column; line-height: 1.25; }
+.related-main b { font-size: 16px; }
+.companion-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* TMVS content browser (presets, looks, packs) */
+.tmvs-content { display: flex; flex-direction: column; gap: 16px; }
+.tmvs-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tmvs-search { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(var(--tint), 0.05); border: 1px solid var(--line); min-width: 220px; }
+.tmvs-search input { background: none; border: 0; outline: 0; color: var(--fg); flex: 1; min-width: 0; font: inherit; }
+.tmvs-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.tmvs-tag { height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: rgba(var(--tint), 0.06); color: var(--fg-2); }
+.tmvs-tag:hover { background: rgba(var(--tint), 0.1); }
+.tmvs-tag.on { background: var(--acc-soft); color: var(--acc-2); }
+.tmvs-source { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.tmvs-source input { height: 34px; padding: 0 10px; border-radius: 8px; background: rgba(var(--tint), 0.05); border: 1px solid var(--line-2); color: var(--fg); font: inherit; }
+.tmvs-note { margin-top: 10px; }
+.tmvs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.tmvs-card { display: flex; flex-direction: column; border-radius: 16px; background: var(--glass); border: 1px solid var(--line); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+.tmvs-card:hover { border-color: var(--line-2); box-shadow: 0 18px 36px -24px rgba(var(--c-0-0-0), 0.9); }
+.tmvs-pic { aspect-ratio: 16 / 9; background: linear-gradient(135deg, rgba(var(--tint), 0.08), rgba(var(--tint), 0.02)); position: relative; overflow: hidden; }
+.tmvs-pic img, .tmvs-pic .cimg, .tmvs-pic .cimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tmvs-body { display: flex; flex-direction: column; gap: 5px; padding: 12px 14px 14px; flex: 1; }
+.tmvs-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tmvs-title b { font-size: 17px; font-weight: 750; }
+.tmvs-desc { color: var(--fg-2); font-size: 13.5px; margin: 0; flex: 1; }
+.tmvs-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tmvs-dots { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; color: var(--dim); }
+.tmvs-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(var(--tint), 0.15); }
+.tmvs-dots i.on { background: var(--acc); }
+.tmvs-actions { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.chip.warn { color: var(--warn); background: rgba(250, 204, 21, 0.12); }
+.chip.ok { color: var(--good); background: rgba(74, 222, 128, 0.1); gap: 3px; }
+.tmvs-local { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.tmvs-code { width: 100%; border-radius: 10px; background: rgba(var(--tint), 0.05); border: 1px solid var(--line-2); color: var(--fg); padding: 10px; font-family: var(--tm-font-mono, monospace); font-size: 12.5px; resize: vertical; }
+.tmvs-files { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tmvs-files li { display: flex; align-items: center; gap: 10px; }
+.tmvs-files li b { flex: 1; }

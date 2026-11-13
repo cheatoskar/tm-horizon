@@ -1,0 +1,170 @@
+---
+// Mod page for catalog entries (Discord mod channel, proxy DLL mods, Openplanet, standalone): no version list, the
+// README comes from the GitHub repository when there is one.
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Thumb from '../components/Thumb.astro';
+import { projects, modTypeIcon, modTypeLabel, installKinds, installIcons, installLabel, launcherCanInstall, entryImage, readmeFor, ghRepoOf, knownGames } from '../data/site';
+import { gameById, byOrder, cover } from '../data/games';
+import { compact, ago, day } from '../lib/fmt';
+import { readmeHtml } from '../lib/readme';
+import '@tm-hub/showcase-ui/readme.css';
+import { webImg } from '@tm-hub/shared/extimg';
+import { installLink } from '../lib/links';
+import { t, tf, lh, type Lang } from '../i18n';
+import Showcase from '../components/Showcase.astro';
+import { showcaseOf } from '@tm-hub/shared/showcase';
+import { showcases } from '../data/site';
+const { lang = 'en', entry: e } = Astro.props as { lang?: Lang; entry: any };
+const L = (p: string) => lh(lang, p);
+const cat = e.id === 'openplanet' ? 'platform' : e.modType ?? 'mod';
+const kinds = installKinds(e);
+const canInstall = launcherCanInstall(e);
+const project = projects.find((p) => p.catalogIds?.includes(e.id));
+const links = [e.url, ...(e.urls ?? [])].filter((u: string | null) => !!u && /^https?:/.test(u as string)) as string[];
+const repo = ghRepoOf(e.url) ?? links.map(ghRepoOf).find(Boolean) ?? null;
+const readme = readmeFor(repo);
+// Remote pictures only through our image proxy (/ext-img/, packages/shared/src/extimg.ts); others are not shown.
+const gal = ((e.gallery ?? []) as string[]).map((src, i) => ({ src: webImg(src), cap: t(lang, 'mod.picture', { name: e.name, n: i + 1 }) })).filter((g): g is { src: string; cap: string } => !!g.src);
+const hero = webImg(entryImage(e));
+const games = knownGames(e.games).sort(byOrder);
+const perGame = Object.entries((e.installs ?? {}) as Record<string, string>).filter(([g]) => gameById[g]).sort((a, b) => byOrder(a[0], b[0]));
+const requires = (e.requires ?? []) as string[];
+const installText = String(e.install ?? '');
+const target = installText.startsWith('gamedata:') ? installText.slice(9).trim() : null;
+const how = (k: string) => {
+  switch (k) {
+    case 'tmloader': return t(lang, 'how.tmloader');
+    case 'proxy': return t(lang, 'how.proxy', { dll: perGame.find(([, v]) => v.startsWith('proxy:'))?.[1].slice(6) ?? 'DLL' });
+    case 'gamedata': return installText === 'skins' ? t(lang, 'how.skins') : target ? t(lang, 'how.gamedata', { target }) : t(lang, 'how.gamedataPlain');
+    case 'openplanet': return t(lang, 'how.openplanet');
+    case 'discord': return t(lang, 'how.discord');
+    default: return installText === 'unlimiter-required' ? t(lang, 'how.unlimiter') : t(lang, 'how.manual');
+  }
+};
+const icon = project?.icon ?? null;
+const author = e.author ?? e.maintainer ?? project?.repo?.split('/')[0] ?? null;
+const hasTabs = !!readme || gal.length > 0;
+const showcase = showcaseOf(showcases, e.id, e.name);
+---
+<Layout title={e.name} desc={(e.description ?? '').slice(0, 150)} lang={lang}>
+  <div {...(hasTabs ? { "data-tabs": "" } : {})}>
+    <header class="card mod-head">
+      <Thumb src={icon ?? hero} seed={e.id} glyph={modTypeIcon(cat)} size={112} alt={t(lang, 'mod.iconAlt', { name: e.name })} />
+      <div class="mod-meta">
+        <h1>{e.name}</h1>
+        {e.description && <p class="sum">{e.description}</p>}
+        <div class="mod-stats">
+          {kinds.map((k) => <span class="chip sys" title={t(lang, `install.${k}.tip`)}><Icon name={installIcons[k]} size={14} />{installLabel(lang, k)}</span>)}
+          <span class="stat"><Icon name={modTypeIcon(cat)} /><b>{modTypeLabel(lang, cat)}</b></span>
+          {project?.downloads != null && <span class="stat" title={t(lang, 'mod.dlTitle')}><Icon name="download" /><b>{compact(project.downloads, lang)}</b> {t(lang, 'mod.downloads')}</span>}
+          {project?.stars != null && <span class="stat" title={t(lang, 'mod.starsTitle')}><Icon name="star" /><b>{compact(project.stars, lang)}</b> {t(lang, 'mod.stars')}</span>}
+          {project?.release && <span class="stat"><Icon name="tag" /><b>{project.release.tag}</b></span>}
+          {project?.release?.published && <span class="stat"><Icon name="history" /><span>{t(lang, 'mod.updated')} <span data-ago={project.release.published}>{ago(project.release.published, lang)}</span></span></span>}
+        </div>
+      </div>
+      <div class="mod-actions">
+        {canInstall && <a class="btn primary lg" href={installLink(e.id)} title={t(lang, 'btn.installTip')}><Icon name="download" />{t(lang, 'btn.install')}</a>}
+        {e.url
+          ? <a class={`btn lg ${canInstall ? '' : 'primary'}`} href={e.url} rel="noopener"><Icon name="external-link" />{canInstall ? t(lang, 'mod.downloadPage') : t(lang, 'btn.openDownload')}</a>
+          : <span class="btn lg" aria-disabled="true"><Icon name="message-circle" />{t(lang, 'install.discord')}</span>}
+      </div>
+    </header>
+
+    {showcase && <div style="margin-top:16px"><Showcase showcase={showcase} lang={lang} installHref={canInstall ? installLink(e.id) : undefined} /></div>}
+
+    {hasTabs && (
+      <div style="margin-top:16px">
+        <nav class="tabs" role="tablist">
+          <button data-tab="description" role="tab"><Icon name="book-open" size={17} />{t(lang, 'mod.tabDescription')}</button>
+          {readme && <button data-tab="readme" role="tab"><Icon name="file-text" size={17} />{t(lang, 'mod.tabReadme')}</button>}
+          {gal.length > 0 && <button data-tab="gallery" role="tab"><Icon name="images" size={17} />{t(lang, 'mod.tabGallery')} <span class="n">{gal.length}</span></button>}
+        </nav>
+      </div>
+    )}
+
+    <div class="mod-cols">
+      <div>
+        <section class="card panel-main prose" {...(hasTabs ? { "data-panel": "description" } : {})}>
+          {hero && <img class="mod-hero" src={hero} alt={t(lang, 'mod.picture', { name: e.name, n: 1 })} loading="lazy" referrerpolicy="no-referrer" />}
+          <p style="font-size:17px">{e.description}</p>
+          {e.note && <><h2>{t(lang, 'mod.note')}</h2><p>{e.note}</p></>}
+          <h2>{t(lang, 'mod.tabInstall')}</h2>
+          <ul>{kinds.map((k) => <li><b>{installLabel(lang, k)}:</b> {how(k)}</li>)}</ul>
+          {!canInstall && e.url && <p class="muted">{t(lang, 'how.launcherNo')}</p>}
+          {!e.url && <p class="muted">{t(lang, 'mod.discordOnly')}</p>}
+        </section>
+
+        {readme && (
+          <section class="card panel-main readme" data-panel="readme" hidden>
+            <p class="muted" style="font-size:13.5px;margin-bottom:14px">{t(lang, 'mod.readmeFrom', { repo: repo ?? '' })} <a href={`https://github.com/${repo}#readme`} rel="noopener">{t(lang, 'mod.readmeFull')}</a></p>
+            <div class="rd" set:html={readmeHtml(readme, repo, e.name)} />
+          </section>
+        )}
+
+        {gal.length > 0 && (
+          <section class="card panel-main" data-panel="gallery" hidden>
+            <div class="gallery">
+              {gal.map((g, i) => <figure class={i === 0 ? 'big' : ''}><img src={g.src} alt={g.cap} loading="lazy" referrerpolicy="no-referrer" /><figcaption>{g.cap}</figcaption></figure>)}
+            </div>
+          </section>
+        )}
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <h3>{t(lang, 'mod.compat')}</h3>
+          <dl class="kv">
+            <div><dt><Icon name="plug" size={16} />{t(lang, 'mod.installType')}</dt><dd class="kinds">{kinds.map((k) => <span class="chip sys"><Icon name={installIcons[k]} size={14} />{installLabel(lang, k)}</span>)}</dd></div>
+            <div><dt><Icon name={modTypeIcon(cat)} size={16} />{t(lang, 'discover.category')}</dt><dd>{modTypeLabel(lang, cat)}</dd></div>
+          </dl>
+          <div class="compat" style="margin-top:14px">
+            {games.map((g) => <a class="chip" href={L(`/game/${g}/`)} style="text-decoration:none"><img src={cover(g)} alt="" />{gameById[g].name}</a>)}
+          </div>
+          {perGame.length > 0 && (
+            <>
+              <h3 style="margin-top:16px">{t(lang, 'mod.installPer')}</h3>
+              <dl class="kv">
+                {perGame.map(([g, v]) => <div><dt>{gameById[g].short}</dt><dd>{v === 'tmloader' ? 'TMLoader' : v.startsWith('proxy:') ? <span class="mono">{v.slice(6)}</span> : v}</dd></div>)}
+              </dl>
+            </>
+          )}
+        </div>
+
+        <div class="card">
+          <h3>{t(lang, 'mod.links')}</h3>
+          <div class="linklist">
+            {links.map((u, i) => <a href={u} rel="noopener"><Icon name={ghRepoOf(u) ? 'github' : i === 0 ? 'globe' : 'link-2'} size={17} />{new URL(u).host.replace(/^www\./, '')}<Icon name="external-link" size={14} /></a>)}
+            {project && <a href={`${project.url}/issues`} rel="noopener"><Icon name="bug" size={17} />{t(lang, 'mod.issues')}<Icon name="external-link" size={14} /></a>}
+            {!links.length && <span class="muted">{t(lang, 'mod.noLinks')}</span>}
+          </div>
+        </div>
+
+        {author && (
+          <div class="card">
+            <h3>{t(lang, 'mod.creators')}</h3>
+            <div class="who"><Thumb src={project?.icon} seed={author} glyph="user-round" size={40} /><div><b>{author}</b><small>{t(lang, 'mod.author')}</small></div></div>
+          </div>
+        )}
+
+        {requires.length > 0 && (
+          <div class="card">
+            <h3>{t(lang, 'mod.requires')}</h3>
+            <ul class="plain">{requires.map((r) => <li>{r}</li>)}</ul>
+          </div>
+        )}
+
+        <div class="card">
+          <h3>{t(lang, 'mod.details')}</h3>
+          <dl class="kv">
+            {e.hosting && <div><dt><Icon name="cloud" size={16} />{t(lang, 'mod.hosting')}</dt><dd>{tf(lang, `hosting.${e.hosting}`, e.hosting)}</dd></div>}
+            {project?.license && <div><dt><Icon name="scale" size={16} />{t(lang, 'mod.licence')}</dt><dd>{project.license}</dd></div>}
+            <div><dt><Icon name="activity" size={16} />{t(lang, 'mod.sourceStatus')}</dt><dd>{t(lang, `status.${e.status}`)}</dd></div>
+            {e.checked && <div><dt><Icon name="shield-check" size={16} />{t(lang, 'card.lastCheck')}</dt><dd>{day(e.checked, lang)}</dd></div>}
+            <div><dt><Icon name="hash" size={16} />{t(lang, 'mod.installId')}</dt><dd class="mono">{e.id}</dd></div>
+          </dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Layout>

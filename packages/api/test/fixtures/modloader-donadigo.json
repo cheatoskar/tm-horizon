@@ -1,0 +1,126 @@
+{
+  "api": 1,
+  "game": "TmForever",
+  "products": {
+    "TMInterface": {
+      "name": "TMInterface",
+      "author": "donadigo",
+      "type": "modification",
+      "description": "TMInterface is a TAS tool for TrackMania Nations and United Forever.",
+      "icon_link": "https://donadigo.com/assets/images/icons/ificon.png",
+      "homepage": "https://donadigo.com/tminterface",
+      "versions": {
+        "2.1.0": {
+          "executable": "TMInterface.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/TMInterface/modloader/TMInterface_2.1.0.zip",
+          "hash_sha256": "06c93541f81ef6341cfc7762f4fdf8c545f2c00269ac6951bf84f0edab11b7b8",
+          "changelog": "- ModLoader integration\n- New Input Editor\n- New relative timestamp format\n- New Angelscript APIs\n- Many bugfixes\n\nFull changelog on the homepage."
+        },
+        "2.1.1": {
+          "executable": "TMInterface.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/TMInterface/modloader/TMInterface_2.1.1.zip",
+          "hash_sha256": "e10ee04159777614b17b379c98c5a0d5a118c9c0430ee39a929dc9f48951f941",
+          "changelog": "This release brings back Discord support and provides various bug fixes and QoL improvements.\n\nFull changelog on the homepage."
+        },
+        "2.2.0": {
+          "executable": "TMInterface.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/TMInterface/modloader/TMInterface_2.2.0.zip",
+          "hash_sha256": "5446f0b4e91fa3ca9c1a10af8e2b4f8290ea9616c8ed65b7144cceced9ce0ea3",
+          "changelog": "This release adds a new recent replay list, new plugin APIs and fixes many outstanding bugs.\n\nFull changelog on the homepage."
+        },
+        "2.2.1": {
+          "executable": "TMInterface.dll",
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/TMInterface/modloader/TMInterface_2.2.1.zip",
+          "hash_sha256": "bc781e724050e81eae85847d7c35db219ad877079249efa79a1cd71616ef2c46",
+          "changelog": "This release contains bruteforce bug fixes and new Angelscript APIs.\n\nFull changelog on the homepage."
+        }
+      }
+    },
+    "Competition Patch": {
+      "name": "Competition Patch",
+      "author": "donadigo",
+      "type": "modification",
+      "description": "Competition Patch for Trackmania Nations and United Forever.",
+      "icon_link": "https://donadigo.com/assets/images/icons/cpicon.png",
+      "homepage": "https://donadigo.com/tmcp",
+      "versions": {
+        "1.5.2": {
+          "executable": "TMCompPatch.dll",
+          "priority": -2147483648,
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/CompetitionPatch/modloader/TMCompetitionPatch_1.5.2.zip",
+          "hash_sha256": "aca5ece95c738c4b66fc9d1ac803c4957c8888b19f58c2a15c8cfb017e3b644d",
+          "changelog": "- ModLoader integration\n- Fixed validating other player's replays on a server would show wrong results"
+        },
+        "1.5.3": {
+          "executable": "TMCompPatch.dll",
+          "priority": -2147483648,
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.1"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/CompetitionPatch/modloader/TMCompetitionPatch_1.5.3.zip",
+          "hash_sha256": "363935b4ed0aece942ef7894749de31ae58737c2a88a1f4e7aedea24d4283d4e",
+          "changelog": "- Fixed issues with uploading replays to TMX"
+        },
+        "2.0.0": {
+          "executable": "TMCompPatch.dll",
+          "priority": -2147483648,
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.10"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/CompetitionPatch/modloader/TMCompPatch-v2.0.0+da04cbc44f029bc7335e0232fdcdc4a6045ecf0db7444205ca6f56e1d14b40d5.zip",
+          "hash_sha256": "da04cbc44f029bc7335e0232fdcdc4a6045ecf0db7444205ca6f56e1d14b40d5",
+          "changelog": "This Competition Patch release has been completely rewritten to use server based validation to protect against tool assisted runs and slow motion cheating.\n\nYou must have a stable internet connection to use Competition Patch 2.0."
+        },
+        "2.0.1": {
+          "executable": "TMCompPatch.dll",
+          "priority": -2147483648,
+          "dependencies": [
+            {
+              "id": "CoreMod",
+              "version": "^1.0.10"
+            }
+          ],
+          "download_link": "https://donadigo.com/files/CompetitionPatch/modloader/TMCompPatch-v2.0.1+ef0df281a7af540e93c95680c9d7ecca0cd2396ec7c0e0afd04cc9ae56359cf8.zip",
+          "hash_sha256": "ef0df281a7af540e93c95680c9d7ecca0cd2396ec7c0e0afd04cc9ae56359cf8",
+          "changelog": "- Fixed issues with Tab and Enter not working\n- Fixed some lag\n- Fixed multiple instances crashing"
+        }
+      }
+    }
+  }
+}

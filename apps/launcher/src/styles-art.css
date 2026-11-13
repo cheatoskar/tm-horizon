@@ -1,0 +1,21 @@
+/* TMX Headers Contest art: banner strip (exchange pages) and blurred hero backdrop (game pages). */
+.site-banner { height: 52px; flex: none; overflow: hidden; border-bottom: 1px solid var(--line, rgba(128, 128, 128, 0.25)); background: #000; }
+.site-banner img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+
+.env-backdrop { position: absolute; inset: 0; overflow: hidden; }
+.env-backdrop img { width: 100%; height: 100%; object-fit: cover; filter: blur(7px) saturate(1.1); transform: scale(1.06); background-size: cover; background-position: center; }
+/* The game's own key art stays on top as a soft overlay so both read together. */
+.hero.has-env .hero-art { opacity: 0.4; mix-blend-mode: luminosity; }
+
+/* Repo dialog (text prepared for an issue form while the repository is not public). */
+.modal .input { background: rgba(var(--c-0-0-0), 0.25); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; }
+.modal textarea.input { line-height: 1.4; }
+
+/* TM Horizon's own game cover (ui/common.tsx DesignedCover): stripes, horizon glow, title. */
+.art-design { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.art .art-type { z-index: 1; }
+.art-type span { letter-spacing: 0.01em; }
+.art-cover .art-type { justify-content: flex-start; padding-top: 34%; }
+.art-cover .art-type span { font-size: clamp(22px, 2.3vw, 34px); }
+/* Steam has only a wide header for this game: a band across our cover. */
+.art-steam-header { position: absolute !important; left: 0; right: 0; top: 50%; width: 100% !important; height: auto !important; transform: translateY(-50%); object-fit: contain !important; box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.7); z-index: 2; }

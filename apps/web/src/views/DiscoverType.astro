@@ -1,0 +1,97 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Discover from '../components/Discover.astro';
+import TypeBar from '../components/TypeBar.astro';
+import Icon from '../components/Icon.astro';
+import { types, itemsFor, modCatsFor, modTypeCatsFor, catalogCatsFor, toolTypesFor, sources, liveServers, typeLabel, directory, dirGroupsFor, dirRegionsFor } from '../data/site';
+import { games, cover, header, hero, isOwnCover } from '../data/games';
+import { forms, formsOpen } from '../data/links';
+import { compact } from '../lib/fmt';
+import { t, lh, locales, type Lang } from '../i18n';
+const { lang = 'en', type } = Astro.props as { lang?: Lang; type: string };
+const ty = types.find((x) => x.id === type)!;
+const items = itemsFor(type, lang);
+const serverModes = Object.fromEntries([...new Set(items.map((i) => i.cat))].map((m) => [m, { label: m, icon: /time ?attack/i.test(m) ? 'timer' : /round|cup|knockout/i.test(m) ? 'trophy' : /team/i.test(m) ? 'users' : /elite|battle|royal|siege|joust|storm|melee/i.test(m) ? 'swords' : /stunt/i.test(m) ? 'sparkles' : /laps/i.test(m) ? 'repeat' : 'flag' }]));
+const dirTab = type === 'communities' && !!directory;
+const cats = type === 'mods' ? { ...modTypeCatsFor(lang), ...modCatsFor(lang), plugin: { label: t(lang, 'modtype.plugin'), icon: 'plug-zap' } } : type === 'servers' ? serverModes : type === 'tools' ? toolTypesFor(lang) : (type === 'skins' || type === 'texture-packs') ? { ...catalogCatsFor(lang), ...modTypeCatsFor(lang) } : dirTab ? dirGroupsFor(lang) : catalogCatsFor(lang);
+const credit = sources.communities?.credit as { text: string; url: string } | undefined;
+const s = (k: string) => t(lang, `sort.${k}`);
+const sorts: [string, string][] = type === 'servers' ? [['players', s('players')], ['name', s('name')]]
+  : type === 'mods' || type === 'projects' ? [['relevance', s('relevance')], ['downloads', s('downloads')], ['stars', s('stars')], ['updated', s('updated')], ['name', s('name')]]
+  : dirTab ? [['members', s('members')], ['presence', s('presence')], ['name', s('name')], ['relevance', s('relevance')]]
+  : [['relevance', s('relevance')], ['downloads', s('popular')], ['updated', s('updated')], ['name', s('name')]];
+const players = liveServers.reduce((n, x) => n + x.players, 0);
+const exch = games.filter((g) => g.exchange);
+const time = new Date(sources.servers.generated).toLocaleTimeString(locales[lang], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+const L = (p: string) => lh(lang, p);
+---
+<Layout title={t(lang, 'discover.title', { type: typeLabel(lang, type).toLowerCase() })} lang={lang}>
+  <TypeBar current={type} lang={lang} />
+
+  {type === 'maps' ? (
+    <section class="maps-out">
+      <div class="maps-head">
+        <div>
+          <h1 class="display">{t(lang, 'maps.h1')}</h1>
+          <p class="lead">{t(lang, 'maps.lead')}</p>
+        </div>
+      </div>
+      <div class="exch-grid">
+        {exch.map((g) => (
+          <a class="exch" href={g.exchange!.url} rel="noopener">
+            {g.steam ? <img class="exch-bg" src={header(g.id)} alt="" width="460" height="215" loading="lazy" /> : isOwnCover(g.id) ? <img class="exch-bg" src={hero(g.id)} alt="" loading="lazy" /> : <><img class="exch-bg blur" src={cover(g.id)} alt="" loading="lazy" /><img class="exch-box" src={cover(g.id)} alt="" loading="lazy" /></>}
+            <span class="exch-body">
+              <span class="exch-game">{g.name}</span>
+              <span class="exch-site"><Icon name="map" size={18} />{g.exchange!.label}<span>{new URL(g.exchange!.url).host}</span></span>
+            </span>
+            <Icon name="arrow-up-right" class="exch-go" />
+          </a>
+        ))}
+        <div class="exch none">
+          <img class="exch-bg" src={header('turbo')} alt="" loading="lazy" />
+          <span class="exch-body"><span class="exch-game">Trackmania Turbo</span><span class="exch-site"><Icon name="info" size={18} />{t(lang, 'maps.noExchange')}</span></span>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <Discover kind={type} lang={lang} items={items} placeholder={t(lang, 'discover.search', { what: t(lang, `what.${type}`) })} cats={cats} catTitle={type === 'servers' ? t(lang, 'discover.gameMode') : t(lang, 'discover.category')} online={type === 'mods'} regions={dirTab ? dirRegionsFor(lang) : {}} archive={dirTab} sorts={sorts} promo={type !== 'servers'}>
+      <Fragment slot="above">
+        {type === 'servers' && (
+          <>
+            <div class="note-bar">
+              <Icon name="radio" />
+              <span set:html={t(lang, 'servers.note', { players: `<b>${t(lang, 'servers.players', { n: compact(players, lang) })}</b>`, n: liveServers.length, time, badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} />
+            </div>
+            <div class="submit-bar">
+              {forms.server
+                ? <a class="btn primary" href={forms.server} target="_blank" rel="noopener"><Icon name="server" />{t(lang, 'servers.add')}</a>
+                : <span class="btn primary" aria-disabled="true" role="link"><Icon name="server" />{t(lang, 'servers.add')}</span>}
+              <span class="muted">{formsOpen ? t(lang, 'forms.note') : t(lang, 'forms.soon')}</span>
+            </div>
+            {items.length === 0 && (
+              <div class="note-bar"><Icon name="server-off" /><span><b>{t(lang, 'servers.noneTitle')}</b> {t(lang, 'servers.noneText')}</span></div>
+            )}
+          </>
+        )}
+        {dirTab && (
+          <div class="note-bar">
+            <Icon name="users" />
+            <span>
+              {t(lang, 'comm.credit')} <a href={credit?.url ?? 'https://docs.google.com/spreadsheets/d/1Rr581P5Icd5_-bYypVLaUDqi1pdMGbBNM-E7Bapz_ME/'} target="_blank" rel="noopener">mx_eyebo / Mania Exchange</a>.
+              {' '}{t(lang, 'comm.suggest')} <span class="muted">{t(lang, 'comm.liveNote')}</span>
+            </span>
+          </div>
+        )}
+        {type === 'texture-packs' && (
+          <div class="note-bar"><Icon name="info" /><span>{t(lang, 'texture.note')}</span></div>
+        )}
+        {type === 'events' && (
+          <a class="note-bar link" href={L('/events/')}><Icon name="calendar-days" /><span><b>{t(lang, 'eventsType.title')}</b> {t(lang, 'eventsType.text')}</span><Icon name="arrow-right" /></a>
+        )}
+        {type === 'mods' && (
+          <div class="note-bar subtle"><Icon name="info" /><span set:html={t(lang, 'mods.note')} /></div>
+        )}
+      </Fragment>
+    </Discover>
+  )}
+</Layout>

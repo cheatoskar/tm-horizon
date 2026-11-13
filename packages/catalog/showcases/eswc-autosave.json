@@ -1,0 +1,47 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": { "accent": "green" },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "ESWC Autosave",
+      "tagline": "Every finish saved as a replay, and the online login error 12157 fixed, for TrackMania Nations ESWC.",
+      "badges": ["TMN ESWC 1.80", "Replays", "Online fix"]
+    },
+    {
+      "type": "features",
+      "items": [
+        { "icon": "save", "title": "Replays on their own", "text": "Every finish is saved as a normal .Replay.Gbx, without clicking Save replay." },
+        { "icon": "share-2", "title": "TMX copy", "text": "On servers a second file keeps only your ghost and inputs, ready for TMX." },
+        { "icon": "globe", "title": "Online login fixed", "text": "Clicking Internet fails with error 12157 on Windows 10 and 11. The fix is for the game process only." },
+        { "icon": "cpu", "title": "A tiny loader", "text": "A 4 KB dinput8.dll passes every DirectInput call on and loads the mod. Nothing else." }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Requirements",
+      "markdown": "It works with **one exe only**: the unofficial community patch of **TrackMania Nations ESWC 1.80** (the StarForce-free `TmNationsESWC.exe`, in-game version 0.1.7.9). With any other exe the mod does nothing and says so in its log."
+    },
+    {
+      "type": "compat",
+      "rows": [{ "game": "eswc", "status": "works", "note": "Unofficial 1.80 patch only" }]
+    },
+    { "type": "changelog", "count": 1 },
+    {
+      "type": "faq",
+      "items": [
+        { "q": "Where do the replays go?", "a": "Into GameData\\Tracks\\Replays\\My Replays, named after the track and the time. Existing files are never overwritten." },
+        { "q": "There is no eswc_autosave.log after starting the game.", "a": "Then eswc_autosave.dll is missing or could not be loaded, and the game runs without the mod. Copy dinput8.dll, eswc_autosave.dll and eswc_autosave.ini next to TmNationsESWC.exe." },
+        { "q": "Does the online fix change Windows?", "a": "No. It allows TLS 1.0 and skips the revocation check for the game process only. Use a password for your ESWC account that you do not use anywhere else." }
+      ]
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        { "kind": "install", "label": "Install" },
+        { "kind": "link", "label": "README", "url": "https://github.com/cheatoskar/eswc-autosave/blob/main/README.md", "style": "ghost" }
+      ]
+    }
+  ]
+}

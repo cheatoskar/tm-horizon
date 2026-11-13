@@ -1,0 +1,114 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "red"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TMX Universal Track Downloader",
+      "tagline": "Browser add-on for bulk downloads, search statistics and 100% TMX badges on the TM-Exchange sites.",
+      "image": "https://raw.githubusercontent.com/cheatoskar/TMX-Downloader/HEAD/Screenshots/View.png",
+      "badges": [
+        "TMNF, TMUF, ESWC, TMO, TMS",
+        "Browser add-on",
+        "Open source"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "download",
+          "title": "Bulk download",
+          "text": "Downloads search results and trackpacks as a ZIP or as single files."
+        },
+        {
+          "icon": "target",
+          "title": "Statistics",
+          "text": "Search statistics plus track and user insights."
+        },
+        {
+          "icon": "flag",
+          "title": "100% TMX badges",
+          "text": "Shows the status in the 100% TMX project and warns about cheated maps."
+        },
+        {
+          "icon": "globe",
+          "title": "Five sites",
+          "text": "Works on TMNF-X, TMUF-X and the TMO, TMS and TMN exchange sites."
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "title": "Screenshots",
+      "images": [
+        {
+          "url": "https://raw.githubusercontent.com/cheatoskar/TMX-Downloader/HEAD/Screenshots/View.png",
+          "caption": "The downloader panel next to a TMNF-X search"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/cheatoskar/TMX-Downloader/HEAD/Screenshots/Modal.png",
+          "caption": "Download options"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/cheatoskar/TMX-Downloader/HEAD/Screenshots/Stats.png",
+          "caption": "Search statistics"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "The add-on is available from the Chrome Web Store and from Firefox Add-ons, and as a release on GitHub. It is MIT licensed. The launcher installs the GitHub release into its embedded browser."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        },
+        {
+          "game": "eswc",
+          "status": "works"
+        },
+        {
+          "game": "tmo",
+          "status": "works"
+        },
+        {
+          "game": "tms",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by cheatoskar."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/cheatoskar/TMX-Downloader"
+        },
+        {
+          "kind": "link",
+          "label": "Releases",
+          "url": "https://github.com/cheatoskar/TMX-Downloader/releases",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

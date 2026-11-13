@@ -1,0 +1,12 @@
+---
+// Lucide icon, rendered to inline SVG at build time (no runtime JS).
+import { icons } from 'lucide';
+interface Props { name: string; size?: number; class?: string; stroke?: number }
+const { name, size = 18, class: cls = '', stroke = 2 } = Astro.props;
+const pascal = name.replace(/(^|-)([a-z0-9])/g, (_: string, __: string, c: string) => c.toUpperCase());
+if (!(icons as any)[pascal]) console.warn('[Icon] missing lucide icon', name);
+const node = (icons as any)[pascal] ?? (icons as any).CircleHelp;
+const kids = (node[2] ?? node) as [string, Record<string, string>][];
+const inner = kids.map(([t, a]) => `<${t} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}/>`).join('');
+---
+<svg class={`i ${cls}`} xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width={stroke} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={inner} />

@@ -1,0 +1,82 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "amber"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TrackMania ModLoader",
+      "tagline": "Mod manager for TrackMania Nations and United Forever. It loads mods into the game without patching the exe.",
+      "badges": [
+        "TMNF, TMUF",
+        "Mod manager",
+        "By Tomashu"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "layers",
+          "title": "Several mods at once",
+          "text": "Runs TrackMania with multiple mods and keeps them updated automatically."
+        },
+        {
+          "icon": "shield",
+          "title": "No exe patching",
+          "text": "Injects DLL mods into the game without patching the exe."
+        },
+        {
+          "icon": "package",
+          "title": "Three downloads",
+          "text": "An installer, a plain zip (for example for Linux) and a prepackaged zip with the common mods."
+        },
+        {
+          "icon": "globe",
+          "title": "Mod servers",
+          "text": "Shows the mods of the servers listed in its config.yaml, so authors can host their own mod lists."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Good to know",
+      "markdown": "ModLoader does not install TrackMania Forever itself; the game has to be installed first.\n\nBecause it injects DLLs into the game, browsers and antivirus programs may flag it. The author calls this a false positive and suggests adding the install folder (`%LocalAppData%\\TMLoader\\` by default) to the antivirus exceptions. Windows SmartScreen may show a blue warning because the installer is not signed.\n\nThe prepackaged zip has to be installed by hand in the game folder and does not update itself."
+    },
+    {
+      "type": "text",
+      "title": "Mods that need it",
+      "markdown": "TMInterface, Competition Patch 2.0, KimMod, CenterSpeed, Always Official, TMUnlimiter and many others are installed through ModLoader."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "TrackMania ModLoader is made by Tomashu. This page follows the installation notes on his site."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "ModLoader page",
+          "url": "https://tomashu.pages.dev/software/tmloader"
+        }
+      ]
+    }
+  ]
+}

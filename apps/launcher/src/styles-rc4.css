@@ -1,0 +1,67 @@
+/* rc.4: Horizon Client head on the Mods page (ui/HorizonClientIntro.tsx). */
+.hc-intro {
+  display: grid; grid-template-columns: auto minmax(260px, 1fr) minmax(320px, 1.3fr); gap: 18px; align-items: center;
+  padding: 18px; margin-bottom: 20px; border: 1px solid var(--line-2); border-radius: var(--r);
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--acc) 14%, transparent), transparent 60%), rgba(var(--tint), 0.03);
+}
+.hc-intro-logo { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); }
+.hc-intro-text h2 { margin: 0 0 4px; font-family: var(--head-font); font-size: 24px; }
+.hc-intro-text p { margin: 0 0 10px; max-width: 64ch; }
+.hc-intro-games { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hc-intro-shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.hc-shot { padding: 0; border: 1px solid var(--line-2); border-radius: var(--r-sm); overflow: hidden; background: none; cursor: zoom-in; aspect-ratio: 16 / 9; }
+.hc-shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.15s ease; }
+.hc-shot:hover img { transform: scale(1.04); }
+.hc-shot:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+@media (max-width: 1250px) { .hc-intro { grid-template-columns: auto 1fr; } .hc-intro-shots { grid-column: 1 / -1; } }
+
+/* rc.4: site switcher grouped by kind (Exchanges, Tools, Community), every site once, game chips for multi-game sites. */
+.site-row { border-radius: 10px; }
+.site-row.on { background: rgba(var(--tint), 0.04); }
+.site-chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 10px 8px 52px; margin-top: -2px; }
+.site-chip { height: 22px; padding: 0 8px; border-radius: 11px; border: 1px solid var(--line-2); background: none; color: var(--fg-2, var(--fg)); font: inherit; font-size: 11.5px; cursor: pointer; }
+.site-chip:hover { border-color: rgba(var(--tint), 0.28); color: var(--fg); }
+.site-chip.on { background: var(--acc); border-color: var(--acc); color: var(--acc-ink, #fff); }
+.site-chip.dim { opacity: 0.6; }
+.site-chip:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }
+
+/* rc.4: one control height in every page toolbar (servers, news, mods; the Maps page browser bar has
+   its own). Loaded last: styles-layout's `.btn.sm { height: var(--ctl-h-sm) }` came after the servers
+   toolbar's own rule and made "Add your server" 32 px next to the 40 px search field. */
+.toolbar > .btn, .toolbar > .btn.sm, .toolbar > .select, .toolbar > .search, .toolbar > .seg, .toolbar > .seg.small-seg,
+.toolbar > input.text-in, .toolbar > .chips > .fchip { height: var(--ctl-h); box-sizing: border-box; }
+.toolbar > .btn.sm { padding: 0 14px; font-size: 13.5px; border-radius: 11px; }
+.toolbar > .seg.small-seg { padding: 3px; }
+.toolbar > .seg.small-seg button { height: calc(var(--ctl-h) - 8px); }
+.toolbar > .chips > .fchip { display: inline-flex; align-items: center; }
+:root[data-density="compact"] .toolbar > .btn, :root[data-density="compact"] .toolbar > .select, :root[data-density="compact"] .toolbar > .search,
+:root[data-density="compact"] .toolbar > .seg, :root[data-density="compact"] .toolbar > .chips > .fchip { height: var(--ctl-h-sm); }
+:root[data-density="compact"] .toolbar > .seg button { height: calc(var(--ctl-h-sm) - 6px); }
+/* Maps page browser bar: back/forward/reload, site switcher, address, Map tools, add-ons in one height. */
+.bbar { --bar-h: 36px; }
+.bbar > .bbtn { width: var(--bar-h); height: var(--bar-h); }
+.bbar > .btn.sm, .bbar .bgame-btn, .bbar > .baddr { height: var(--bar-h); box-sizing: border-box; }
+
+/* Highlands: readme/credits from the ZIP, on/off row */
+.hl-note { margin-top: 6px; }
+.hl-note summary { cursor: pointer; }
+.hl-note pre { white-space: pre-wrap; max-height: 220px; overflow: auto; margin: 6px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--bg-2, rgba(127,127,127,.08)); font-size: 12px; }
+.hl-switch .sg-row { align-items: center; gap: 12px; }
+.play-split { display: inline-flex; gap: 4px; align-items: stretch; }
+.play-split .play-more { padding: 0 10px; }
+/* Text followed by a button or another block inside a card: never glued together (emulator, classic,
+   "where to get" and hint cards). */
+.panel > p + .btn, .panel > p + button, .panel > p + .row-btns, .panel > p + p, .panel > .row-btns + p { margin-top: 10px; }
+.hint-card .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Get sheet: game art header, full-width source rows (same layout for every game). */
+.modal.get-sheet { padding-top: 0; overflow: hidden; }
+.get-sheet .get-art { margin: 0 -22px; height: 120px; background: linear-gradient(135deg, rgba(var(--c-30-35-48), 1), rgba(var(--c-20-24-34), 1)) center / cover no-repeat; mask-image: linear-gradient(to bottom, #000 55%, transparent); }
+.get-sheet h3 { margin-top: -28px; position: relative; }
+.get-rows { display: flex; flex-direction: column; gap: 8px; }
+.get-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-2); background: rgba(var(--tint), 0.03); color: inherit; text-align: left; font: inherit; }
+button.get-row { cursor: pointer; }
+button.get-row:hover { background: rgba(var(--tint), 0.07);  }
+.get-row .grow { display: flex; flex-direction: column; min-width: 0; }
+.get-ico { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: rgba(var(--tint), 0.06); flex: none; }
+.get-sheet .get-row + p { margin-top: 10px; }

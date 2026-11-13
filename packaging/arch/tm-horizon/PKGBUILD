@@ -1,0 +1,56 @@
+# Maintainer: cheatoskar
+# Builds TM Horizon from a release tag. The repository is private for now, so the source
+# download needs access; once it is public this works as is (then fill sha256sums with
+# `updpkgsums`). Build: `makepkg -si` in this folder.
+pkgname=tm-horizon
+# pkgver cannot contain "-": the release tag v0.3.0-beta.1 becomes 0.3.0_beta.1 here.
+_tag=0.5.1
+pkgver=${_tag//-/_}
+pkgrel=1
+pkgdesc="One launcher for every TrackMania: games, TMLoader mods, maps, servers (games run through Wine/Proton)"
+arch=('x86_64')
+url="https://github.com/cheatoskar/tm-horizon"
+license=('AGPL-3.0-only')
+depends=('webkit2gtk-4.1' 'gtk3' 'librsvg' 'openssl' 'xdg-utils' 'hicolor-icon-theme')
+makedepends=('rust' 'cargo' 'nodejs' 'npm')
+optdepends=('wine: run the games in a Wine prefix'
+            'umu-launcher: run the games with Proton outside Steam'
+            'steam: Steam versions of the games (Proton)'
+            'winetricks: fonts and runtimes for old games')
+provides=('tm-horizon')
+conflicts=('tm-horizon-bin')
+options=('!lto')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$_tag.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "$pkgname-$_tag"
+  export npm_config_cache="$srcdir/npm-cache"
+  npm ci --no-audit --no-fund
+}
+
+build() {
+  cd "$pkgname-$_tag/apps/launcher"
+  export CARGO_HOME="$srcdir/cargo-home"
+  export npm_config_cache="$srcdir/npm-cache"
+  # tauri build (not plain cargo) so the app loads its bundled UI instead of the dev server.
+  npx tauri build --no-bundle
+}
+
+check() {
+  cd "$pkgname-$_tag/apps/launcher/src-tauri"
+  export CARGO_HOME="$srcdir/cargo-home"
+  cargo test --release --locked --lib
+}
+
+package() {
+  cd "$pkgname-$_tag"
+  install -Dm755 apps/launcher/src-tauri/target/release/tm-hub "$pkgdir/usr/bin/tm-horizon"
+  install -Dm644 packaging/linux/tm-horizon.desktop "$pkgdir/usr/share/applications/tm-horizon.desktop"
+  local icons=apps/launcher/src-tauri/icons
+  install -Dm644 "$icons/32x32.png" "$pkgdir/usr/share/icons/hicolor/32x32/apps/tm-horizon.png"
+  install -Dm644 "$icons/64x64.png" "$pkgdir/usr/share/icons/hicolor/64x64/apps/tm-horizon.png"
+  install -Dm644 "$icons/128x128.png" "$pkgdir/usr/share/icons/hicolor/128x128/apps/tm-horizon.png"
+  install -Dm644 "$icons/128x128@2x.png" "$pkgdir/usr/share/icons/hicolor/256x256/apps/tm-horizon.png"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

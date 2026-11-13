@@ -1,0 +1,15 @@
+{
+  "updb.title": "Dostępna aktualizacja",
+  "updb.version": "Wersja {v}",
+  "updb.install": "Zainstaluj",
+  "updb.later": "Później",
+  "updb.more": "Więcej",
+  "updb.less": "Mniej",
+  "updb.downloading": "Pobieranie {pct}",
+  "updb.restart": "Uruchom ponownie",
+  "updb.winNote": "Instalator zamknie aplikację i uruchomi nową wersję.",
+  "updb.testDone": "Sprawdzono, tryb testowy, nic nie zainstalowano.",
+  "updb.errSig": "Pobrany plik nie pasuje do podpisu. Nic nie zainstalowano.",
+  "updb.errNet": "Brak połączenia z serwerem aktualizacji.",
+  "updb.errOther": "Aktualizacja nie powiodła się: {msg}"
+}

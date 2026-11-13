@@ -1,0 +1,99 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "amber"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Ultimate Medals",
+      "tagline": "Openplanet widget that shows your personal best and all medals of the current track.",
+      "badges": [
+        "TM2020, TM2, Turbo",
+        "Openplanet plugin",
+        "GPL-3.0"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "trophy",
+          "title": "All medals",
+          "text": "Your PB and every medal time of the map in one widget."
+        },
+        {
+          "icon": "timer",
+          "title": "Deltas",
+          "text": "Colors for positive, negative and neutral deltas, with right-aligned times."
+        },
+        {
+          "icon": "flag",
+          "title": "Game modes",
+          "text": "Supports Stunt and Platform modes, and time attack with clones."
+        },
+        {
+          "icon": "star",
+          "title": "Turbo",
+          "text": "In Turbo it can also show the Super-Trackmaster times of the campaign tracks."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Limits",
+      "markdown": "In Turbo, only the Solo campaign PBs are loaded. The plugin needs Openplanet 1.29.0 or newer."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tm2020",
+          "status": "works"
+        },
+        {
+          "game": "turbo",
+          "status": "works"
+        },
+        {
+          "game": "tm2-stadium",
+          "status": "works"
+        },
+        {
+          "game": "tm2-canyon",
+          "status": "works"
+        },
+        {
+          "game": "tm2-valley",
+          "status": "works"
+        },
+        {
+          "game": "tm2-lagoon",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Ultimate Medals is made by Phlarx and Miss."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Plugin page",
+          "url": "https://openplanet.dev/plugin/ultimatemedals"
+        },
+        {
+          "kind": "link",
+          "label": "Source",
+          "url": "https://github.com/Phlarx/tm-ultimate-medals",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

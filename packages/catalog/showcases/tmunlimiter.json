@@ -1,0 +1,78 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "lime"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TMUnlimiter",
+      "tagline": "Lifts block and map limits in TrackMania Forever; version 2.0 adds AngelScript map scripts.",
+      "badges": [
+        "TMNF, TMUF",
+        "ModLoader mod",
+        "Version 2.0"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "map",
+          "title": "No limits",
+          "text": "Removes the block and map limits of TrackMania Forever."
+        },
+        {
+          "icon": "code-2",
+          "title": "Map scripts",
+          "text": "Version 2.0 adds scripting with AngelScript."
+        },
+        {
+          "icon": "book-open",
+          "title": "Documentation",
+          "text": "A documentation site and a wiki with the AngelScript reference."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install and notes",
+      "markdown": "TMUnlimiter is installed through the TrackMania ModLoader. The TMInterface guide has a chapter on playing with TMUnlimiter.\n\nDocumentation lives on unlimiter.net and in the wiki of the repository; the author plans to move the documentation into the repository."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Repository and wiki by tomek0055."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "TMUnlimiter",
+          "url": "https://unlimiter.net/"
+        },
+        {
+          "kind": "link",
+          "label": "Wiki",
+          "url": "https://github.com/tomek0055/TMUnlimiter/wiki",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

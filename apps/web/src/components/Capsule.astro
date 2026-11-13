@@ -1,0 +1,18 @@
+---
+import { cover, isOwnCover } from '../data/games';
+import Icon from './Icon.astro';
+import type { Game } from '../data/games';
+import { t, lh, priceText, type Lang } from '../i18n';
+const { g, mods = 0, lang = 'en' } = Astro.props as { g: Game; mods?: number; lang?: Lang };
+---
+<a class={`cap ${g.steam || isOwnCover(g.id) ? '' : 'box'}`} href={lh(lang, `/game/${g.id}/`)}>
+  <img src={cover(g.id)} alt={t(lang, 'alt.cover', { name: g.name })} width="600" height="900" loading="lazy" decoding="async" />
+  <span class="cap-year">{g.year}</span>
+  <span class="cap-meta">
+    <b>{g.name}</b>
+    <span>
+      {g.modSystem !== 'none' && <span class={`cap-tag ${g.modSystem === 'TMLoader' ? 'acc' : ''}`}><Icon name={g.modSystem === 'TMLoader' ? 'plug' : 'orbit'} size={12} />{g.modSystem}{mods ? ` · ${mods}` : ''}</span>}
+      <span class="cap-tag">{priceText(lang, g.price)}</span>
+    </span>
+  </span>
+</a>

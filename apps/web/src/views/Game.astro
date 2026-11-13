@@ -1,0 +1,140 @@
+---
+import { cover, hero, logo, isOwnCover } from '../data/games';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Thumb from '../components/Thumb.astro';
+import ResultCard from '../components/ResultCard.astro';
+import EventCard from '../components/EventCard.astro';
+import type { Game } from '../data/games';
+import { modItems, serverItems, catalogItem, catalog, events, eventsSample } from '../data/site';
+import { forms, formsOpen } from '../data/links';
+import { gameLink } from '../lib/links';
+import { compact } from '../lib/fmt';
+import { t, lh, priceText, familyText, gameText, type Lang } from '../i18n';
+const { lang = 'en', g } = Astro.props as { lang?: Lang; g: Game };
+const L = (p: string) => lh(lang, p);
+const steam = !!g.steam;
+const mods = modItems(lang).filter((i) => i.games.includes(g.id));
+const allServers = serverItems(lang).filter((i) => i.games.includes(g.id));
+const srv = allServers.slice().sort((a, b) => (b.players ?? 0) - (a.players ?? 0)).slice(0, 12);
+const players = allServers.filter((s) => !s.sample && !s.community).reduce((n, s) => n + (s.players ?? 0), 0);
+const evs = events.filter((e) => e.game === g.id);
+const organisers = catalog.filter((e) => e.category === 'events' && e.games?.includes(g.id) && e.status !== 'dead').map((e) => catalogItem(e, lang));
+const comms = catalog.filter((e) => e.category === 'community' && e.games?.includes(g.id)).map((e) => catalogItem(e, lang)).sort((a, b) => (a.status === 'alive' ? 0 : 1) - (b.status === 'alive' ? 0 : 1) || a.games.length - b.games.length);
+const tools = catalog.filter((e) => ['tool', 'leaderboard', 'skins'].includes(e.category) && e.games?.includes(g.id) && e.status === 'alive').length;
+const exch = catalog.find((e) => e.category === 'exchange' && e.url && e.url === g.exchange?.url);
+const storeLabel = (l: string) => (l === 'Official site' ? t(lang, 'game.officialSite') : l);
+const host = g.exchange ? new URL(g.exchange.url).host : '';
+---
+<Layout title={g.name} desc={t(lang, 'game.desc', { name: g.name })} lang={lang} flush>
+  <section class="g-hero">
+    {steam || isOwnCover(g.id) ? <img class="g-hero-bg" src={hero(g.id)} alt="" width="1920" height="620" /> : <img class="g-hero-bg blur" src={cover(g.id)} alt="" />}
+    <div class="wrap g-hero-in">
+      <div class="g-cap"><img src={cover(g.id)} alt={t(lang, 'alt.cover', { name: g.name })} width="600" height="900" /></div>
+      <div>
+        {steam ? <img class="g-logo" src={logo(g.id)} alt={g.name} /> : <h1 class="g-title">{g.name}</h1>}
+        {steam && <h1 class="sr" style="position:absolute;left:-9999px">{g.name}</h1>}
+        <div class="g-meta">
+          <span class="badge">{g.year}</span>
+          <span class="badge">{familyText(lang, g.family)}</span>
+          <span class={`badge ${g.price.startsWith('Free') ? 'accent' : ''}`}>{priceText(lang, g.price)}</span>
+          {g.modSystem !== 'none' && <span class="badge"><Icon name={g.modSystem === 'TMLoader' ? 'plug' : 'orbit'} size={13} />{g.modSystem}</span>}
+          {players > 0 && <span class="badge" style="background:rgba(61,220,132,.22);color:#9ff5c4"><Icon name="radio" size={13} />{t(lang, 'game.playing', { n: compact(players, lang) })}</span>}
+        </div>
+        <div class="g-actions">
+          {steam && <a class="btn primary lg" href={`steam://run/${g.steam}`}><Icon name="play" />{t(lang, 'game.play')}</a>}
+          {g.stores.map((s) => <a class={`btn lg on-art`} href={s.url} rel="noopener"><Icon name={s.label === 'Steam' ? 'shopping-bag' : 'globe'} />{s.label === 'Steam' ? t(lang, 'game.getSteam') : storeLabel(s.label)}</a>)}
+          <a class="btn lg on-art" href={gameLink(g.id)} title={t(lang, 'btn.openGameTip')}><Icon name="rocket" />{t(lang, 'btn.openGame')}</a>
+          <a class="btn lg on-art" href="https://www.trackmania.wiki/" rel="noopener"><Icon name="book-open" />TrackMania Wiki</a>
+          {!steam && g.exchange && <a class="btn primary lg" href={g.exchange.url} rel="noopener"><Icon name="map" />{t(lang, 'game.mapsOn', { site: g.exchange.label })}</a>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap g-body" data-tabs>
+    <div class="tabs-row">
+      <nav class="tabs" role="tablist">
+        <button data-tab="mods" role="tab"><Icon name="puzzle" size={17} />{t(lang, 'type.mods')} <span class="n">{mods.length}</span></button>
+        <button data-tab="maps" role="tab"><Icon name="map" size={17} />{t(lang, 'type.maps')}</button>
+        <button data-tab="servers" role="tab"><Icon name="server" size={17} />{t(lang, 'type.servers')} <span class="n">{allServers.length}</span></button>
+        <button data-tab="events" role="tab"><Icon name="calendar-days" size={17} />{t(lang, 'type.events')} <span class="n">{evs.length + organisers.length}</span></button>
+        <button data-tab="communities" role="tab"><Icon name="users" size={17} />{t(lang, 'type.communities')} <span class="n">{comms.length}</span></button>
+      </nav>
+    </div>
+
+    <div class="g-grid">
+      <div>
+        <section data-panel="mods">
+          {mods.length ? <div class="results list">{mods.map((it) => <ResultCard it={it} lang={lang} />)}</div> : (
+            <div class="card panel-empty">
+              <Icon name={g.modSystem === 'Openplanet' ? 'orbit' : 'puzzle'} size={36} />
+              <b>{g.modSystem === 'Openplanet' ? t(lang, 'game.pluginsTitle') : t(lang, 'game.noModsTitle')}</b>
+              <span>{g.modSystem === 'Openplanet' ? t(lang, 'game.pluginsText') : t(lang, 'game.noModsText')}</span>
+              {g.modSystem === 'Openplanet' ? <a class="btn primary" href="https://openplanet.dev/plugins" rel="noopener"><Icon name="external-link" size={16} />openplanet.dev</a> : <a class="btn" href={L(`/directory/?games=${g.id}`)}>{t(lang, 'game.dirFor', { name: g.short })}</a>}
+            </div>
+          )}
+        </section>
+
+        <section data-panel="maps" hidden>
+          {g.exchange ? (
+            <a class="card exch-cta" href={g.exchange.url} rel="noopener">
+              <Thumb seed={g.id + 'x'} glyph="map" size={64} />
+              <span><b>{t(lang, 'game.exchTitle', { site: g.exchange.label, name: g.name })}</b><span class="muted">{exch?.description ?? t(lang, 'game.exchText')}</span></span>
+              <span class="btn primary"><Icon name="external-link" size={16} />{t(lang, 'game.open', { host })}</span>
+            </a>
+          ) : <div class="card panel-empty"><Icon name="map" size={36} /><b>{t(lang, 'game.noExchange', { name: g.name })}</b><span>{t(lang, 'game.mapsInGame')}</span></div>}
+        </section>
+
+        <section data-panel="servers" hidden>
+          {srv.length ? <>
+            <div class="results list">{srv.map((it) => <ResultCard it={it} kind="servers" lang={lang} />)}</div>
+            {allServers.length > srv.length && <a class="btn ghost block" style="margin-top:12px" href={L(`/discover/servers/?games=${g.id}`)}>{t(lang, 'game.allServers', { n: allServers.length })} <Icon name="arrow-right" size={16} /></a>}
+          </> : (
+            <div class="card panel-empty">
+              <Icon name="server-off" size={36} />
+              <b>{t(lang, 'game.noServersTitle')}</b>
+              <span>{g.family === 'Forever' || g.family === 'First generation' ? t(lang, 'game.noServersForever') : t(lang, 'game.noServersOther')}</span>
+              {forms.server
+                ? <a class="btn primary" href={forms.server} target="_blank" rel="noopener"><Icon name="server" size={16} />{t(lang, 'servers.add')}</a>
+                : <span class="btn primary" aria-disabled="true" role="link"><Icon name="server" size={16} />{t(lang, 'servers.add')}</span>}
+              <span class="muted" style="font-size:13px">{formsOpen ? t(lang, 'forms.note') : t(lang, 'forms.soon')}</span>
+            </div>
+          )}
+        </section>
+
+        <section data-panel="events" hidden>
+          {evs.length > 0 && <div class="ev-list" style="margin-bottom:16px">{evs.map((e) => <EventCard e={e} lang={lang} />)}</div>}
+          {organisers.length > 0 ? <div class="results list">{organisers.map((it) => <ResultCard it={it} kind="events" lang={lang} />)}</div> : evs.length === 0 && <div class="card panel-empty"><Icon name="calendar-x" size={36} /><b>{t(lang, 'game.noEventsTitle')}</b><span>{t(lang, 'game.noEventsText')}</span></div>}
+        </section>
+
+        <section data-panel="communities" hidden>
+          {comms.length ? <div class="results list">{comms.map((it) => <ResultCard it={it} kind="communities" lang={lang} />)}</div> : <div class="card panel-empty"><Icon name="users" size={36} /><b>{t(lang, 'game.noComms')}</b></div>}
+        </section>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <h3>{t(lang, 'game.about')}</h3>
+          <p class="muted" style="font-size:15px;margin-bottom:14px">{gameText(lang, g, 'note')}</p>
+          <dl class="kv">
+            <div><dt><Icon name="calendar" size={16} />{t(lang, 'game.released')}</dt><dd>{g.year}</dd></div>
+            <div><dt><Icon name="mountain" size={16} />{t(lang, 'game.envs')}</dt><dd>{gameText(lang, g, 'envs')}</dd></div>
+            <div><dt><Icon name="badge-euro" size={16} />{t(lang, 'game.price')}</dt><dd>{priceText(lang, g.price)}</dd></div>
+            <div><dt><Icon name="plug" size={16} />{t(lang, 'type.mods')}</dt><dd>{g.modSystem === 'none' ? t(lang, 'games.noneCap') : g.modSystem}</dd></div>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>{t(lang, 'game.getIt')}</h3>
+          <p class="muted" style="font-size:15px;margin-bottom:10px">{gameText(lang, g, 'get')}</p>
+          <div class="linklist">
+            {g.stores.map((s) => <a href={s.url} rel="noopener"><Icon name={s.label === 'Steam' ? 'shopping-bag' : 'globe'} size={17} />{storeLabel(s.label)}<Icon name="external-link" size={14} /></a>)}
+            {g.exchange && <a href={g.exchange.url} rel="noopener"><Icon name="map" size={17} />{g.exchange.label}<Icon name="external-link" size={14} /></a>}
+            <a href={L(`/directory/?games=${g.id}`)}><Icon name="library" size={17} />{t(lang, 'game.toolsSites', { n: tools })}<Icon name="arrow-right" size={14} /></a>
+          </div>
+        </div>
+        {eventsSample && evs.length > 0 && <p class="muted" style="font-size:13px" set:html={t(lang, 'game.sampleEvents', { badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} />}
+      </aside>
+    </div>
+  </div>
+</Layout>

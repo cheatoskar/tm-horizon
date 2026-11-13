@@ -1,0 +1,32 @@
+# OPTIONAL. Most authors only connect their repository in the portal; the hub then copies every
+# release by itself. Use this only if CI should upload builds that are not GitHub releases, or to
+# skip waiting for the next crawl.
+# Save as .github/workflows/tm-hub.yml in the mod repository and add the repository secret
+# TMHUB_TOKEN (portal > Account > API tokens, scope "versions:write", limited to this project).
+name: Publish to TM Horizon Hub
+on:
+  release:
+    types: [published]
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "${{ github.event.release.tag_name }}" --repo "${{ github.repository }}" --pattern "*.zip" --dir dist
+      - name: Upload to the hub
+        env:
+          TMHUB_TOKEN: ${{ secrets.TMHUB_TOKEN }}
+          TMHUB_URL: https://hub.example.org
+          TMHUB_PROJECT: my-mod
+          TAG: ${{ github.event.release.tag_name }}
+          NOTES: ${{ github.event.release.body }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          file=$(ls dist/*.zip | head -n1)
+          channel=stable; [ "$PRERELEASE" = "true" ] && channel=beta
+          meta=$(jq -n --arg v "${TAG#v}" --arg c "$channel" --arg n "$NOTES" '{version:$v, channel:$c, changelog:$n}')
+          curl -fsS -H "Authorization: Bearer $TMHUB_TOKEN" \
+            -F "file=@$file" -F "meta=$meta" \
+            "$TMHUB_URL/v1/projects/$TMHUB_PROJECT/versions" | jq '{status, version, publishAt, verdict: .report.verdict}'

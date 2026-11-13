@@ -1,0 +1,7 @@
+id: 2026-11-01-past-event
+title: Past event
+games: [eswc]
+start: 2026-11-01T18:00:00Z
+durationMinutes: 60
+host: Example Community
+join: 198.51.100.20:2352

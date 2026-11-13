@@ -1,0 +1,93 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "violet"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "TMInterface",
+      "tagline": "TAS tool for TrackMania Nations and United Forever: replay, analyse and modify runs with scripts, save states and bruteforce.",
+      "badges": [
+        "TMNF, TMUF",
+        "TAS tool",
+        "By donadigo"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "timer",
+          "title": "Race speed",
+          "text": "Change the race speed, with deterministic playback of full input sequences."
+        },
+        {
+          "icon": "save",
+          "title": "Save states",
+          "text": "Native save states and fast forward."
+        },
+        {
+          "icon": "rocket",
+          "title": "Bruteforce",
+          "text": "A bruteforce script that changes inputs to improve a metric you define."
+        },
+        {
+          "icon": "code-2",
+          "title": "AngelScript API",
+          "text": "Plugins hook into the game simulation; the documentation covers callbacks, settings and custom commands."
+        },
+        {
+          "icon": "keyboard",
+          "title": "Commands and keys",
+          "text": "A command system with bindable commands, plus input visualization."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Not for leaderboards",
+      "markdown": "The author states that TMInterface is not meant for cheating or unfair play and has security features for that. Every run driven with it counts as a tool-assisted run, even if no inputs were injected, and does not belong on public leaderboards."
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "TMInterface is available directly in the TrackMania ModLoader. The guide on the site covers installation, scripting, save states, bruteforce and the plugin API."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "TMInterface is made by donadigo."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "TMInterface",
+          "url": "https://donadigo.com/tminterface"
+        },
+        {
+          "kind": "link",
+          "label": "TMTAS Exchange",
+          "url": "https://tmtas.exchange/tas-tools",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

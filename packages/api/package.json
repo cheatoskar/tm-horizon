@@ -1,0 +1,29 @@
+{
+  "name": "@tm-hub/api",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Static JSON data for the TM Horizon launcher and website: mods, projects, maps, servers, events and the community catalog.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node src/build.ts",
+    "typecheck": "tsc --noEmit",
+    "schema": "node scripts/gen-schema.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "record-fixtures": "node scripts/record-fixtures.ts"
+  },
+  "dependencies": {
+    "@tm-hub/shared": "*",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "ts-json-schema-generator": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "license": "AGPL-3.0-only"
+}

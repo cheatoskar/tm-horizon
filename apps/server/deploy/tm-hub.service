@@ -1,0 +1,39 @@
+# /etc/systemd/system/tm-hub.service  (docs/hub/deploy-oracle.md)
+[Unit]
+Description=TM Horizon Hub API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tmhub
+Group=tmhub
+WorkingDirectory=/srv/tm-hub/app/apps/server
+EnvironmentFile=/etc/tm-hub/hub.env
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning src/main.ts
+Restart=on-failure
+RestartSec=5
+
+# Isolation from the other sites on the box
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/tm-hub
+UMask=0077
+MemoryMax=1200M
+CPUQuota=200%
+TasksMax=200
+
+[Install]
+WantedBy=multi-user.target

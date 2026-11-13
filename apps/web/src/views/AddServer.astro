@@ -1,0 +1,201 @@
+---
+// "Add your server": posts to the hub (POST /v1/servers). Without a login the entry waits for an admin.
+// With a Discord/GitHub login the hub asks the server at once ("Check" shows the live answer) and lists it
+// when it answers as the chosen game. docs/hub/server-registration.md. The hub address comes from
+// PUBLIC_HUB_URL at build time; the hub needs HUB_WEB_URL set to this site for the login to work here.
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { t, type Lang } from '../i18n';
+const { lang = 'en' } = Astro.props as { lang?: Lang };
+const hub = String(import.meta.env.PUBLIC_HUB_URL ?? '').replace(/\/?$/, '/');
+const hubOn = !!import.meta.env.PUBLIC_HUB_URL;
+const games = [['tmnf', 'TrackMania Nations Forever'], ['tmuf', 'TrackMania United Forever'], ['eswc', 'TrackMania Nations ESWC'], ['tms', 'TrackMania Sunrise'], ['tmo', 'TrackMania Original']];
+const keys = ['sent', 'sending', 'failed', 'exists', 'badAddress', 'private', 'limit', 'invalid', 'signedIn', 'check', 'checking', 'checkOk', 'checkPassword', 'noAnswer', 'badPort', 'busy', 'listed', 'listedSuggested', 'pendingNoAnswer', 'pendingPassword', 'tokenShown', 'claimCode', 'claimNotFound', 'claimExpired', 'needLogin', 'send', 'sendNow', 'contactNote', 'contactNoteUser'];
+const msg = Object.fromEntries(keys.map((k) => [k, t(lang, 'addserver.' + k)]));
+---
+<Layout title={t(lang, 'addserver.title')} desc={t(lang, 'addserver.desc')} lang={lang}>
+  <div class="phead">
+    <div><h1>{t(lang, 'addserver.title')}</h1><p class="lead">{t(lang, 'addserver.lead')}</p></div>
+  </div>
+  <div class="two">
+    <form class="card as-form" id="as-form" data-hub={hub} novalidate>
+      <div class="as-login" id="as-login" hidden>
+        <strong>{t(lang, 'addserver.loginTitle')}</strong>
+        <span class="muted">{t(lang, 'addserver.loginHint')}</span>
+        <span class="row">
+          <a class="btn" id="as-discord" href="#">{t(lang, 'addserver.loginDiscord')}</a>
+          <a class="btn" id="as-github" href="#">{t(lang, 'addserver.loginGithub')}</a>
+        </span>
+      </div>
+      <p class="muted" id="as-user" hidden></p>
+      <label>{t(lang, 'addserver.game')}
+        <select name="game" required>{games.map(([id, name]) => <option value={id}>{name}</option>)}</select>
+      </label>
+      <label>{t(lang, 'addserver.address')}
+        <input name="address" required maxlength="260" placeholder="1.2.3.4:2350" autocomplete="off" spellcheck="false" />
+        <small class="muted">{t(lang, 'addserver.addressNote')}</small>
+      </label>
+      <div class="row" id="as-checkrow" hidden>
+        <button class="btn" type="button" id="as-check">{t(lang, 'addserver.check')}</button>
+        <span id="as-answer" class="muted" role="status" aria-live="polite"></span>
+      </div>
+      <label>{t(lang, 'addserver.name')}
+        <input name="name" id="as-name" required minlength="3" maxlength="80" />
+        <small class="muted" id="as-nameNote" hidden>{t(lang, 'addserver.nameAuto')}</small>
+      </label>
+      <label class="as-check" id="as-ownerrow" hidden>
+        <input type="checkbox" name="owner" id="as-owner" />
+        <span>{t(lang, 'addserver.owner')}<small class="muted"> {t(lang, 'addserver.ownerNote')}</small></span>
+      </label>
+      <label>{t(lang, 'addserver.contact')}
+        <input name="contact" id="as-contact" required maxlength="200" autocomplete="off" />
+        <small class="muted" id="as-contactNote">{t(lang, 'addserver.contactNote')}</small>
+      </label>
+      <label>{t(lang, 'addserver.homepage')}
+        <input name="homepage" type="url" maxlength="300" placeholder="https://" />
+      </label>
+      <input name="website" class="as-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="row">
+        <button class="btn primary" type="submit" id="as-send" disabled={!hubOn}><Icon name="server" /><span id="as-sendlabel">{t(lang, 'addserver.send')}</span></button>
+        <span id="as-status" class="muted" role="status" aria-live="polite">{hubOn ? '' : t(lang, 'addserver.hubOff')}</span>
+      </div>
+      <div class="row" id="as-tokenrow" hidden>
+        <button class="btn" type="button" id="as-token">{t(lang, 'addserver.token')}</button>
+        <code id="as-tokenout"></code>
+      </div>
+    </form>
+    <aside class="card" style="padding:20px">
+      <h3 style="margin-bottom:12px">{t(lang, 'addserver.howTitle')}</h3>
+      <ol class="muted" style="padding-left:18px;display:grid;gap:8px;font-size:15px">
+        <li>{t(lang, 'addserver.how1')}</li>
+        <li>{t(lang, 'addserver.how2')}</li>
+        <li>{t(lang, 'addserver.how3')}</li>
+      </ol>
+      <p class="muted" style="font-size:14px;margin-top:12px">{t(lang, 'addserver.privacy')}</p>
+    </aside>
+  </div>
+  <style>
+    .as-form { display: grid; gap: 14px; padding: 20px; align-content: start; }
+    .as-form label { display: grid; gap: 6px; font-weight: 600; font-size: 15px; }
+    .as-form input:not([type=checkbox]), .as-form select { height: 42px; padding: 0 12px; border-radius: 12px; border: 0; background: var(--surface-2); color: var(--text); font: 500 15px var(--body); box-shadow: inset 0 0 0 1px var(--line); }
+    .as-form small { font-weight: 400; font-size: 13px; }
+    .as-form .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .as-form label.as-check { display: flex; gap: 10px; align-items: flex-start; }
+    .as-form .as-check input { margin-top: 3px; }
+    .as-login { display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+    .as-form [hidden] { display: none; }
+    .as-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  </style>
+  <script is:inline define:vars={{ msg }}>
+    (function () {
+      var f = document.getElementById('as-form');
+      var hub = f.dataset.hub;
+      var st = document.getElementById('as-status');
+      var btn = document.getElementById('as-send');
+      var $ = function (id) { return document.getElementById(id); };
+      var me = null; // { user, csrf } when logged in
+      var lastId = null;
+      var show = function (id, on) { $(id).hidden = !on; };
+      var fill = function (s, v) { return s.replace(/\{(\w+)\}/g, function (_, k) { return v[k] == null ? '' : v[k]; }); };
+
+      function call(path, body) {
+        var h = { 'content-type': 'application/json' };
+        if (me && me.csrf) h['x-csrf-token'] = me.csrf;
+        return fetch(hub + path, { method: 'POST', headers: h, credentials: me && me.user ? 'include' : 'omit', body: JSON.stringify(body || {}) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); });
+      }
+      function errorText(r) {
+        var c = r.body && r.body.error;
+        return r.status === 429 ? msg.limit : c === 'exists' ? msg.exists : c === 'private_address' ? msg.private : c === 'bad_address' ? msg.badAddress : c === 'bad_port' ? msg.badPort
+          : c === 'no_answer' ? msg.noAnswer : c === 'busy' ? msg.busy : r.status === 400 ? msg.invalid : msg.failed;
+      }
+      function syncContact() {
+        var on = !!(me && me.user);
+        $('as-contact').required = !on || $('as-owner').checked;
+        $('as-contactNote').textContent = on ? msg.contactNoteUser : msg.contactNote;
+      }
+      function ui() {
+        var on = !!(me && me.user);
+        show('as-login', !on && !!hub);
+        show('as-user', on);
+        show('as-checkrow', on);
+        show('as-ownerrow', on);
+        show('as-nameNote', on);
+        $('as-name').required = !on;
+        $('as-sendlabel').textContent = on ? msg.sendNow : msg.send;
+        syncContact();
+        if (on) $('as-user').textContent = fill(msg.signedIn, { name: me.user.name || me.user.username || '' });
+      }
+      $('as-owner').addEventListener('change', syncContact);
+
+      if (hub) {
+        var next = encodeURIComponent('web:' + location.pathname);
+        $('as-discord').href = hub + 'auth/discord/start?next=' + next;
+        $('as-github').href = hub + 'auth/github/start?next=' + next;
+        fetch(hub + 'v1/me', { credentials: 'include' }).then(function (r) { return r.json(); }).then(function (j) { me = j; ui(); }).catch(function () { ui(); });
+      }
+
+      $('as-check').addEventListener('click', function () {
+        var d = { game: f.game.value, address: f.address.value.trim() };
+        if (!d.address) return;
+        var out = $('as-answer');
+        out.textContent = msg.checking;
+        $('as-check').disabled = true;
+        call('v1/servers/check', d).then(function (r) {
+          $('as-check').disabled = false;
+          if (!r.ok) { out.textContent = r.status === 401 ? msg.needLogin : errorText(r); return; }
+          var i = r.body.info;
+          out.textContent = fill(msg.checkOk, { name: i.name, players: i.players, max: i.maxPlayers, map: i.map || '-', mode: i.mode || '-' }) + (i.password ? ' ' + msg.checkPassword : '');
+        }).catch(function () { $('as-check').disabled = false; out.textContent = msg.failed; });
+      });
+
+      $('as-token').addEventListener('click', function () {
+        if (!lastId) return;
+        call('v1/servers/' + lastId + '/claim').then(function (r) {
+          var c = r.body && r.body.error;
+          $('as-tokenout').textContent = r.ok ? fill(msg.tokenShown, { token: r.body.token }) : c === 'code_not_found' ? msg.claimNotFound : c === 'code_expired' || c === 'no_code' ? msg.claimExpired : errorText(r);
+        });
+      });
+
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!hub) return;
+        var d = {};
+        new FormData(f).forEach(function (v, k) { d[k] = String(v).trim(); });
+        if (!d.homepage) delete d.homepage;
+        if (d.website) return; // honeypot
+        delete d.website;
+        var logged = !!(me && me.user);
+        d.owner = logged && $('as-owner').checked;
+        if (!d.contact) delete d.contact;
+        if (!d.name) delete d.name;
+        if (!logged && (!d.name || d.name.length < 3 || !d.contact)) { st.textContent = msg.invalid; return; }
+        if (d.owner && !d.contact) { st.textContent = msg.invalid; return; }
+        btn.disabled = true;
+        st.textContent = msg.sending;
+        call('v1/servers', d)
+          .then(function (r) {
+            if (!r.ok) { st.textContent = errorText(r); btn.disabled = false; return; }
+            var b = r.body;
+            lastId = b.id;
+            if (b.status === 'verified') {
+              st.textContent = msg.listed + ' ' + msg.listedSuggested;
+            } else if (logged) {
+              st.textContent = b.reason === 'password' ? msg.pendingPassword : msg.pendingNoAnswer;
+            } else {
+              st.textContent = msg.sent;
+            }
+            if (logged && d.owner) {
+              call('v1/servers/' + b.id + '/claim-code').then(function (c) {
+                if (c.ok) { $('as-tokenout').textContent = fill(msg.claimCode, { code: c.body.code }); show('as-tokenrow', true); }
+              });
+            }
+            f.reset();
+            ui();
+            btn.disabled = !logged;
+          })
+          .catch(function () { st.textContent = msg.failed; btn.disabled = false; });
+      });
+    })();
+  </script>
+</Layout>

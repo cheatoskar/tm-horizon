@@ -1,0 +1,22 @@
+{
+  "skid.title": "Ślady hamowania",
+  "skid.text": "Czyste ślady hamowania: ślady z trawy na drodze. Tylko wygląd, działa online.",
+  "skid.classic": "Klasyczne",
+  "skid.clean": "Czyste",
+  "skid.custom": "Zmienione przez coś innego.",
+  "skid.missing": "Nie znaleziono tekstury w tym folderze gry.",
+  "skid.restore": "Przywróć",
+  "skid.noSource": "Własna tekstura śladów gry nie istnieje lub jest zmieniona.",
+  "hist.k.skid-clean": "Ślady hamowania ustawione na czyste",
+  "hist.k.skid-classic": "Ślady hamowania ustawione na klasyczne",
+  "skid.tmlText": "Czyste jako produkt TMLoader: bez admina, folder gry zostaje bez zmian.",
+  "skid.tmlOn": "Czyste przez TMLoader, profil {profile}.",
+  "skid.tmlTest": "Jeszcze nie sprawdzone: uruchom grę i zobacz ślady na drodze Stadium.",
+  "skid.tmlTip": "Instaluje produkt TMLoader Skid Marks i włącza go w tym profilu.",
+  "skid.direct": "Pliki gry",
+  "skid.directTip": "Zamiast tego zmień teksturę w folderze gry (wymaga admina).",
+  "skid.admin": "Gra jest w Program Files: potrzebne uruchomienie TM Horizon jako administrator.",
+  "skid.useTml": "Użyj TMLoader",
+  "hist.k.skid-tml": "Ślady ustawione na czyste (TMLoader)",
+  "hist.k.skid-tml-remove": "Usunięto produkt TMLoader śladów"
+}

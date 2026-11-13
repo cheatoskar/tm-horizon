@@ -1,0 +1,15 @@
+{
+  "updb.title": "Mise à jour disponible",
+  "updb.version": "Version {v}",
+  "updb.install": "Installer",
+  "updb.later": "Plus tard",
+  "updb.more": "Plus",
+  "updb.less": "Moins",
+  "updb.downloading": "Téléchargement {pct}",
+  "updb.restart": "Redémarrer",
+  "updb.winNote": "L'installateur ferme l'application et lance la nouvelle version.",
+  "updb.testDone": "Vérifié, mode test, rien d'installé.",
+  "updb.errSig": "Le téléchargement ne correspond pas à sa signature. Rien n'a été installé.",
+  "updb.errNet": "Pas de connexion au serveur de mises à jour.",
+  "updb.errOther": "Échec de la mise à jour : {msg}"
+}

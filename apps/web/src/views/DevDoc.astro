@@ -1,0 +1,180 @@
+---
+// One page of the developer docs (English text, page chrome in the visitor's language): left navigation with a filter,
+// the Markdown body, "On this page" on the right, source line and "Edit on GitHub".
+import { render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { devDocs, devHeadings, devGroups } from '../data/dev';
+import { t, lh, type Lang } from '../i18n';
+const { lang = 'en', id } = Astro.props as { lang?: Lang; id: string };
+const L = (p: string) => lh(lang, p);
+const docs = await devDocs();
+const heads = await devHeadings();
+const i = docs.findIndex((d) => d.id === id);
+const entry = docs[i];
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const prev = docs[i - 1], next = docs[i + 1];
+const d = entry.data;
+---
+<Layout title={d.title} desc={d.note ?? t(lang, 'dev.meta')} lang={lang}>
+  <div class="doc-shell" data-lang={lang} data-copy-label={t(lang, 'btn.copy')}>
+    <aside class="doc-nav" aria-label={t(lang, 'dev.navLabel')}>
+      <details class="doc-nav-d" open>
+        <summary class="doc-nav-sum"><Icon name="book-open" size={16} /> {t(lang, 'dev.navLabel')} <Icon name="chevron-down" size={16} class="chev" /></summary>
+        <input class="doc-filter" type="search" placeholder={t(lang, 'dev.nav.filter')} aria-label={t(lang, 'dev.nav.filter')} data-doc-filter />
+        <nav>
+          <a class="doc-link" href={L('/dev/')}>{t(lang, 'dev.nav.overview')}</a>
+          {devGroups.map((g) => (
+            <div class="doc-grp" data-grp>
+              <h4>{t(lang, `dev.g.${g}`)}</h4>
+              {docs.filter((x) => x.data.group === g).map((x) => (
+                <a class={`doc-link ${x.id === id ? 'on' : ''}`} href={L(`/dev/docs/${x.id}/`)} aria-current={x.id === id ? 'page' : undefined} data-s={[x.data.title, ...(heads.get(x.id) ?? [])].join(' ').toLowerCase()}>{x.data.title}</a>
+              ))}
+            </div>
+          ))}
+        </nav>
+      </details>
+    </aside>
+
+    <article class="doc-main">
+      <header class="doc-head">
+        <p class="doc-crumb"><a href={L('/dev/')}>{t(lang, 'nav.dev')}</a> / {t(lang, `dev.g.${d.group}`)}</p>
+        <h1>{d.title}</h1>
+        {d.note && <p class="doc-note"><Icon name="flask-conical" size={16} /> <span>{d.note}</span></p>}
+        <p class="doc-meta">
+          {d.synced && <span>{t(lang, 'dev.source')}: <code>{d.sourceRepo}</code> @ <code>{d.sourceBranch}</code> (<code>{d.sourceCommit}</code>), <code>{d.sourcePath}</code>. {t(lang, 'dev.snapshot')}</span>}
+          {d.editUrl && <a class="btn sm ghost" href={d.editUrl} target="_blank" rel="noopener" title={t(lang, 'dev.editNote')}><Icon name="pencil" size={14} /> {t(lang, 'dev.edit')}</a>}
+        </p>
+      </header>
+      <div class="doc-body prose" data-doc-body><Content /></div>
+      <nav class="doc-pn" aria-label="Previous and next">
+        {prev ? <a href={L(`/dev/docs/${prev.id}/`)}><small>{t(lang, 'dev.prev')}</small><span>{prev.data.title}</span></a> : <span />}
+        {next ? <a class="r" href={L(`/dev/docs/${next.id}/`)}><small>{t(lang, 'dev.next')}</small><span>{next.data.title}</span></a> : <span />}
+      </nav>
+    </article>
+
+    {toc.length > 1 && (
+      <aside class="doc-toc" aria-label={t(lang, 'dev.toc')}>
+        <h4>{t(lang, 'dev.toc')}</h4>
+        {toc.map((h) => <a class={`d${h.depth}`} href={`#${h.slug}`}>{h.text}</a>)}
+      </aside>
+    )}
+  </div>
+</Layout>
+
+<script>
+  const shell = document.querySelector<HTMLElement>('.doc-shell');
+  const body = document.querySelector<HTMLElement>('[data-doc-body]');
+  if (shell && body) {
+    const lang = shell.dataset.lang || 'en';
+    // links between docs: /dev/... -> /<lang>/dev/...
+    if (lang !== 'en') body.querySelectorAll<HTMLAnchorElement>('a[href^="/dev/"]').forEach((a) => a.setAttribute('href', `/${lang}${a.getAttribute('href')}`));
+    // external links open in a new tab
+    body.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => { a.target = '_blank'; a.rel = 'noopener'; });
+    // copy button on every code block (the click is handled by the site-wide [data-copy] handler)
+    body.querySelectorAll<HTMLPreElement>('pre').forEach((pre) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'doc-code';
+      pre.parentNode!.insertBefore(wrap, pre);
+      wrap.appendChild(pre);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn sm doc-copy';
+      b.dataset.copy = pre.innerText.replace(/\n$/, '');
+      b.innerHTML = '<span data-copy-l></span>';
+      b.querySelector('[data-copy-l]')!.textContent = shell.dataset.copyLabel || 'Copy';
+      wrap.appendChild(b);
+    });
+    // anchors on headings
+    body.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]').forEach((h) => {
+      const a = document.createElement('a');
+      a.href = `#${h.id}`; a.className = 'doc-anchor'; a.textContent = '#'; a.setAttribute('aria-label', 'Link to this section');
+      h.appendChild(a);
+    });
+    // filter the navigation by title and headings
+    const input = document.querySelector<HTMLInputElement>('[data-doc-filter]');
+    input?.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      document.querySelectorAll<HTMLElement>('[data-grp]').forEach((g) => {
+        let any = false;
+        g.querySelectorAll<HTMLElement>('a[data-s]').forEach((a) => { const ok = !q || (a.dataset.s ?? '').includes(q); a.hidden = !ok; if (ok) any = true; });
+        g.hidden = !any;
+      });
+    });
+    // on phones the navigation starts closed
+    if (window.matchMedia('(max-width: 900px)').matches) document.querySelector<HTMLDetailsElement>('.doc-nav-d')?.removeAttribute('open');
+  }
+</script>
+
+<style is:global>
+  .doc-shell { display: grid; grid-template-columns: 250px minmax(0, 1fr) 210px; gap: 32px; align-items: start; padding-top: 20px; }
+  .doc-shell:not(:has(.doc-toc)) { grid-template-columns: 250px minmax(0, 1fr); }
+  .doc-nav, .doc-toc { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow: auto; font-size: 14.5px; }
+  .doc-nav-sum { list-style: none; display: none; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow), 0 0 0 1px var(--line-soft); font-weight: 650; cursor: pointer; }
+  .doc-nav-sum::-webkit-details-marker { display: none; }
+  .doc-nav-sum .chev { margin-left: auto; }
+  .doc-filter { width: 100%; height: 38px; padding: 0 12px; margin-bottom: 12px; border: 0; border-radius: 12px; background: var(--surface-2); color: var(--text); font: 500 14.5px var(--body); box-shadow: inset 0 0 0 1px var(--line); }
+  .doc-nav nav { display: grid; gap: 2px; }
+  .doc-grp { display: grid; gap: 2px; margin-top: 14px; }
+  .doc-grp h4, .doc-toc h4 { font: 700 11.5px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0 10px 6px; }
+  .doc-link { display: block; padding: 6px 10px; border-radius: 9px; color: var(--text-2); text-decoration: none; line-height: 1.35; }
+  .doc-link:hover { background: var(--surface-2); color: var(--text); }
+  .doc-link.on { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+  .doc-toc { display: grid; gap: 1px; align-content: start; }
+  .doc-toc a { color: var(--muted); text-decoration: none; padding: 4px 10px; border-left: 2px solid var(--line-soft); line-height: 1.35; font-size: 13.5px; }
+  .doc-toc a.d3 { padding-left: 22px; }
+  .doc-toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+  .doc-main { min-width: 0; padding-bottom: 40px; }
+  .doc-crumb { color: var(--muted); font-size: 13.5px; margin-bottom: 8px; }
+  .doc-crumb a { color: var(--text-2); }
+  .doc-head h1 { font: 800 italic 40px/1.05 var(--display); text-transform: uppercase; }
+  .doc-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 10px 14px; border-radius: 12px; background: var(--surface); box-shadow: 0 0 0 1px var(--line-soft); border-left: 3px solid var(--warn); color: var(--text-2); font-size: 15px; }
+  .doc-note .i { color: var(--warn); margin-top: 3px; }
+  .doc-meta { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-top: 12px; color: var(--muted); font-size: 13px; }
+  .doc-meta code { font-size: 12px; }
+  .doc-meta .btn { margin-left: auto; }
+  .doc-body { margin-top: 22px; max-width: 880px; overflow-wrap: break-word; }
+  .doc-body h2 { font: 700 25px/1.25 var(--body); margin: 34px 0 10px; padding-top: 6px; border-top: 1px solid var(--line-soft); }
+  .doc-body h3 { font: 700 19px/1.3 var(--body); margin: 26px 0 8px; }
+  .doc-body h4 { font: 700 16px/1.3 var(--body); color: var(--text); margin: 20px 0 6px; }
+  .doc-body h2:first-child { border-top: 0; margin-top: 0; }
+  .doc-body :is(h2, h3, h4) { scroll-margin-top: 90px; position: relative; }
+  .doc-anchor { margin-left: 8px; color: var(--muted); text-decoration: none; opacity: 0; font-weight: 400; }
+  .doc-body :is(h2, h3, h4):hover .doc-anchor, .doc-anchor:focus { opacity: 1; }
+  .doc-body p { margin: 0 0 12px; }
+  .doc-body ul, .doc-body ol { margin: 6px 0 14px; padding-left: 22px; display: grid; gap: 6px; }
+  .doc-body li > ul, .doc-body li > ol { margin: 6px 0 2px; }
+  .doc-body ol li::marker { color: var(--accent); font-weight: 700; }
+  .doc-body a { text-underline-offset: 3px; }
+  .doc-body blockquote { margin: 12px 0; padding: 8px 14px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 10px 10px 0; }
+  .doc-body blockquote p:last-child { margin-bottom: 0; }
+  .doc-body hr { border: 0; border-top: 1px solid var(--line-soft); margin: 24px 0; }
+  .doc-body img { max-width: 100%; height: auto; border-radius: 8px; }
+  .doc-body table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 14.5px; margin: 12px 0 18px; max-width: 100%; }
+  .doc-body th, .doc-body td { padding: 8px 12px; border: 1px solid var(--line-soft); text-align: left; vertical-align: top; min-width: 90px; }
+  .doc-body th { background: var(--surface-2); color: var(--text); white-space: nowrap; }
+  .doc-body code { overflow-wrap: anywhere; }
+  .doc-body td code { white-space: nowrap; }
+  .doc-code { position: relative; margin: 12px 0 18px; }
+  .doc-body pre { margin: 0; padding: 14px 16px; padding-right: 92px; border-radius: 12px; background: var(--surface-2) !important; box-shadow: inset 0 0 0 1px var(--line-soft); overflow-x: auto; font: 13.5px/1.55 ui-monospace, Consolas, monospace; tab-size: 4; }
+  .doc-body pre code { background: none; padding: 0; font: inherit; overflow-wrap: normal; }
+  .doc-copy { position: absolute; top: 8px; right: 8px; }
+  .doc-body .astro-code, .doc-body .astro-code span { color: var(--shiki-light); }
+  :root[data-theme='dark'] .doc-body .astro-code span { color: var(--shiki-dark); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .doc-body .astro-code span { color: var(--shiki-dark); } }
+  .doc-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 40px; max-width: 880px; }
+  .doc-pn a { display: grid; gap: 2px; padding: 12px 16px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow), 0 0 0 1px var(--line-soft); text-decoration: none; }
+  .doc-pn a.r { text-align: right; }
+  .doc-pn small { color: var(--muted); font-size: 12.5px; }
+  .doc-pn span { color: var(--text); font-weight: 650; }
+  .doc-pn a:hover span { color: var(--accent); }
+  @media (max-width: 1180px) { .doc-shell, .doc-shell:not(:has(.doc-toc)) { grid-template-columns: 230px minmax(0, 1fr); } .doc-toc { display: none; } }
+  @media (max-width: 900px) {
+    .doc-shell, .doc-shell:not(:has(.doc-toc)) { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .doc-nav { position: static; max-height: none; overflow: visible; }
+    .doc-nav-sum { display: flex; margin-bottom: 10px; }
+    .doc-head h1 { font-size: 32px; }
+    .doc-meta .btn { margin-left: 0; }
+  }
+</style>

@@ -1,0 +1,79 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "pink"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "Always Official",
+      "tagline": "Keeps restarting Official mode in TrackMania United Forever after you entered it once.",
+      "badges": [
+        "TMUF",
+        "ModLoader mod",
+        "By BigBang1112"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "refresh-cw",
+          "title": "Restart stays official",
+          "text": "Retiring or pressing Improve starts official mode again without the confirmation."
+        },
+        {
+          "icon": "keyboard",
+          "title": "Inputs carry over",
+          "text": "Input presses are carried over, so you do not have to press them again."
+        },
+        {
+          "icon": "flag",
+          "title": "Offline by default",
+          "text": "A race is still offline until you use Restart in Official Mode."
+        },
+        {
+          "icon": "package",
+          "title": "Small",
+          "text": "The first C# mod for the TMF ModLoader, built with NativeAOT at a little over 800 kB."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Good to know",
+      "markdown": "Coppers are consumed at the end of the countdown, so this is not a free official mode.\n\nThe recommended install is through ModLoader: add the mod server URL from the README under `servers:` in `%LOCALAPPDATA%\\TMLoader\\config.yaml`. A standalone build with a d3d9.dll proxy also exists, but it can collide with other mods."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Always Official is made by BigBang1112."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/BigBang1112/always-official"
+        },
+        {
+          "kind": "link",
+          "label": "Releases",
+          "url": "https://github.com/BigBang1112/always-official/releases",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "stats.campaign": "Kampania",
+  "stats.campaignTip": "Mapa z samej gry (autor Nadeo).",
+  "stats.beforeHorizon": "{time} przed TM Horizon",
+  "stats.beforeTip": "Czas gry policzony przez grę w Twoich profilach ({list}), bez czasu policzonego przez TM Horizon.",
+  "host.presetName.100tmx": "Nieukończone mapy TMX",
+  "host.presetName.short_lol": "Wszystkie mapy TMX: Short & LOL",
+  "host.presetName.lunatic": "Wszystkie mapy TMX: Lunatic",
+  "host.presetName.rpg": "Wszystkie mapy TMX: RPG",
+  "host.presetName.fullspeed": "Wszystkie mapy TMX: Fullspeed",
+  "host.presetName.tech": "Wszystkie mapy TMX: Tech",
+  "host.presetName.multilap": "Wszystkie mapy TMX: Multilap"
+}

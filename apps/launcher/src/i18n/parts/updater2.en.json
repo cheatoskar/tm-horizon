@@ -1,0 +1,20 @@
+{
+  "updp.tip": "A new TM Horizon is ready",
+  "updp.label": "Update {v}",
+  "updp.title": "TM Horizon {v}",
+  "updp.restartNow": "Restart now",
+  "updp.noNotes": "No release notes.",
+  "updp.readyAuto": "Downloaded. Installs when you close TM Horizon or at the next start.",
+  "updp.ready": "Downloaded and ready to install.",
+  "updp.downloadingAuto": "Downloads in the background, then installs when you close TM Horizon.",
+  "updp.manual": "Install downloads it and restarts TM Horizon.",
+  "updp.readyShort": "Version {v} is downloaded",
+  "updw.title": "What's new in {v}",
+  "updw.news": "News",
+  "updw.noNotes": "TM Horizon was updated. The release notes are on the News page and on GitHub.",
+  "upd.auto": "Install updates automatically",
+  "upd.autoNote": "Downloads in the background, installs at the next start or when you close TM Horizon. Never while a game runs.",
+  "news.horizon": "TM Horizon",
+  "updp.startTitle": "Updating TM Horizon to {v}…",
+  "updp.startText": "The installer takes over in a moment and opens TM Horizon again."
+}

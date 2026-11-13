@@ -1,0 +1,36 @@
+/* Classic and console games (ui/Classics.tsx): emulator steps, Steam fix, recommendations, United hint. */
+.cs-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: cs; }
+.cs-steps > li { position: relative; padding: 12px 14px 12px 44px; border-radius: 11px; background: rgba(var(--tint), 0.035); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cs-steps > li::before { counter-increment: cs; content: counter(cs); position: absolute; left: 12px; top: 12px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: rgba(var(--tint), 0.08); color: var(--fg-2); }
+.cs-steps > li.done::before { content: '✓'; background: var(--acc); color: #fff; }
+.cs-head { display: flex; align-items: center; gap: 8px; }
+.cs-head svg { color: var(--acc-2); }
+.cs-sub { margin: 0; padding-left: 18px; color: var(--fg-2); display: flex; flex-direction: column; gap: 3px; }
+.cs-path { display: block; max-width: 100%; font-size: 11.5px; }
+.cs-legal { display: flex; align-items: center; gap: 6px; }
+.cs-options { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.cs-options .setrow { display: flex; align-items: center; gap: 12px; }
+.cs-options .btn { align-self: flex-start; }
+.cs-online { margin-top: 12px; }
+.ok-ic { color: var(--ok, #4ade80); vertical-align: -2px; }
+.bad-text { color: var(--bad, #f87171); display: flex; gap: 6px; align-items: center; }
+.ok-text { color: var(--ok, #4ade80); }
+.warn-text { color: var(--warn, #fbbf24); }
+.tiny { font-size: 11.5px; }
+
+.sf-step { align-items: center; }
+.sf-num { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: rgba(var(--tint), 0.08); color: var(--fg-2); }
+.sf-num.ok { background: var(--acc); color: #fff; }
+.steamfix .section-head h2 { display: flex; align-items: center; gap: 8px; }
+
+.suggest-card { border-color: color-mix(in srgb, var(--acc) 40%, var(--line)); }
+.sg-row { margin: 8px 0; }
+.sg-pill { margin-left: 8px; background: color-mix(in srgb, var(--acc) 22%, transparent); }
+.hl-flow { margin: 0 0 10px 18px; display: flex; flex-direction: column; gap: 0; }
+.hl-flow .linkish { align-self: flex-start; }
+
+.united-hint { display: flex; gap: 14px; align-items: flex-start; }
+.united-hint.compact { margin-top: 14px; padding: 12px 14px; border-radius: 11px; background: rgba(var(--tint), 0.035); border: 1px solid var(--line); }
+.united-hint p { margin: 4px 0 8px; color: var(--fg-2); }
+.united-cover { width: 64px; height: 86px; flex: none; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); }
+.united-cover.ph { display: grid; place-items: center; background: linear-gradient(135deg, #3b2a12, #0f1a2c); color: #fff; font-weight: 700; font-size: 13px; }

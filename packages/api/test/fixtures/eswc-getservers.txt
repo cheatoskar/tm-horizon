@@ -1,0 +1,4 @@
+0;3
+master1.trackmanianations.com;online_game;443;Beginner Europe;0;41;12;0;;80
+master2.trackmanianations.com;online_game;443;Normal Europe;1;17;5;2;;80
+203.0.113.30;online_game;443;Expert;2;3;1;0;;80

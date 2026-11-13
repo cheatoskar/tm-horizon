@@ -1,0 +1,116 @@
+/* Settings page: grouped sections, presets, Midnight theme, teal accent, compact density. */
+
+/* ---------- Midnight: dark with real black backgrounds (OLED) ---------- */
+:root[data-theme="midnight"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-2: #05060a;
+  --c-0-0-0: 0, 0, 0;
+  --c-10-12-17: 3, 4, 6;
+  --c-12-14-20: 4, 5, 8;
+  --c-12-15-21: 4, 5, 8;
+  --c-14-17-24: 6, 7, 10;
+  --c-16-19-27: 8, 9, 13;
+  --c-20-24-33: 10, 12, 17;
+  --c-20-24-34: 10, 12, 17;
+  --c-22-26-36: 12, 14, 20;
+  --c-28-33-45: 16, 19, 27;
+  --c-30-35-48: 18, 21, 30;
+  --c-4-6-10: 0, 0, 0;
+  --c-8-10-14: 1, 2, 4;
+  --h-0b0d12: #000000;
+  --h-0d1016: #020305;
+  --h-111111: #030303;
+  --h-14161b: #06070a;
+  --h-141820: #07080c;
+  --h-171b26: #0a0c11;
+  --h-1a1f2b: #0c0e14;
+  --h-1b1d22: #0b0c0f;
+  --h-1b2030: #0d1017;
+  --h-1f2533: #10131b;
+  --h-2a3142: #171b26;
+  --h-2b3140: #181c27;
+  --h-2c3446: #1a1f2c;
+  --h-555555: #333333;
+}
+:root[data-theme="midnight"] body { background: #000; }
+
+/* ---------- Teal accent (used by the TM2 preset) ---------- */
+:root[data-accent="teal"] { --acc: var(--tm-acc-teal); --acc-2: var(--tm-acc-teal-light); --acc-rgb: var(--tm-acc-teal-rgb); --acc-ink: var(--tm-acc-teal-ink); --acc-soft: rgba(var(--tm-acc-teal-rgb), 0.15); --play-a: var(--tm-acc-teal-light); --play-b: var(--tm-acc-teal-deep); --acc-deep: var(--tm-acc-teal-deep); --acc-text: var(--tm-acc-teal-text); }
+.sw-teal { background: var(--tm-acc-teal); }
+
+/* ---------- Compact density ---------- */
+:root[data-density="compact"] .panel { padding: 12px 14px; }
+:root[data-density="compact"] .setrow { padding: 6px 0; gap: 10px; }
+:root[data-density="compact"] .setlist li { padding: 5px 2px; }
+:root[data-density="compact"] .settings-grid { gap: 12px; }
+:root[data-density="compact"] .btn { height: 32px; padding: 0 12px; }
+:root[data-density="compact"] .btn.sm { height: 28px; }
+:root[data-density="compact"] .seg button { height: 28px; }
+:root[data-density="compact"] .page { padding-top: 14px; padding-bottom: 14px; }
+:root[data-density="compact"] .settings-block { margin-bottom: 14px; }
+
+/* ---------- Settings sections ---------- */
+.settings-wrap { display: flex; flex-direction: column; gap: 22px; }
+.settings-block { display: flex; flex-direction: column; gap: 10px; }
+.settings-block > h2 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+.settings-block .panel .setrow:first-child { border-top: 0; padding-top: 0; }
+.settings-block .setrow .grow > b { display: block; }
+.settings-block .setrow .grow > .setnote { margin-top: 2px; }
+.settings-block .setrow .grow > .setnote + .row-btns { margin-top: 8px; }
+
+.presets { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.preset { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 10px; border-radius: 10px; border: 1px solid var(--line-2); background: rgba(var(--tint), 0.04); color: var(--fg-2); font-weight: 650; cursor: pointer; }
+.preset:hover { background: rgba(var(--tint), 0.08); }
+.preset.on { border-color: var(--fg); color: var(--fg); background: rgba(var(--tint), 0.1); }
+.preset .dot { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(var(--tint), 0.25); }
+.preset .dot.dark { background: #10131a; }
+.preset .dot.midnight { background: #000; }
+.preset .dot.light { background: #eef0f4; }
+.preset .dot.stadium { background: var(--tm-acc-orange); }
+.preset .dot.eswc { background: var(--tm-acc-blue); }
+.preset .dot.tm2 { background: var(--tm-acc-teal); }
+
+.setrow .tip-block { margin-top: 2px; }
+.start-options { margin-top: var(--s3); }
+.is-disabled { opacity: 0.45; pointer-events: none; }
+/* Switch that counts only together with another one: dimmed, still switchable. */
+.is-off { opacity: 0.6; }
+
+/* ---------- Linux game setup ---------- */
+.lsetup-card { display: flex; flex-direction: column; gap: 8px; }
+.lsetup-card p { margin: 0; }
+.lsetup-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.lsetup-block p { margin: 0; }
+.lsetup-opt { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+.lsetup-opt.off { opacity: 0.5; cursor: default; }
+.lsetup-opt input { margin-top: 3px; }
+.lsetup-note { display: block; }
+.lsetup-vd { width: 140px; margin-left: 24px; }
+.lsetup-ver { padding-top: 0; border-top: 0; }
+.lsetup-found { margin: 0; padding-left: 18px; }
+.lsetup-radios { display: flex; gap: 18px; flex-wrap: wrap; }
+.lsetup-cmd { margin: 6px 0; }
+.lsetup-code { padding: 6px 8px; border-radius: 6px; background: rgba(var(--tint), 0.06); overflow-x: auto; white-space: nowrap; }
+.lsetup-other { margin-top: 6px; }
+.lsetup-steps { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lsetup-step { display: flex; gap: 10px; align-items: flex-start; }
+.lsetup-step.pending { color: var(--dim); }
+.lsetup-step.fail { color: var(--warn, #e5484d); }
+.lsetup-step > svg, .lsetup-dot { flex: none; margin-top: 3px; }
+.lsetup-dot { width: 6px; height: 6px; margin-left: 4px; margin-right: 5px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+.lsetup-bar-wrap { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.lsetup-bar { flex: 1; height: 6px; border-radius: 3px; background: rgba(var(--tint), 0.1); overflow: hidden; }
+.lsetup-bar > div { height: 100%; background: var(--fg); }
+.lsetup-bar > div.indet { animation: lsetup-slide 1.2s ease-in-out infinite alternate; }
+@keyframes lsetup-slide { from { margin-left: 0; } to { margin-left: 70%; } }
+.lsetup-log { max-height: 240px; overflow: auto; margin: 0; padding: 8px 10px; border-radius: 8px; background: rgba(var(--tint), 0.06); font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+
+/* ---------- TMX replay upload ---------- */
+.tmxup-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+.tmxup-table th { text-align: left; font-weight: 600; color: var(--dim); padding: 4px 8px 4px 0; }
+.tmxup-table td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tmxup-table th:nth-child(2), .tmxup-table td:nth-child(2) { width: 84px; }
+.tmxup-table th:nth-child(3), .tmxup-table td:nth-child(3) { width: 120px; }
+.tmxup-table th:nth-child(4), .tmxup-table td:nth-child(4) { width: 84px; }
+.tmxup-table th:nth-child(5), .tmxup-table td:nth-child(5) { width: 64px; }

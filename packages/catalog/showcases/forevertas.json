@@ -1,0 +1,83 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "blue"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "ForeverTAS",
+      "tagline": "Community TAS client for TrackMania Nations and United Forever that runs the game physics outside the game.",
+      "badges": [
+        "TMNF, TMUF",
+        "TAS tool",
+        "Alpha"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "cpu",
+          "title": "Own physics",
+          "text": "Runs the deterministic physics of ForeverValidator outside the game."
+        },
+        {
+          "icon": "rocket",
+          "title": "GPU search",
+          "text": "Bruteforce input search on NVIDIA or AMD GPUs."
+        },
+        {
+          "icon": "monitor",
+          "title": "Windows and Linux",
+          "text": "A Windows installer and a Linux AppImage."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Updates",
+          "text": "The first download runs everywhere and offers the matching GPU package on launch."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Status",
+      "markdown": "ForeverTAS is an alpha release and is listed with the other TAS tools on TMTAS Exchange. Like every TAS tool, runs made with it are tool-assisted and do not belong on public leaderboards."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "ForeverTAS is maintained by Skycrafter (Skycrafter-dev)."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Repository",
+          "url": "https://github.com/Skycrafter-dev/ForeverTAS"
+        },
+        {
+          "kind": "link",
+          "label": "Releases",
+          "url": "https://github.com/Skycrafter-dev/ForeverTAS/releases/latest",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

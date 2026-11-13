@@ -1,0 +1,11 @@
+/* Embedded browser: loading bar and the "site not reachable" panel. */
+.bload { position: absolute; top: 0; left: 0; right: 0; height: 2px; overflow: hidden; z-index: 2; pointer-events: none; }
+.bload::before { content: ''; position: absolute; top: 0; bottom: 0; width: 35%; background: var(--acc); border-radius: 2px; animation: bload 1.1s ease-in-out infinite; }
+@keyframes bload { from { left: -35%; } to { left: 100%; } }
+.bdown { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; background: var(--h-14161b); }
+.bdown-head { display: flex; align-items: center; gap: 8px; color: var(--fg-2); }
+.bdown-head .site-ico { width: 22px; height: 22px; }
+.bdown-ico { color: var(--fg-2); margin-top: 6px; }
+.bdown h3 { margin: 0; }
+.bdown p { margin: 0; max-width: 420px; color: var(--fg-2); }
+.bdown-btns { display: flex; gap: 8px; margin: 6px 0; }

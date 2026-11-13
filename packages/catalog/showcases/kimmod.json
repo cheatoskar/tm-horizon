@@ -1,0 +1,83 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "cyan"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "KimMod",
+      "tagline": "ModLoader mod for TrackMania Nations and United Forever with quality-of-life features and a much faster physics engine.",
+      "badges": [
+        "TMNF, TMUF",
+        "ModLoader mod",
+        "Needs AVX"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "zap",
+          "title": "Faster physics",
+          "text": "The physics engine is optimized for replay validation and bruteforce; the main loop can run at maximum speed."
+        },
+        {
+          "icon": "check",
+          "title": "Mass validation",
+          "text": "Validation can run in several instances at once and shows progress in the window title."
+        },
+        {
+          "icon": "keyboard",
+          "title": "Replay menu",
+          "text": "A replay menu with mouse-button navigation and undo/redo."
+        },
+        {
+          "icon": "wrench",
+          "title": "Quality of life",
+          "text": "Quality-of-life improvements and other game optimizations."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Requirements",
+      "markdown": "KimMod needs the TrackMania ModLoader and a CPU with AVX support. It runs on Windows and on Linux with Wine. The changelog on the mod page lists support for Competition Patch, Highlands and NewSnowCar in recent versions."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmnf",
+          "status": "works"
+        },
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "KimMod is published at home.koyaanis.com. The page does not name the author; the description follows that page (version 1.0.3-v7, January 2026)."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "KimMod page",
+          "url": "https://home.koyaanis.com/modloader"
+        },
+        {
+          "kind": "link",
+          "label": "ModLoader",
+          "url": "https://tomashu.pages.dev/software/tmloader",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

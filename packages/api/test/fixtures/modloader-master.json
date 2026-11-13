@@ -1,0 +1,14 @@
+{
+  "api": 1,
+  "servers": [
+    "https://modloader.tomashu.dev/modloader/TmForever/v1/",
+    "https://tomashu.pages.dev/modloader/TmForever/v1/",
+    "https://unlimiter.net/modloader/",
+    "https://donadigo.com/modloader/"
+  ],
+  "versions": {
+    "1.0.1": {
+      "changelog": "- Fixed compatibility with Windows 7\n- More error messages, also on crash\n- Fixed padding in settings menu\n- Fix config file getting corrupted\n- Improved DPI Awareness\n- Uninstaller removes database now"
+    }
+  }
+}

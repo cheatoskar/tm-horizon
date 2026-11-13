@@ -1,0 +1,24 @@
+{
+  "name": "@tm-hub/map-inspector",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Map inspector core from 100tmx.com/tools/map-inspector: .Gbx map reading, route blocks, block list, build order and the 3D/top-down map views. Shared by the website and the launcher.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" },
+    "./read": { "types": "./src/read.ts", "default": "./src/read.ts" },
+    "./react": { "types": "./src/react/index.ts", "default": "./src/react/index.ts" },
+    "./lzo1x": { "types": "./src/lzo1x.ts", "default": "./src/lzo1x.ts" }
+  },
+  "dependencies": {
+    "gbx": "1.0.0-rc12"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

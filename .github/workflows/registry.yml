@@ -1,0 +1,76 @@
+# Approved server or event submissions -> pull request with packages/api/data/servers/<id>.yaml or
+# packages/api/data/events/<id>.yaml.
+# A maintainer adds the label "approved" to an issue opened with .github/ISSUE_TEMPLATE/server.yml or event.yml.
+# Only people with triage rights can add labels, so outsiders cannot trigger this.
+# Repository setting needed: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+# Note: pull requests opened with GITHUB_TOKEN do not start other workflows; the root ci.yml runs
+# when a maintainer pushes to the branch or closes and reopens the pull request, and the hourly build
+# validates packages/api/data/ anyway.
+name: Registry submission
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: registry-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  to-pr:
+    if: >-
+      github.event.label.name == 'approved' &&
+      (contains(github.event.issue.labels.*.name, 'server') || contains(github.event.issue.labels.*.name, 'event'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: packages/api
+    env:
+      ISSUE: ${{ github.event.issue.number }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+        working-directory: .
+
+      # The issue body is read from the event file by the script, never put into a shell line.
+      - name: Convert the issue
+        id: conv
+        run: node scripts/issue-to-yaml.ts "$GITHUB_EVENT_PATH"
+
+      - name: Validate data/
+        run: npm test
+
+      - name: Open or update the pull request
+        env:
+          FILE: ${{ steps.conv.outputs.file }}
+          TITLE: ${{ steps.conv.outputs.title }}
+        run: |
+          branch="registry/issue-$ISSUE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -A data/
+          git commit -m "$TITLE" -m "From issue #$ISSUE."
+          git push --force origin "$branch"
+          if gh pr view "$branch" --json number >/dev/null 2>&1; then
+            gh pr comment "$branch" --body "Updated from the issue."
+          else
+            gh pr create --head "$branch" --title "$TITLE" --body "Adds \`$FILE\` from #$ISSUE. Closes #$ISSUE."
+          fi
+
+      - name: Tell the submitter what is wrong
+        if: failure() && hashFiles('packages/api/registry-errors.md') != ''
+        run: gh issue comment "$ISSUE" --body-file registry-errors.md

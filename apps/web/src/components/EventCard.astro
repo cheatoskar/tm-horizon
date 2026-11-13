@@ -1,0 +1,41 @@
+---
+import Icon from './Icon.astro';
+import { gameById, cover, header, hero, isOwnCover } from '../data/games';
+import { t, locales, type Lang } from '../i18n';
+import { duration, linkify } from '../lib/fmt';
+const { e, compact = false, lang = 'en' } = Astro.props as { e: any; compact?: boolean; lang?: Lang };
+const g = gameById[e.game];
+const own = !!g && isOwnCover(e.game);
+const art = g?.steam ? header(e.game) : own ? hero(e.game) : cover(e.game);
+const d = new Date(e.start);
+const address: string | null = !e.join && e.address ? e.address : null; // ESWC, Sunrise, Original: join by address
+---
+<article class={`ev ${compact ? "compact" : ""}`} data-ev data-id={e.id} data-title={e.title} data-host={e.host} data-start={e.start} data-minutes={e.minutes}>
+  <div class="ev-date"><b data-day>{d.getUTCDate()}</b><span data-mon>{d.toLocaleString(locales[lang], { month: 'short', timeZone: 'UTC' })}</span></div>
+  {!compact && g && <div class="ev-art"><img class={g?.steam || own ? '' : 'box'} src={art} alt="" loading="lazy" decoding="async" /></div>}
+  <div class="ev-body">
+    <h3>{e.sample ? e.title.replace(/^Sample:\s*/, '') : e.title}<span class="badge live ev-live">{t(lang, 'event.live')}</span>{e.sample && <span class="badge sample">{t(lang, 'chip.sample')}</span>}</h3>
+    <div class="ev-meta">
+      <span><Icon name="clock" size={15} /><span class="when-rel" data-d></span> · <span data-t>{d.toISOString().slice(11, 16)}</span> · <span data-dur>{duration(e.minutes, lang)}</span></span>
+      {g && <span><img src={cover(e.game)} alt="" style="width:16px;height:16px;border-radius:4px;object-fit:cover;object-position:top" />{g.short}</span>}
+      {e.host && <span><Icon name="users" size={15} />{e.host}</span>}
+    </div>
+    {!compact && e.note && (
+      <div class="ev-note"><p class="muted" data-note set:html={linkify(e.note)} /><button class="ev-more" type="button" hidden data-more={t(lang, 'event.more')} data-less={t(lang, 'event.less')} aria-expanded="false">{t(lang, 'event.more')}</button></div>
+    )}
+    {!compact && address && (
+      <p class="addr-row"><Icon name="network" size={15} /><code>{address}</code>
+        <button class="btn sm ghost" type="button" data-copy={address}><Icon name="copy" size={15} /><span data-copy-l>{t(lang, 'btn.copy')}</span></button>
+        <span class="muted addr-hint">{t(lang, 'server.addressHint')}</span>
+      </p>
+    )}
+    {!compact && <div class="ev-act">
+        <a class="btn sm primary" data-join data-href={e.join ?? ''} aria-disabled="true"><Icon name="play" size={15} />{t(lang, 'btn.join')}</a>
+        <button class="btn sm ghost" data-ics type="button"><Icon name="calendar-plus" size={15} />{compact ? '' : t(lang, 'event.addCalendar')}</button>
+      </div>}
+  </div>
+  {compact && <div class="ev-act">
+    <a class="btn sm primary" data-join data-href={e.join ?? ''} aria-disabled="true"><Icon name="play" size={15} />{t(lang, 'btn.join')}</a>
+    <button class="btn sm ghost" data-ics type="button"><Icon name="calendar-plus" size={15} />{compact ? '' : t(lang, 'event.addCalendar')}</button>
+  </div>}
+</article>

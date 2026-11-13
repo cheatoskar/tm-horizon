@@ -1,0 +1,203 @@
+---
+import fs from 'node:fs';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Thumb from '../components/Thumb.astro';
+import { modById, modCatsFor, sources, entryForMod, installKinds, installIcons, installLabel, readmeFor, ghRepoOf } from '../data/site';
+import { gameById, byOrder, cover } from '../data/games';
+import { compact, ago, day, bytes, isPre } from '../lib/fmt';
+import { md } from '../lib/md';
+import { readmeHtml } from '../lib/readme';
+import '@tm-hub/showcase-ui/readme.css';
+import { webImg } from '@tm-hub/shared/extimg';
+import { installLink } from '../lib/links';
+import { t, tf, lh, type Lang } from '../i18n';
+import Showcase from '../components/Showcase.astro';
+import { showcaseOf } from '@tm-hub/shared/showcase';
+import { showcases, README_PICTURE_MODS, README_HERO_MODS, readmePictures, withReadmePictures } from '../data/site';
+const { lang = 'en', mod } = Astro.props as { lang?: Lang; mod: any };
+const L = (p: string) => lh(lang, p);
+const modCats = modCatsFor(lang);
+const cat = modCats[mod.category] ?? { label: mod.category, icon: 'puzzle' };
+const latest = mod.versions.find((v: any) => v.version === mod.latest) ?? mod.versions[0];
+const dl = latest?.fileUrl ?? mod.versions.find((v: any) => v.fileUrl)?.fileUrl ?? null;
+const deps = [...new Map(mod.versions.slice(0, 1).flatMap((v: any) => v.dependencies).map((d: any) => [d.id, d])).values()] as any[];
+const entry = entryForMod(mod);
+const kinds = installKinds(entry, true);
+const readmeRepo = mod.repo?.id ?? ghRepoOf(entry?.url) ?? null;
+// Pictures come from the catalog: the entry's gallery, else the gallery of its showcase (packages/catalog/showcases, in
+// that order and with its captions, e.g. TMVS); for the mods in README_PICTURE_MODS from their GitHub README, in README order.
+const readmePics = README_PICTURE_MODS.has(mod.id) ? readmePictures(readmeRepo) : [];
+const baseShowcase = showcaseOf(showcases, mod.id, mod.name, entry?.id);
+const showcasePics = ((baseShowcase?.blocks ?? []) as any[]).filter((b) => b.type === 'gallery').flatMap((b) => (b.images ?? []) as { url: string; caption?: string }[]);
+const picCap = (i: number) => t(lang, 'mod.picture', { name: mod.name, n: i + 1 });
+const gal = (readmePics.length ? readmePics.map((p, i) => ({ src: webImg(p.url), cap: picCap(i) }))
+  : (entry?.gallery ?? []).length ? ((entry?.gallery ?? []) as string[]).map((u, i) => ({ src: webImg(u), cap: picCap(i) }))
+  : showcasePics.map((p, i) => ({ src: webImg(p.url), cap: p.caption || picCap(i) })))
+  .filter((g): g is { src: string; cap: string } => !!g.src);
+const readme = readmeFor(readmeRepo);
+const perGame = Object.entries((entry?.installs ?? {}) as Record<string, string>).filter(([g]) => gameById[g]).sort((a, b) => byOrder(a[0], b[0]));
+const mirrors = ((entry?.urls ?? []) as string[]).filter((u) => /^https?:/.test(u));
+const owner = mod.repo?.id?.split('/')[0];
+const avatar = owner && fs.existsSync(`public/img/avatars/${owner.toLowerCase()}.png`) ? `/img/avatars/${owner.toLowerCase()}.png` : null;
+const online = mod.online === 'yes' ? { t: t(lang, 'mod.onlineYes'), i: 'shield-check', c: 'var(--ok)' } : mod.online === 'offline' ? { t: t(lang, 'mod.onlineOffline'), i: 'shield-alert', c: 'var(--warn)' } : { t: t(lang, 'mod.onlineUnknown'), i: 'circle-help', c: 'var(--muted)' };
+// "Features include a, b, c." in the summary becomes a list
+const fm = mod.summary.match(/Features include (.+?)\.(\s|$)/);
+const features = fm ? fm[1].split(/,\s*(?:and\s+)?/).map((s: string) => s.trim()).filter(Boolean) : [];
+const intro = fm ? mod.summary.replace(fm[0], ' ').trim() : mod.summary;
+const firstPara = (latest?.changelog ?? '').split(/\n\s*\n/)[0];
+const vdate = (v: any) => v.date;
+const showcase = baseShowcase && readmePics.length ? withReadmePictures(baseShowcase, readmePics, t(lang, 'mod.tabGallery'), README_HERO_MODS.has(mod.id)) : baseShowcase;
+const scReleases = mod.versions.slice(0, 3).map((v: any) => ({ version: v.version, date: v.date ?? null, notes: v.changelog ?? '' }));
+---
+<Layout title={mod.name} desc={mod.summary.slice(0, 150)} lang={lang}>
+  <div data-tabs>
+    <header class="card mod-head">
+      <Thumb src={mod.icon} seed={mod.id} glyph={cat.icon} size={112} alt={t(lang, 'mod.iconAlt', { name: mod.name })} />
+      <div class="mod-meta">
+        <h1>{mod.name}</h1>
+        <p class="sum">{mod.summary.split('. ')[0].replace(/\.$/, '')}.</p>
+        <div class="mod-stats">
+          {mod.downloads != null && <span class="stat" title={t(lang, 'mod.dlTitle')}><Icon name="download" /><b>{compact(mod.downloads, lang)}</b> {t(lang, 'mod.downloads')}</span>}
+          {mod.stars != null && <span class="stat" title={t(lang, 'mod.starsTitle')}><Icon name="star" /><b>{compact(mod.stars, lang)}</b> {t(lang, 'mod.stars')}</span>}
+          <span class="stat"><Icon name="tag" /><b>v{mod.latest}</b></span>
+          <span class="stat"><Icon name="layers" /><b>{mod.versions.length}</b> {t(lang, 'mod.versionsCount')}</span>
+          {mod.updated && <span class="stat"><Icon name="history" /><span>{t(lang, 'mod.updated')} <span data-ago={mod.updated}>{ago(mod.updated, lang)}</span></span></span>}
+        </div>
+      </div>
+      <div class="mod-actions">
+        <a class="btn primary lg" href={installLink(mod.id)} title={t(lang, 'btn.installTip')}><Icon name="download" />{t(lang, 'btn.install')}</a>
+        {dl ? <a class="btn lg" href={dl} rel="noopener"><Icon name="file-archive" />{t(lang, 'btn.download')}</a> : mod.homepage ? <a class="btn lg" href={mod.homepage} rel="noopener"><Icon name="external-link" />{t(lang, 'mod.downloadPage')}</a> : null}
+        <button class="icon-btn" type="button" title={t(lang, 'mod.followTitle')} aria-label={t(lang, 'mod.follow')}><Icon name="heart" /></button>
+      </div>
+    </header>
+
+    {showcase && <div style="margin-top:16px"><Showcase showcase={showcase} lang={lang} installHref={installLink(mod.id)} releases={scReleases} /></div>}
+
+    <div style="margin-top:16px">
+      <nav class="tabs" role="tablist">
+        <button data-tab="description" role="tab"><Icon name="book-open" size={17} />{t(lang, 'mod.tabDescription')}</button>
+        {readme && <button data-tab="readme" role="tab"><Icon name="file-text" size={17} />{t(lang, 'mod.tabReadme')}</button>}
+        {gal.length > 0 && <button data-tab="gallery" role="tab"><Icon name="images" size={17} />{t(lang, 'mod.tabGallery')} <span class="n">{gal.length}</span></button>}
+        <button data-tab="changelog" role="tab"><Icon name="scroll-text" size={17} />{t(lang, 'mod.tabChangelog')}</button>
+        <button data-tab="versions" role="tab"><Icon name="layers" size={17} />{t(lang, 'mod.tabVersions')} <span class="n">{mod.versions.length}</span></button>
+      </nav>
+    </div>
+
+    <div class="mod-cols">
+      <div>
+        <section class="card panel-main prose" data-panel="description">
+          <p style="font-size:17px">{intro}</p>
+          {entry?.note && <p class="muted">{entry.note}</p>}
+          {features.length > 0 && <><h2>{t(lang, 'mod.features')}</h2><ul>{features.map((f: string) => <li>{f.charAt(0).toUpperCase() + f.slice(1)}</li>)}</ul></>}
+          {gal.length > 0 && (
+            <a href="#gallery" data-goto="gallery" style="display:block;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line-soft)"><img src={gal[0].src} alt={gal[0].cap} style="width:100%;aspect-ratio:16/9;object-fit:cover" /></a>
+          )}
+          {firstPara && <><h2>{t(lang, 'mod.newIn', { v: latest.version })}</h2><div set:html={md(firstPara)} /><p><a href="#changelog" data-goto="changelog">{t(lang, 'mod.fullChangelog')}</a></p></>}
+          <h2>{t(lang, 'btn.install')}</h2>
+          <p set:html={t(lang, 'mod.installText', { install: `<strong>${t(lang, 'btn.install')}</strong>`, sha: latest?.sha256 ? t(lang, 'mod.installSha') : '' })} />
+        </section>
+
+        {readme && (
+          <section class="card panel-main readme" data-panel="readme" hidden>
+            <p class="muted" style="font-size:13.5px;margin-bottom:14px">{t(lang, 'mod.readmeFrom', { repo: readmeRepo ?? '' })} <a href={`https://github.com/${readmeRepo}#readme`} rel="noopener">{t(lang, 'mod.readmeFull')}</a></p>
+            <div class="rd" set:html={readmeHtml(readme, readmeRepo, mod.name)} />
+          </section>
+        )}
+
+        {gal.length > 0 && (
+          <section class="card panel-main" data-panel="gallery" hidden>
+            <div class="gallery">
+              {gal.map((g, i) => <figure class={i === 0 ? 'big' : ''}><img src={g.src} alt={g.cap} loading="lazy" referrerpolicy="no-referrer" /><figcaption>{g.cap}</figcaption></figure>)}
+            </div>
+          </section>
+        )}
+
+        <section class="card panel-main" data-panel="changelog" hidden>
+          {mod.versions.map((v: any) => (
+            <div class="cl-item">
+              <div class="cl-h"><b>v{v.version}</b>{isPre(v.version) ? <span class="badge sample">{t(lang, 'status.pre')}</span> : <span class="badge" style="background:rgba(61,220,132,.14);color:var(--ok)">{t(lang, 'mod.release')}</span>}{vdate(v) && <span class="muted" style="font-size:14px">{day(vdate(v), lang)}</span>}</div>
+              {v.changelog ? <div class="prose" set:html={md(v.changelog)} /> : <p class="muted">{t(lang, 'mod.noChangelog')}</p>}
+            </div>
+          ))}
+        </section>
+
+        <section class="card panel-main" data-panel="versions" hidden>
+          <div class="ver-list">
+            {mod.versions.map((v: any) => (
+              <div class="ver">
+                <span class={`ver-ic ${isPre(v.version) ? 'pre' : ''}`}>{isPre(v.version) ? 'β' : 'R'}</span>
+                <div style="min-width:0">
+                  <b>v{v.version}</b>
+                  <small>{[vdate(v) ? day(vdate(v), lang) : null, v.dependencies.length ? t(lang, 'mod.needs', { list: v.dependencies.map((d: any) => `${d.name} ${d.version}`).join(', ') }) : null, bytes(v.size, lang)].filter(Boolean).join(' · ')}</small>
+                  {v.sha256 && <div class="hash" title={v.sha256}><Icon name={v.hashMismatch ? 'shield-alert' : 'shield-check'} size={13} /> SHA-256 {v.sha256.slice(0, 16)}…{v.sha256Checked ? ` (${t(lang, 'mod.checked')})` : ''}</div>}
+                </div>
+                <span class="hide-s muted" style="font-size:13.5px">{v.downloads != null ? `${compact(v.downloads, lang)} ${t(lang, 'mod.downloads')}` : ''}</span>
+                {v.fileUrl ? <a class="btn sm" href={v.fileUrl} rel="noopener"><Icon name="download" size={15} /><span class="hide-s">{t(lang, 'btn.download')}</span></a> : <span></span>}
+              </div>
+            ))}
+          </div>
+          <p class="muted" style="font-size:13px;margin-top:12px">{t(lang, 'mod.datesNote', { sha: sources.mods.from === 'tm-hub-api' ? t(lang, 'mod.shaApi') : t(lang, 'mod.shaNone') })}</p>
+        </section>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <h3>{t(lang, 'mod.compat')}</h3>
+          <dl class="kv">
+            <div><dt><Icon name="plug" size={16} />{t(lang, 'mod.installType')}</dt><dd class="kinds">{kinds.map((k) => <span class="chip sys"><Icon name={installIcons[k]} size={14} />{installLabel(lang, k)}</span>)}</dd></div>
+            <div><dt><Icon name={online.i} size={16} />{t(lang, 'mod.online')}</dt><dd style={`color:${online.c}`}>{online.t}</dd></div>
+            <div><dt><Icon name={cat.icon} size={16} />{t(lang, 'discover.category')}</dt><dd>{cat.label}</dd></div>
+          </dl>
+          <div class="compat" style="margin-top:14px">
+            {[...new Set([...mod.games, ...(entry?.games ?? [])])].filter((g: string) => gameById[g]).sort(byOrder).map((g: string) => <a class="chip" href={L(`/game/${g}/`)} style="text-decoration:none"><img src={cover(g)} alt="" />{gameById[g].name}</a>)}
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>{t(lang, 'mod.links')}</h3>
+          <div class="linklist">
+            {mod.homepage && <a href={mod.homepage} rel="noopener"><Icon name="globe" size={17} />{t(lang, 'mod.homepage')}<Icon name="external-link" size={14} /></a>}
+            {mod.repo && <a href={mod.repo.url} rel="noopener"><Icon name="github" size={17} />{t(lang, 'mod.source')}<Icon name="external-link" size={14} /></a>}
+            {mod.repo && <a href={`${mod.repo.url}/issues`} rel="noopener"><Icon name="bug" size={17} />{t(lang, 'mod.issues')}{mod.repo.openIssues ? ` (${mod.repo.openIssues})` : ''}<Icon name="external-link" size={14} /></a>}
+            {mod.repo && <a href={`${mod.repo.url}/releases`} rel="noopener"><Icon name="package" size={17} />{t(lang, 'mod.releases')}<Icon name="external-link" size={14} /></a>}
+            {mirrors.map((u) => <a href={u} rel="noopener"><Icon name="link-2" size={17} />{new URL(u).host.replace(/^www\./, '')}<Icon name="external-link" size={14} /></a>)}
+            {!mod.homepage && !mod.repo && !mirrors.length && <span class="muted">{t(lang, 'mod.noLinks')}</span>}
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>{t(lang, 'mod.creators')}</h3>
+          <div class="who"><Thumb src={avatar} seed={mod.author} glyph="user-round" size={40} /><div><b>{mod.author}</b><small>{t(lang, 'mod.author')}</small></div></div>
+        </div>
+
+        <div class="card">
+          <h3>{t(lang, 'mod.deps')}</h3>
+          {deps.length ? (
+            <div class="stack">
+              {deps.map((d) => { const dm = modById(d.id); return (
+                <a class="who" href={dm ? L(`/mod/${d.id}/`) : '#'} style="text-decoration:none">
+                  <Thumb src={dm?.icon} seed={d.id} glyph={modCats[dm?.category]?.icon ?? 'package'} size={40} />
+                  <div><b>{d.name}</b><small>{t(lang, 'mod.required')} · {d.version}</small></div>
+                </a>
+              ); })}
+            </div>
+          ) : <p class="muted" style="font-size:15px">{t(lang, 'mod.none')}</p>}
+        </div>
+
+        <div class="card">
+          <h3>{t(lang, 'mod.details')}</h3>
+          <dl class="kv">
+            {entry?.hosting && <div><dt><Icon name="cloud" size={16} />{t(lang, 'mod.hosting')}</dt><dd>{tf(lang, `hosting.${entry.hosting}`, entry.hosting)}</dd></div>}
+            {mod.repo?.license && <div><dt><Icon name="scale" size={16} />{t(lang, 'mod.licence')}</dt><dd>{mod.repo.license}</dd></div>}
+            <div><dt><Icon name="hash" size={16} />{t(lang, 'mod.installId')}</dt><dd class="mono">{mod.id}</dd></div>
+            {latest?.executable && <div><dt><Icon name="file-code" size={16} />{t(lang, 'mod.entryFile')}</dt><dd class="mono">{latest.executable}</dd></div>}
+            {latest?.size && <div><dt><Icon name="hard-drive" size={16} />{t(lang, 'mod.size')}</dt><dd>{bytes(latest.size, lang)}</dd></div>}
+            {latest?.sha256 && <div><dt><Icon name="shield-check" size={16} />SHA-256</dt><dd class="mono" title={latest.sha256}>{latest.sha256.slice(0, 12)}…</dd></div>}
+            <div><dt><Icon name="database" size={16} />{t(lang, 'mod.data')}</dt><dd>{mod.from === 'tm-hub-api' ? t(lang, 'mod.dataApi') : t(lang, 'mod.dataLocal')}</dd></div>
+          </dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Layout>

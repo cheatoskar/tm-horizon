@@ -1,0 +1,90 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "pink"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "ManiaExchange Random Map Picker",
+      "tagline": "Openplanet plugin that picks random maps from ManiaExchange and runs the Random Map Challenge game modes.",
+      "badges": [
+        "TM2020, TM2",
+        "Openplanet plugin",
+        "GPL-3.0"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "rocket",
+          "title": "Random Map Challenge",
+          "text": "Play random maps taken from ManiaExchange."
+        },
+        {
+          "icon": "trophy",
+          "title": "Game modes",
+          "text": "Includes Survival and Together modes and other variants."
+        },
+        {
+          "icon": "puzzle",
+          "title": "In the plugin menu",
+          "text": "Open the game modes from Play Random Map Challenge in the Openplanet plugins menu."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Notes",
+      "markdown": "The author notes that a skipped map that does not switch in the Together mode is a Nadeo issue; a vote skip to the next map should work. Leaderboard and rules are on flinkblog.de/RMC."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tm2020",
+          "status": "works"
+        },
+        {
+          "game": "tm2-stadium",
+          "status": "works"
+        },
+        {
+          "game": "tm2-canyon",
+          "status": "works"
+        },
+        {
+          "game": "tm2-valley",
+          "status": "works"
+        },
+        {
+          "game": "tm2-lagoon",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "Made by Greep and Fort-TM."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "Plugin page",
+          "url": "https://openplanet.dev/plugin/mxrandom"
+        },
+        {
+          "kind": "link",
+          "label": "Source",
+          "url": "https://github.com/GreepTheSheep/openplanet-MXRandom",
+          "style": "ghost"
+        }
+      ]
+    }
+  ]
+}

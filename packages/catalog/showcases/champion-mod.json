@@ -1,0 +1,68 @@
+{
+  "$schema": "../../shared/showcase.schema.json",
+  "version": 1,
+  "theme": {
+    "accent": "amber"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "title": "ChampionMod",
+      "tagline": "Adds Warrior and Champion medals above the author medal on the official tracks of TrackMania United Forever.",
+      "badges": [
+        "TMUF",
+        "ModLoader mod",
+        "By Paulo"
+      ]
+    },
+    {
+      "type": "features",
+      "items": [
+        {
+          "icon": "trophy",
+          "title": "Two new medals",
+          "text": "Warrior and Champion medals above the author medal."
+        },
+        {
+          "icon": "flag",
+          "title": "917 tracks",
+          "text": "Covers 917 official tracks."
+        },
+        {
+          "icon": "shield",
+          "title": "Game files untouched",
+          "text": "Writes nothing to the game files."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Install",
+      "markdown": "Install the TrackMania ModLoader, then copy the `ChampionMod` folder to `%LocalAppData%\\TMLoader\\database\\TmForever\\products`."
+    },
+    {
+      "type": "compat",
+      "rows": [
+        {
+          "game": "tmuf",
+          "status": "works"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "Credits",
+      "markdown": "ChampionMod is made by Paulo."
+    },
+    {
+      "type": "cta",
+      "buttons": [
+        {
+          "kind": "link",
+          "label": "ModLoader",
+          "url": "https://tomashu.pages.dev/software/tmloader"
+        }
+      ]
+    }
+  ]
+}
