@@ -2,13 +2,13 @@
 
 # TM Horizon
 
-**One launcher for every TrackMania game on Windows, from TrackMania (2003) to Trackmania (2020): your library, mods, maps, servers and statistics in one place.**
+**One launcher for every TrackMania game, from TrackMania (2003) to Trackmania (2020): your library, mods, maps, servers and statistics in one place. Windows, and Linux experimental (Wine/Proton).**
 
 It also installs and updates the other TM Horizon projects: [Horizon Client](https://github.com/cheatoskar/horizon-client) (an in-game menu with modules for Nations ESWC, Sunrise, Original and, experimentally, Nations/United Forever), [Legacy Essentials](https://github.com/cheatoskar/eswc-autosave) and [TM Vibrant Shaders](https://github.com/cheatoskar/TM-Vibrant-Shaders).
 
-Version 0.5.1 is the **Launcher Preview** for Windows: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
+Version 0.5.1 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
 
-**[Download the latest release](https://github.com/cheatoskar/tm-horizon/releases/latest)** · [Install](#install-windows) · [Features](#features) · [Games](#what-works-in-which-game) · [Privacy](#privacy) · [Known issues](#known-issues) · [Build](#build) · [TM Horizon family](#tm-horizon-family)
+**[Download the latest release](https://github.com/cheatoskar/tm-horizon/releases/latest)** · [Install](#install-windows) · [Linux](#install-linux-experimental) · [Features](#features) · [Games](#what-works-in-which-game) · [Privacy](#privacy) · [Known issues](#known-issues) · [Build](#build) · [TM Horizon family](#tm-horizon-family)
 
 ![Home](docs/screenshots/home.png)
 
@@ -43,7 +43,33 @@ TMNF/TMUF = TrackMania Nations/United Forever, ESWC = TrackMania Nations ESWC, T
 
 Updates come through the app (Settings > Updates: channel Stable or Beta, "Check at start", "Install updates automatically") and are checked against my signing key. An update installs when you close TM Horizon or at the next start, never while a game runs; a button in the title bar shows a waiting update, and "What's new" shows the notes afterwards.
 
-Linux packages exist in the build setup ([apps/launcher/docs/linux.md](apps/launcher/docs/linux.md), [packaging/arch/](packaging/arch/)) but are not part of this preview.
+---
+
+## Install (Linux, experimental)
+
+The Linux build is new and **not tested on real hardware yet**: it is built and started in WSL (Arch Linux, WSLg) on a Windows PC, no game has been played through it on a Linux desktop, and the Steam Deck is untested. Testers are welcome; please report what works and what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). The games stay Windows games and run through Wine or Proton.
+
+1. Download `TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage` from the [v0.5.1 release](https://github.com/cheatoskar/tm-horizon/releases/tag/v0.5.1) and check it against `SHA256SUMS-linux`.
+2. Make it executable and start it:
+
+```
+sha256sum -c --ignore-missing SHA256SUMS-linux
+chmod +x TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage
+./TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage
+```
+
+3. For the games: `wine` (or `wine-staging`), or `umu-launcher`, or Steam with Proton. TM Horizon finds games inside Wine/Proton prefixes (Steam, Lutris, Bottles, Heroic, `~/Games`, `~/.wine`, own prefixes under Settings > Linux). Nations/United Forever can be set up from the game page ("Set up": prefix, DXVK, official setup, TMLoader).
+
+Status and known gaps:
+
+- Needs an x86_64 distribution with glibc 2.35 or newer (Ubuntu 22.04 and newer, Fedora, current Arch). It was started in WSL (Arch) and in an Ubuntu 22.04 userland; SteamOS should qualify but is untested.
+- Built from the same 0.5.1 code as the Windows release plus Linux-only fixes; the app shows version 0.5.1.
+- Updates: Linux updates through the app come with the next release. Until then, download the new AppImage by hand.
+- Not read yet: Trackmania (2020) from Epic/Heroic, Openplanet folders inside a prefix. The embedded TMX/ManiaPark view may misbehave on Wayland.
+- Arch Linux: `tm-horizon-0.5.1-1-x86_64-experimental.pkg.tar.zst` from the same release (`sudo pacman -U <file>`), built from the same code. PKGBUILDs: [packaging/arch/](packaging/arch/).
+- No FUSE on the system (the AppImage then does not start): `./TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage --appimage-extract-and-run`.
+
+Details: [apps/launcher/docs/linux.md](apps/launcher/docs/linux.md).
 
 ---
 
