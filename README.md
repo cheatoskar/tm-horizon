@@ -8,6 +8,9 @@ It also installs and updates the other TM Horizon projects: [Horizon Client](htt
 
 Version 0.5.1 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
 
+> [!NOTE]
+> TM Horizon is a community project: bug reports, ideas, fixes and new features are welcome as [issues](https://github.com/cheatoskar/tm-horizon/issues), [discussions](https://github.com/cheatoskar/tm-horizon/discussions) and pull requests. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
+
 **[Download the latest release](https://github.com/cheatoskar/tm-horizon/releases/latest)** · [Install](#install-windows) · [Linux](#install-linux-experimental) · [Features](#features) · [Games](#what-works-in-which-game) · [Privacy](#privacy) · [Known issues](#known-issues) · [Build](#build) · [TM Horizon family](#tm-horizon-family)
 
 ![Home](docs/screenshots/home.png)
