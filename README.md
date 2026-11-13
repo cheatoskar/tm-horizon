@@ -16,7 +16,7 @@ Version 0.5.1 is the **Launcher Preview** for Windows: expect rough edges and te
 
 ## TM Horizon family
 
-Six projects by the same author, made to work together. TM Horizon installs and updates the others where it can; each one also works without it.
+Six projects, built to work together. TM Horizon installs and updates the others where it can; each one also works without it.
 
 | Project | What it is | Games | How to get it | Repo |
 |---|---|---|---|---|
