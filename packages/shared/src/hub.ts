@@ -2,7 +2,7 @@
 // launcher reads. Shapes shared by apps/server (the hub backend), apps/portal (developer portal)
 // and the launcher's hub data source (apps/launcher/src/data/hubIndex.ts + src-tauri/src/hubindex.rs).
 // Plain types and constants only (no enums), so Node runs this file without a compile step.
-import type { GameId, IsoDateTime } from './types.ts';
+import type { CatalogEntry, GameId, IsoDateTime } from './types.ts';
 
 // ---------------------------------------------------------------- install types
 
@@ -58,7 +58,7 @@ export type HubCategory = (typeof HUB_CATEGORIES)[number];
  */
 export const HUB_PROJECT_TYPES = [
   'mod', 'skin', 'texture-pack', 'sound-pack', 'maps', 'openplanet-plugin', 'tmi-plugin', 'tool', 'tas', 'editor', 'server', 'library',
-  'browser-extension', 'docs', 'community', 'event',
+  'browser-extension', 'docs', 'community', 'event', 'content',
 ] as const;
 export type HubProjectType = (typeof HUB_PROJECT_TYPES)[number];
 
@@ -89,6 +89,7 @@ export const PROJECT_TYPES: Record<HubProjectType, { label: string; hint: string
   docs: { label: 'Documentation', hint: 'Guides and pages about something.', delivery: 'link' },
   community: { label: 'Community', hint: 'A Discord server, a club or a site.', delivery: 'link' },
   event: { label: 'Event', hint: 'A cup, a league or a one-off event.', delivery: 'link' },
+  content: { label: 'Content', hint: 'Presets, looks, packs or other data that a mod or the launcher reads straight from the repository. No release needed.', delivery: 'link' },
 };
 export const isProjectType = (s: unknown): s is HubProjectType => typeof s === 'string' && (HUB_PROJECT_TYPES as readonly string[]).includes(s);
 
@@ -145,6 +146,8 @@ export interface HubIndexFile {
   sha256: string;
   /** Download link (counts the download, then redirects to the cached copy). */
   url: string;
+  /** Added later. Which variant this file is when a version has several (browser add-ons: "chrome", "firefox", "edge", "opera"). */
+  label?: string;
 }
 
 export interface HubAuthorKey {
@@ -175,6 +178,12 @@ export interface HubIndexVersion {
   authorSignature: HubAuthorSignature | null;
   /** The hub checked authorSignature against one of the project's author keys at upload. */
   verified: boolean;
+  /**
+   * Added later. Paths inside the zip of files that must never be installed into a StarForce-protected game (today only
+   * a dinput8.dll the hub allowed for the author's own loader, apps/server/src/checks/dinput8.ts). Present only then.
+   * The launcher enforces it: it skips those files for such games, or refuses the install for them.
+   */
+  starForceBlocked?: string[];
 }
 
 export interface HubDependency {
@@ -220,6 +229,33 @@ export interface HubIndexProject {
   updated: IsoDateTime;
   /** Newest first; only published, not revoked versions. */
   versions: HubIndexVersion[];
+  /**
+   * Added later (older launchers ignore it). Unclaimed project imported from the catalog: its entry exactly as the
+   * launcher's bundled catalog.json carries it (packages/catalog, release policy applied: hidden entries are not in
+   * the index, link-only entries have no installSpec). Catalog projects are listed even without a hub version; the
+   * launcher uses this entry (same id as catalogId) while no hub version is installable. Absent on claimed projects.
+   */
+  catalogEntry?: CatalogEntry;
+  /**
+   * Added later. true: a catalog entry that is not a hub project (website, exchange, community, guide, a mod of a game
+   * the hub does not list): no versions, no portal page, `catalogEntry` is the whole entry and `games` are the
+   * catalog's game ids. Its id is "c_<catalog id>", its slug "catalog-<catalog id>".
+   */
+  catalogOnly?: boolean;
+  /** Added later. Where the hub looks for new releases: a GitHub repository or a TMLoader server. */
+  sources?: HubIndexSource[];
+  /** Added later. TMLoader product id when the project is a TMLoader product. */
+  tmloaderProduct?: string;
+}
+
+/** A release source of a project (GitHub repository "owner/repo" or a TMLoader server base URL). */
+export interface HubIndexSource {
+  kind: 'github' | 'tmloader';
+  target: string;
+  /** TMLoader product id on that server. */
+  product?: string;
+  /** Release asset pattern (GitHub), e.g. "TMFOXR-*-for-TMLoader.zip". */
+  asset?: string;
 }
 
 /** A version the launcher must not install, and offers to remove when it is installed. */
@@ -253,6 +289,11 @@ export interface HubIndexPayload {
   /** After this the launcher shows the data as stale (it keeps using it). */
   expires: IsoDateTime;
   projects: HubIndexProject[];
+  /**
+   * Added later. Catalog ids the hub no longer lists (removed by an admin, hidden by the release policy or dropped
+   * from the catalog). A launcher drops bundled catalog entries with these ids.
+   */
+  withdrawn?: string[];
   /** Approved game servers (added later; older launchers ignore it). */
   servers?: HubIndexServer[];
   revoked: HubRevocation[];
@@ -352,6 +393,10 @@ export interface HubSource {
   lastCheck: IsoDateTime | null;
   nextCheck: IsoDateTime | null;
   lastError: string | null;
+  /** Added later. true: releases wait until the project has its games and install type (a setup step, not an error). */
+  setupNeeded?: boolean;
+  /** Why games or install type could not be derived from the repository (one line; with setupNeeded). */
+  setupReason?: string;
   /** Release tags / version ids already copied into the hub. */
   imported: number;
   /** A crawled release needs the author's choice (several matching assets). */

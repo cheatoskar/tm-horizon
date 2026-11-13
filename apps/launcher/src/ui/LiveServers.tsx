@@ -9,7 +9,7 @@ import {
   rowKey, setQueryEnabled, type QGame, type QRow, type RegEntry,
 } from '../data/serverQuery';
 import { copyText } from '../pages/CommunityServices';
-import { useHubState } from '../state';
+import { loadPref, savePref, useHubState } from '../state';
 import { ago, useT } from '../i18n';
 import { GameChip, SectionHead, TmText, Toggle } from './common';
 import { Modal } from './Modal';
@@ -110,7 +110,9 @@ export function LiveServers({ games, q = '', sort = 'players', compact = false, 
   const st = useQuery();
   const since = useSince();
   const [dialog, setDialog] = useState(false);
-  const [hideOffline, setHideOffline] = useState(false);
+  // On by default; only an explicit "0" turns it off.
+  const [hideOffline, setHideOfflineState] = useState(() => loadPref('tmhub.liveHideOffline') !== '0');
+  const setHideOffline = (v: boolean) => { setHideOfflineState(v); savePref('tmhub.liveHideOffline', v ? '1' : '0'); };
   const key = games.join(',');
 
   useEffect(() => {
@@ -149,6 +151,8 @@ export function LiveServers({ games, q = '', sort = 'players', compact = false, 
 
   if (!isNative) return null;
   const off = st.registry && !st.registry.enabled;
+  const knownN = (st.registry?.servers ?? []).filter((e) => games.includes(e.game)).length;
+  const allHidden = hideOffline && !q.trim() && lines.length === 0 && knownN > 0;
   const onlineN = lines.filter((l) => l.row?.state === 'ok').length;
   const players = lines.reduce((n, l) => n + (l.row?.state === 'ok' ? l.row.info?.players ?? 0 : 0), 0);
   return (
@@ -171,7 +175,8 @@ export function LiveServers({ games, q = '', sort = 'players', compact = false, 
           {lines.length === 0 && (st.registry
             ? <div className="live-empty empty-rich">
                 <Server size={22} />
-                <b>{q.trim() || hideOffline ? t('live.noMatch') : t('live.noneFor', { games: games.map((g) => GAME_NAME[g]).join(', ') })}</b>
+                <b>{allHidden ? t('live.allOffline', { n: knownN }) : q.trim() || hideOffline ? t('live.noMatch') : t('live.noneFor', { games: games.map((g) => GAME_NAME[g]).join(', ') })}</b>
+                {allHidden && <button className="btn primary sm" onClick={() => setHideOffline(false)}>{t('live.showAll')}</button>}
                 {!q.trim() && !hideOffline && <button className="btn primary sm" onClick={() => setDialog(true)}><ListPlus size={14} /> {t('live.addServer')}</button>}
               </div>
             : <div className="live-empty dim small">{t('live.loading')}</div>)}

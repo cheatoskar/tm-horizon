@@ -560,7 +560,11 @@ export interface Community {
   icon: string | null;
   /** "Checked on" date of the sheet's section (YYYY-MM-DD), the list maintainer's last check; null if not given. */
   checked: string | null;
-  source: 'directory';
+  source: 'directory' | 'own';
+  /** Own entries only: game ids (tmnf, tmuf, ...) the server is shown for on the game pages. Without it the page guesses from the name. */
+  games?: string[];
+  /** Own entries only: pinned to the top of the list. */
+  featured?: boolean;
 }
 
 export interface CommunitiesFile extends FileMeta {

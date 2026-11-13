@@ -50,7 +50,7 @@ Hosting of the website: [Hosting der Website, z. B. Oracle Cloud wie der Hub ode
 | **Projects not yet claimed** from public sources (catalogue, Discord mod channel, GitHub, TMLoader servers): name or username of the original author, link to the source; for entries from the Discord mod channel, the Discord ID of the person who posted the entry (not displayed, only used for claiming via Discord sign-in) | Crediting the authors, claiming of the project by them | Art. 6(1)(f) GDPR | Until claimed or until removed on request (objection to [E-Mail-Adresse]) |
 | **Moderation log** (who decided what and when) | Traceability, obligations under the DSA | Art. 6(1)(c) and (f) GDPR | [3] years |
 | **Reports "Report content"** (reason, explanation, optionally name and email) | Handling under Art. 16 DSA, reply to the person reporting | Art. 6(1)(c) GDPR | [1] year after closure |
-| **Backup** of the database (contains the account data above) | Recovery after failures | Art. 6(1)(f) GDPR | [30] days; deleted data disappears from the backups at the latest by then |
+| **Backup** of the database (contains the account data above) | Recovery after failures | Art. 6(1)(f) GDPR | 14 days; deleted data disappears from the backups at the latest by then |
 
 ### Recipients and services of the hub
 

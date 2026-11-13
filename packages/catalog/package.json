@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/catalog",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Researched catalog of TrackMania sites, mods, tools and communities (catalog.json).",
   "license": "AGPL-3.0-only",

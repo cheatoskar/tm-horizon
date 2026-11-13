@@ -50,7 +50,7 @@ Hosting der Website: [Hosting der Website, z. B. Oracle Cloud wie der Hub oder G
 | **Nicht übernommene Projekte** aus öffentlichen Quellen (Katalog, Discord-Mod-Kanal, GitHub, TMLoader-Server): Name oder Benutzername der ursprünglichen Autorin bzw. des Autors, Link zur Quelle; bei Einträgen aus dem Discord-Mod-Kanal die Discord-ID der Person, die den Beitrag gepostet hat (wird nicht angezeigt, dient nur der Übernahme per Discord-Anmeldung) | Nennung der Urheber, Übernahme des Projekts durch sie | Art. 6 Abs. 1 lit. f DSGVO | bis zur Übernahme oder bis zur Entfernung auf Wunsch (Widerspruch an [E-Mail-Adresse]) |
 | **Protokoll der Moderation** (wer hat wann was entschieden) | Nachvollziehbarkeit, Pflichten nach dem DSA | Art. 6 Abs. 1 lit. c und f DSGVO | [3] Jahre |
 | **Meldungen „Inhalt melden“** (Grund, Erläuterung, freiwillig Name und E-Mail) | Bearbeitung nach Art. 16 DSA, Antwort an die meldende Person | Art. 6 Abs. 1 lit. c DSGVO | [1] Jahr nach Abschluss |
-| **Datensicherung** der Datenbank (enthält die Kontodaten oben) | Wiederherstellung nach Ausfällen | Art. 6 Abs. 1 lit. f DSGVO | [30] Tage; gelöschte Daten verschwinden spätestens dann auch aus den Sicherungen |
+| **Datensicherung** der Datenbank (enthält die Kontodaten oben) | Wiederherstellung nach Ausfällen | Art. 6 Abs. 1 lit. f DSGVO | 14 Tage; gelöschte Daten verschwinden spätestens dann auch aus den Sicherungen |
 
 ### Empfänger und Dienste des Hubs
 

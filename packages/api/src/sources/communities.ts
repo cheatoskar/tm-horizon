@@ -18,6 +18,47 @@ export const COMMUNITIES_SUGGEST = 'To add a server, contact mx_eyebo on Discord
 /** A directory row before the Discord lookup. */
 export type DirectoryEntry = Omit<Community, 'alive' | 'members' | 'online' | 'guildName' | 'icon'>;
 
+/** One curated entry of data/communities-own.json. It wins over the directory entry with the same invite code. */
+export interface OwnCommunity {
+  invite: string;
+  name: string;
+  games: string[];
+  featured?: boolean;
+  /** Local asset path (served by the launcher), used instead of Discord's CDN icon. */
+  icon?: string;
+  group?: string;
+  section?: string;
+}
+
+/** Apply the curated entries: same invite code = override name, games, featured flag and icon; unknown code = new entry. */
+export function applyOwn(list: Community[], own: OwnCommunity[]): Community[] {
+  const out = list.map((c) => ({ ...c }));
+  for (const o of own) {
+    const hits = out.filter((c) => c.invite === o.invite);
+    // The directory can list one server twice (several sections): keep the first, the own entry stands for all of them.
+    for (const c of hits.slice(1)) out.splice(out.indexOf(c), 1);
+    const base: Community = hits[0] ?? {
+      id: '', name: o.name, url: `https://discord.gg/${o.invite}`, invite: o.invite, group: 'Communities', section: 'Communities', region: null,
+      active: true, alive: null, members: null, online: null, guildName: null, icon: null, checked: null, source: 'own',
+    };
+    Object.assign(base, {
+      id: `own:${o.invite}`, name: o.name, source: 'own', games: o.games, featured: !!o.featured,
+      ...(o.group ? { group: o.group } : {}), ...(o.section ? { section: o.section } : {}), ...(o.icon ? { icon: o.icon } : {}),
+    });
+    if (!hits[0]) out.push(base);
+  }
+  return out;
+}
+
+export function readOwn(file: string): OwnCommunity[] {
+  try {
+    const j = JSON.parse(fs.readFileSync(file, 'utf8')) as OwnCommunity[];
+    return Array.isArray(j) ? j.filter((o) => o && typeof o.invite === 'string' && typeof o.name === 'string' && Array.isArray(o.games)) : [];
+  } catch {
+    return [];
+  }
+}
+
 // ------------------------------------------------------------------ sheet layout
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
@@ -208,7 +249,9 @@ export async function buildCommunities(
   const codes = [...new Set(entries.map((e) => e.invite).filter((c): c is string => !!c))];
   // Oldest answers first (never looked up = 0), at most maxLookupsPerBuild.
   const due = offline ? [] : codes.filter((c) => !cache[c] || nowDate.getTime() - cache[c].t >= ttl).sort((a, b) => (cache[a]?.t ?? 0) - (cache[b]?.t ?? 0));
-  const todo = due.slice(0, cfg.maxLookupsPerBuild);
+  // HUB_MAX_LOOKUPS lifts the per-build limit for a local catch-up run (the hourly CI build kept 150).
+  const maxLookups = Number(ctx.env.HUB_MAX_LOOKUPS) > 0 ? Number(ctx.env.HUB_MAX_LOOKUPS) : cfg.maxLookupsPerBuild;
+  const todo = due.slice(0, maxLookups);
   let looked = 0;
   let failed = 0;
   let errorsInRow = 0;
@@ -258,5 +301,6 @@ export async function buildCommunities(
       icon: info?.icon ?? null,
     };
   });
-  return { communities, sources };
+  const own = readOwn(path.join(ctx.root, 'data', 'communities-own.json'));
+  return { communities: applyOwn(communities, own), sources };
 }

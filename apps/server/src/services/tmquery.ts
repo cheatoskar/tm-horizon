@@ -204,6 +204,8 @@ export interface ServerInfo {
   password: boolean; spectatorPassword: boolean;
   players: number; maxPlayers: number; spectators: number; maxSpectators: number;
   name: string; comment: string; mode: string | null; currentMap: string | null;
+  /** Forever only: the title pack the server runs ("Stadium" for Nations, "United" for United); null for the other games. */
+  packMask: string | null;
 }
 
 /** Parses the server info bytes of a subtype 6 answer (the map list only as far as the current map). */
@@ -224,7 +226,7 @@ export function parseServerInfo(data: Buffer, v: Variant): ServerInfo {
   const players = r.u8(); const maxPlayers = r.u8(); const spectators = r.u8(); const maxSpectators = r.u8();
   r.u8(); // ladder mode
   const nameRaw = r.text();
-  if (forever) r.text(); // pack mask
+  const packMask = forever ? r.text() : null;
   const n = r.count(8);
   const names: string[] = [];
   for (let i = 0; i < n; i++) names.push(r.text());
@@ -232,7 +234,7 @@ export function parseServerInfo(data: Buffer, v: Variant): ServerInfo {
   const commentRaw = r.text();
   const info: ServerInfo = {
     gameTag: tag, reportedAddress, hostLogin, password: flag === 'p' || flag === 'f', spectatorPassword: flag === 's' || flag === 'f',
-    players, maxPlayers, spectators, maxSpectators, name: stripFormat(nameRaw), comment: stripFormat(commentRaw), mode: null, currentMap: null,
+    players, maxPlayers, spectators, maxSpectators, name: stripFormat(nameRaw), comment: stripFormat(commentRaw), mode: null, currentMap: null, packMask,
   };
   if (r.left === 0) return info;
   info.mode = MODES[r.u8()] ?? null;
@@ -244,6 +246,8 @@ export function parseServerInfo(data: Buffer, v: Variant): ServerInfo {
 }
 
 // ---- address rules and the global cap
+/** Addresses that are never contacted, whatever name leads to them (the owner's separate 100% TMX box). */
+export const NEVER_QUERY = new Set(['141.144.230.233']);
 export const queryTestFlags = { /** Tests only: lets queries and addresses reach 127.0.0.1 (fake servers). Never set outside tests. */ allowLocal: false };
 
 const CAP_PER_MINUTE = 30;
@@ -281,6 +285,7 @@ export async function resolveTarget(address: string): Promise<Target> {
     }
   }
   if (!addrs.length) throw new QueryError('dns', 'name does not resolve');
+  if (addrs.some((a) => NEVER_QUERY.has(a))) throw new QueryError('private', 'address is not queried');
   if (!local && addrs.some((a) => isPrivateIp(a))) throw new QueryError('private', 'address is not public');
   return { ip: addrs.find((a) => isIP(a) === 4) ?? addrs[0]!, port };
 }
@@ -346,7 +351,7 @@ export interface QueryResult { info: ServerInfo; pingMs: number }
  * or when a legacy server wants the other protocol version). Every connection takes a slot of the global
  * cap; with none free this throws QueryError('busy') unless `wait` is set (background job).
  */
-export async function queryServer(game: string, address: string, opts: { wait?: boolean } = {}): Promise<QueryResult> {
+export async function queryServer(game: string, address: string, opts: { wait?: boolean; /** Poller: own pacing instead of the global cap, and no second connection after a timeout. */ poll?: boolean } = {}): Promise<QueryResult> {
   const v = variantOf(game);
   if (!v) throw new QueryError('protocol', `unknown game ${game}`);
   const target = await resolveTarget(address);
@@ -354,7 +359,8 @@ export async function queryServer(game: string, address: string, opts: { wait?: 
   let version = versionOf(v);
   let lastErr: unknown = null;
   for (let attempt = 0; attempt < 2; attempt++) {
-    if (opts.wait) await waitSlot();
+    if (opts.poll) { /* the poller paces itself */ }
+    else if (opts.wait) await waitSlot();
     else if (!acquireSlot()) throw new QueryError('busy', 'too many checks right now, try again in a minute');
     const left = QUERY_TIMEOUT_MS - (Date.now() - started);
     if (attempt > 0 && left < 800) break;
@@ -367,7 +373,7 @@ export async function queryServer(game: string, address: string, opts: { wait?: 
       if (!(e instanceof QueryError)) throw e;
       const sv = e.serverVersion;
       if (e.kind === 'rejected' && sv !== undefined && sv !== version && (sv === 4 || sv === 5)) { version = sv; continue; }
-      if (e.kind === 'timeout' || e.kind === 'io') continue;
+      if ((e.kind === 'timeout' || e.kind === 'io') && !opts.poll) continue;
       throw e;
     }
   }

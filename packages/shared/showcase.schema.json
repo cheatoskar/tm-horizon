@@ -9,6 +9,12 @@
   "properties": {
     "$schema": { "type": "string" },
     "version": { "const": 1 },
+    "icon": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://.+\\.(png|webp)$",
+      "description": "Project icon: square PNG or WebP, at most 512 KB, on raw.githubusercontent.com or a GitHub release. Without it the hub looks for docs/logo/logo-256.png or logo-512.png in the repository."
+    },
     "theme": {
       "type": "object",
       "additionalProperties": false,

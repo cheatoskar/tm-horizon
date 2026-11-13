@@ -99,6 +99,8 @@ export type GameSource =
 export interface FoundInstall { game: string; path: string; exe: string }
 export interface NativeSettings {
   hubUrl: string; updateUrl: string; tmloaderDir: string | null; eswcUseLauncher: boolean; protocolAsked: boolean;
+  /** Per game (tmnf, tmuf): start through the game's own launcher instead of the game exe. */
+  useLauncher?: Record<string, boolean>;
   extraFolders: string[]; foundInstalls: FoundInstall[]; installerHashes: Record<string, string>;
   /** "Show what I play in Discord". */
   discordPresence: boolean;
@@ -338,7 +340,7 @@ export interface HubBackend {
     setupDownload?(game: string): Promise<{ path: string; url: string; version: string; size: number; sha256: string }>;
     setupRun?(game: string, path: string): Promise<void>;
   };
-  saveSettings?(patch: Partial<Pick<NativeSettings, 'hubUrl' | 'updateUrl' | 'eswcUseLauncher' | 'protocolAsked' | 'discordPresence' | 'discordTas' | 'coverDownloads' | 'language' | 'theme' | 'accent' | 'density' | 'modsView' | 'defaultGame' | 'playFromHome' | 'setupDone'>>): Promise<NativeSettings>;
+  saveSettings?(patch: Partial<Pick<NativeSettings, 'hubUrl' | 'updateUrl' | 'eswcUseLauncher' | 'useLauncher' | 'protocolAsked' | 'discordPresence' | 'discordTas' | 'coverDownloads' | 'language' | 'theme' | 'accent' | 'density' | 'modsView' | 'defaultGame' | 'playFromHome' | 'setupDone'>>): Promise<NativeSettings>;
   /** Which install folder of a game Play starts (null = the first one). */
   setSelectedInstall?(game: string, dir: string | null): Promise<void>;
   protocol?: { register(): Promise<ActionResult>; unregister(): Promise<ActionResult> };

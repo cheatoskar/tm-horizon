@@ -13,6 +13,8 @@ export interface ProjectsTable {
   license: string | null; links: string; dependencies: string; conflicts: string; author_name: string; claimed: number; catalog_id: string | null;
   state: string; removal: string | null; icon_id: string | null; banner_id: string | null; downloads: number; search_text: string;
   owner_changed_at: string | null; tmloader_product: string | null; source_url: string | null; claim_discord_id: string | null; showcase: string | null; showcase_from: string | null; created_at: string; updated_at: string;
+  /** Catalog entry (packages/catalog, release policy applied) of an imported project; the index carries it while the project is unclaimed. */
+  catalog_entry: string | null;
   /** hub.ts HubProjectType; null on projects from before the choice. */
   type: string | null; github_downloads: number; github_downloads_at: string | null;
 }
@@ -22,7 +24,10 @@ export interface VersionsTable {
   id: string; project_id: string; version: string; channel: string; changelog: string; games: string; installs: string; status: string;
   publish_at: string | null; published_at: string | null; origin: string; uploader_id: string | null; signature: string | null; verified: number;
   report: string | null; decision: string | null; file_name: string; file_size: number; file_sha256: string; storage_key: string; downloads: number; created_at: string;
+  /** Further files of the same version (browser add-ons: one per browser), JSON ExtraFile[]; null = only the main file. */
+  extra_files?: string | null;
 }
+export interface ExtraFile { name: string; size: number; sha256: string; storage_key: string; label: string | null }
 export interface SourcesTable {
   id: string; project_id: string; kind: string; target: string; product: string | null; asset_pattern: string | null; etag: string | null;
   last_check: string | null; next_check: string | null; last_error: string | null; imported: number; needs_choice: string | null;
@@ -45,6 +50,8 @@ export interface GameServersTable {
   submitter_id: string | null; submitter_hash: string | null; owner: number | null; verified_at: string | null; last_check_at: string | null; last_ok_at: string | null; offline_since: string | null; check_info: string | null;
   /** Ownership proof in progress: the code the operator puts into the server name or comment, who asked for it, until when. */
   claim_code: string | null; claim_user: string | null; claim_expires: string | null;
+  /** Live list: server login (tmtp://#join=<login>), country, last public answer of the game port (JSON), ping from the hub, failures in a row, next poll, 'seed' for the imported list. */
+  login: string | null; country: string | null; zone: string | null; live: string | null; ping_ms: number | null; poll_fail: number | null; next_poll_at: string | null; source: string | null;
 }
 /** TrackMania repositories found on GitHub (services/discover-github.ts). Public repository metadata only. state: new | accepted | hidden | ignored | known | skipped. */
 export interface DiscoveredTable {

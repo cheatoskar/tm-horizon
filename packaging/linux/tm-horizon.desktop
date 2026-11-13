@@ -8,4 +8,4 @@ Icon=tm-horizon
 Terminal=false
 Categories=Game;
 Keywords=trackmania;tmnf;tmuf;maniaplanet;tmloader;
-StartupWMClass=tm-hub
+StartupWMClass=tm-horizon

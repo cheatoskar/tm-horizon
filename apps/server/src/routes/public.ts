@@ -13,7 +13,7 @@ import { searchProjects, projectBySlug, toHubProject, roleIn, gameEnum } from '.
 import { toHubVersion } from '../services/versions.ts';
 import { currentIndex } from '../services/hubindex.ts';
 import { isAdmin } from '../services/users.ts';
-import { CappedSet, HttpError, newId, notFound, nowIso } from '../util.ts';
+import { CappedSet, HttpError, newId, notFound, nowIso, parseJson } from '../util.ts';
 
 const slugParam = z.object({ slug: z.string().max(64) });
 let salt = { day: '', value: Buffer.alloc(0) };
@@ -79,8 +79,10 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
     params: z.object({ versionId: z.string().regex(/^v_[a-z0-9]{6,20}$/), file: z.string().max(160) }), query: z.object({ install: z.string().max(80).optional() }),
     rateLimit: { max: 120, timeWindow: '1 minute' },
   }, async (req, { params, query, reply }) => {
-    const v = await ctx.db.selectFrom('versions').select(['id', 'project_id', 'status', 'storage_key', 'file_name']).where('id', '=', params.versionId).executeTakeFirst();
-    if (!v || v.file_name !== params.file) throw notFound('File not found');
+    const v = await ctx.db.selectFrom('versions').select(['id', 'project_id', 'status', 'storage_key', 'file_name', 'extra_files']).where('id', '=', params.versionId).executeTakeFirst();
+    const extra = v && v.file_name !== params.file ? parseJson<{ name: string; storage_key: string }[]>(v.extra_files ?? null, []).find((x) => x.name === params.file) : undefined;
+    if (!v || (v.file_name !== params.file && !extra)) throw notFound('File not found');
+    if (extra) v.storage_key = extra.storage_key;
     if (v.status === 'revoked') throw new HttpError(410, 'revoked', 'This version was revoked');
     const team = req.auth.user ? !!(await roleIn(ctx, v.project_id, req.auth.user.id)) || req.auth.admin : false;
     if (v.status !== 'published' && !team) throw notFound('File not found');

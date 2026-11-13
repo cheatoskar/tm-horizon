@@ -48,6 +48,7 @@ pub mod ownnews;
 pub mod openplanet;
 pub mod defender;
 pub mod dxvk;
+pub mod elevate;
 pub mod optimize;
 pub mod perfbench;
 pub mod replayarchive;
@@ -506,6 +507,9 @@ pub fn run() {
             dxvk::dxvk_plan,
             dxvk::dxvk_on,
             dxvk::dxvk_off,
+            syscfg::gpusync_state,
+            syscfg::gpusync_apply,
+            syscfg::gpusync_open_launcher,
             perfbench::bench_state,
             perfbench::bench_pick_map,
             perfbench::bench_start,

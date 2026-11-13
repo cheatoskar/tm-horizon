@@ -40,6 +40,20 @@ export function extImgPath(url: string): string | null {
       if (p.length === 3 && p[0] === 'user-attachments' && p[1] === 'assets' && /^[0-9a-f-]{36}$/.test(p[2]!)) return `/ext-img/gh-att/${p[2]}`;
       return null;
     }
+    case 'art.gametdb.com': {
+      const m = /^wii\/cover\/([A-Z]{2})\/([A-Z0-9]{4,6})\.png$/.exec(path);
+      return m ? `/ext-img/gametdb/${m[1]}/${m[2]}.png` : null;
+    }
+    case 'tmnf.exchange':
+    case 'tmuf.exchange':
+    case 'nations.tm-exchange.com':
+    case 'sunrise.tm-exchange.com':
+    case 'original.tm-exchange.com': {
+      // Track thumbnails and screenshots of the Forever-era exchange sites: trackshow/<id>/thumbnail | image/<1-9>
+      const m = /^trackshow\/(\d{1,9})\/(thumbnail|image\/[1-9])$/.exec(path);
+      const site = u.hostname.split('.')[0];
+      return m ? `/ext-img/tmx/${site}/${m[1]}/${m[2]}` : null;
+    }
     case 'i.imgur.com': {
       const m = /^([A-Za-z0-9]{5,12}\.(?:png|jpe?g|webp|gif))$/.exec(path);
       return m ? `/ext-img/imgur/${m[1]}` : null;

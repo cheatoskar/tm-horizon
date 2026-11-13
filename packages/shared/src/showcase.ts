@@ -79,6 +79,12 @@ export type ShowcaseBlock =
 export interface Showcase {
   version: 1;
   theme?: { accent: ShowcaseAccent };
+  /**
+   * Project icon (added later; older readers ignore it): square PNG or WebP, at most 512 KB, https on
+   * raw.githubusercontent.com or a GitHub release asset (or the hub's storage). The hub stores it as the
+   * project icon. Repositories without it can put docs/logo/logo-256.png (or logo-512.png) instead.
+   */
+  icon?: string;
   blocks: ShowcaseBlock[];
 }
 
@@ -363,7 +369,7 @@ export function validateShowcase(raw: unknown, opts: ShowcaseOptions = {}): Show
   try {
     if (JSON.stringify(raw).length > L.rawBytes) { c.bad('', `too large (max ${L.rawBytes} characters)`); return done(null); }
   } catch { c.bad('', 'not JSON data'); return done(null); }
-  c.keys(raw, ['$schema', 'version', 'theme', 'blocks'], '');
+  c.keys(raw, ['$schema', 'version', 'theme', 'icon', 'blocks'], '');
   if (raw.version !== undefined && raw.version !== SHOWCASE_VERSION) c.bad('version', `version must be ${SHOWCASE_VERSION}`);
   let accent: ShowcaseAccent | undefined;
   if (raw.theme !== undefined && raw.theme !== null) {
@@ -376,6 +382,12 @@ export function validateShowcase(raw: unknown, opts: ShowcaseOptions = {}): Show
       else c.bad('theme.accent', `accent must be one of ${ACCENTS.join(', ')}`);
     }
   }
+  let icon: string | undefined;
+  if (raw.icon !== undefined && raw.icon !== null) {
+    const u = cleanImageUrl(raw.icon, opts);
+    if (u && /\.(png|webp)$/i.test(new URL(u).pathname) && new URL(u).hostname !== 'i.imgur.com') icon = u;
+    else c.bad('icon', 'icon must be an https PNG or WebP on raw.githubusercontent.com or a GitHub release');
+  }
   if (!Array.isArray(raw.blocks)) { c.bad('blocks', 'required: a list of blocks'); return done(null); }
   if (raw.blocks.length > L.blocks) c.bad('blocks', `at most ${L.blocks} blocks`);
   const blocks: ShowcaseBlock[] = [];
@@ -387,7 +399,7 @@ export function validateShowcase(raw: unknown, opts: ShowcaseOptions = {}): Show
     blocks.push(r);
   });
   if (!blocks.length) { c.bad('blocks', 'no valid block'); return done(null); }
-  const showcase: Showcase = { version: 1, ...(accent ? { theme: { accent } } : {}), blocks };
+  const showcase: Showcase = { version: 1, ...(accent ? { theme: { accent } } : {}), ...(icon ? { icon } : {}), blocks };
   if (JSON.stringify(showcase).length > L.bytes) { c.bad('', `too large after cleaning (max ${L.bytes} characters)`); return done(null); }
   return done(showcase);
 }

@@ -6,7 +6,7 @@ the repository; the server creates no production key by itself.
 
 | Name | Secret | What | Who creates it |
 |---|---|---|---|
-| `HUB_INDEX_SIGNING_KEY` | **yes, the most important one** | Ed25519 private seed (base64) that signs the index the launcher trusts | me, with `npm run generate-key -w @tm-hub/server` on my PC; offline copy |
+| `HUB_INDEX_SIGNING_KEY` | **yes, the most important one** | Ed25519 private seed (base64) that signs the index the launcher trusts | me, with `npm run generate-key -w @tm-hub/server` on my PC; offline copy. Production (2026-11-12): made on the box straight into `/etc/tm-hub/prod.env`, offline copy into the password manager through the clipboard (`docs/hub/production.md`, "Index signing key") |
 | `HUB_INDEX_PUBLIC_KEYS` | no | extra public keys listed at `/v1/index/keys` during a key change | — |
 | `DATABASE_URL` | yes (password) | `postgres://tmhub:<password>@127.0.0.1:5432/tmhub` | me, at `createuser` |
 | `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | yes | Oracle "Customer Secret Key" for the bucket | OCI console |

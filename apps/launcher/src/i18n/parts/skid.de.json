@@ -15,7 +15,7 @@
   "skid.tmlTip": "Installiert das TMLoader-Produkt Skid Marks und schaltet es in diesem Profil ein.",
   "skid.direct": "Spieldateien",
   "skid.directTip": "Stattdessen die Textur im Spielordner ändern (braucht dort Admin).",
-  "skid.admin": "Das Spiel liegt in Program Files: dafür TM Horizon als Administrator starten.",
+  "skid.admin": "Das Spiel liegt in Program Files: Windows fragt einmal nach Adminrechten.",
   "skid.useTml": "TMLoader nutzen",
   "hist.k.skid-tml": "Bremsspuren auf sauber gestellt (TMLoader)",
   "hist.k.skid-tml-remove": "Bremsspuren-Produkt aus TMLoader entfernt"

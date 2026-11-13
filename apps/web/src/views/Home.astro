@@ -6,8 +6,9 @@ import Capsule from '../components/Capsule.astro';
 import LauncherShots from '../components/LauncherShots.astro';
 import DevBlock from '../components/DevBlock.astro';
 import EventCard from '../components/EventCard.astro';
-import { gameById, cover } from '../data/games';
-import { mods, catalogMods, projects, catalog, events, eventsSample, servers, liveServers, modById, showcases, entryForMod, entryImage, modCatsFor, catalogCatsFor, playersOnline } from '../data/site';
+import { gameById, cover, gameName } from '../data/games';
+import { FEATURED_AUTO, FEATURED_EXTRA } from '../data/featured';
+import { mods, catalogMods, projects, catalog, events, servers, liveServers, baseServerCount, basePlayers, modById, showcases, entryForMod, entryImage, modCatsFor, catalogCatsFor, playersOnline } from '../data/site';
 import { showcaseOf } from '@tm-hub/shared/showcase';
 import { webImg } from '@tm-hub/shared/extimg';
 import { compact, ago, tmName, pair } from '../lib/fmt';
@@ -23,7 +24,9 @@ const modCount = (gid: string) => mods.filter((m) => m.games.includes(gid)).leng
 const wallIds = ['tm2020', 'tmnf', 'tm2-canyon', 'turbo', 'tm2-valley', 'tmuf', 'tm2-lagoon', 'sm-storm', 'tm2-stadium', 'tmo', 'tms', 'eswc'];
 const wall = Array.from({ length: 9 }, (_, c) => Array.from({ length: 4 }, (_, r) => wallIds[(c * 4 + r * 5) % wallIds.length]));
 // Featured: three mods by the shared rule (recently updated + popular, one per author; packages/shared/src/featured.ts).
-const featured = pickFeatured(mods.map((m) => ({ ...m, name: m.name, updated: m.updated, downloads: m.downloads, stars: m.stars })), 3);
+const featured = pickFeatured(mods.map((m) => ({ ...m, name: m.name, updated: m.updated, downloads: m.downloads, stars: m.stars })), FEATURED_AUTO);
+const extras = FEATURED_EXTRA;
+const slideCount = featured.length + extras.length;
 const featIds = new Set(featured.map((m) => m.id));
 const recent = mods.filter((m) => !featIds.has(m.id)).slice(0, 5);
 const live = liveServers.slice().sort((a, b) => b.players - a.players).slice(0, 5);
@@ -34,7 +37,7 @@ const popular = projects.filter((p) => !p.archived).sort((a, b) => (projScore.ge
   .filter((p) => { const o = String(p.repo).split('/')[0].toLowerCase(); perOwner[o] = (perOwner[o] ?? 0) + 1; return perOwner[o] <= 2; }).slice(0, 4);
 const catCounts = Object.entries(catalogCats).map(([id, c]) => ({ id, ...c, n: catalog.filter((e) => e.category === id).length })).filter((c) => c.n).sort((a, b) => b.n - a.n);
 const upcoming = events.slice(0, 3);
-const publicServers = servers.filter((s) => !s.sample).length;
+const hubUrl = String(import.meta.env.PUBLIC_HUB_URL ?? '').replace(/\/?$/, '/');
 ---
 <Layout title="TM Horizon" lang={lang} flush>
   <section class="home-hero">
@@ -51,10 +54,10 @@ const publicServers = servers.filter((s) => !s.sample).length;
           <label><Icon name="search" size={20} /><input name="q" type="search" placeholder={t(lang, 'home.searchPlaceholder')} aria-label={t(lang, 'home.searchLabel')} /></label>
           <button class="btn primary lg" type="submit">{t(lang, 'btn.search')}</button>
         </form>
-        <div class="hero-stats">
+        <div class="hero-stats" id="hero-stats" data-hub={import.meta.env.PUBLIC_HUB_URL ? hubUrl : ''} data-base-players={basePlayers} data-base-servers={baseServerCount} data-lang={lang}>
           <div><b>{mods.length + catalogMods.length}</b><span>{t(lang, 'home.statMods')}</span></div>
-          <div><b class="liveb">{compact(playersOnline, lang)}</b><span>{t(lang, 'home.statPlayers')}</span></div>
-          <div><b>{publicServers}</b><span>{t(lang, 'home.statServers')}</span></div>
+          <div><b class="liveb" id="stat-players">{compact(basePlayers, lang)}</b><span>{t(lang, 'home.statPlayers')}</span></div>
+          <div><b id="stat-servers">{baseServerCount}</b><span>{t(lang, 'home.statServers')}</span></div>
           <div><b>{catalog.length}</b><span>{t(lang, 'home.statSites')}</span></div>
         </div>
       </div>
@@ -72,14 +75,14 @@ const publicServers = servers.filter((s) => !s.sample).length;
     <section class="sec">
       <div class="sec-h"><h2>{t(lang, 'type.mods')}</h2><span class="sub">{t(lang, 'home.modsSub')}</span><a class="more" href={L('/discover/mods/')}>{t(lang, 'home.modsMore')} <Icon name="arrow-right" size={16} /></a></div>
       <div class="duo">
-        {featured.length > 0 && (
+        {slideCount > 0 && (
           <div class="feat-car" data-carousel aria-roledescription="carousel" aria-label={t(lang, 'home.featured')}>
             {featured.map((m, i) => {
               const [a, b] = pair(m.id);
               const sc = showcaseOf(showcases, m.id, m.name);
               const shot = webImg(entryImage(entryForMod(m)) ?? (sc?.blocks.find((b) => b.type === 'hero') as { image?: string } | undefined)?.image);
               return (
-                <a class={`feat ${i === 0 ? 'on' : ''}`} href={L(`/mod/${m.id}/`)} data-slide={i} aria-roledescription="slide" aria-label={t(lang, 'home.featSlide', { n: i + 1, total: featured.length, name: m.name })} aria-hidden={i === 0 ? undefined : 'true'} tabindex={i === 0 ? undefined : -1}>
+                <a class={`feat ${i === 0 ? 'on' : ''}`} href={L(`/mod/${m.id}/`)} data-slide={i} aria-roledescription="slide" aria-label={t(lang, 'home.featSlide', { n: i + 1, total: slideCount, name: m.name })} aria-hidden={i === 0 ? undefined : 'true'} tabindex={i === 0 ? undefined : -1}>
                   {shot
                     ? <img src={shot} alt="" loading={i === 0 ? 'eager' : 'lazy'} />
                     : <span class="feat-gen" aria-hidden="true" style={`--a:${a};--b:${b}`}><Thumb src={null} seed={m.id} glyph={modCats[m.category]?.icon} size={260} /></span>}
@@ -91,11 +94,26 @@ const publicServers = servers.filter((s) => !s.sample).length;
                 </a>
               );
             })}
-            {featured.length > 1 && (
+            {extras.map((e, j) => {
+              const i = featured.length + j;
+              const [a, b] = pair(e.id);
+              return (
+                <a class={`feat ${i === 0 ? 'on' : ''}`} href={e.url} target="_blank" rel="noopener" data-slide={i} aria-roledescription="slide" aria-label={t(lang, 'home.featSlide', { n: i + 1, total: slideCount, name: e.name })} aria-hidden={i === 0 ? undefined : 'true'} tabindex={i === 0 ? undefined : -1}>
+                  <span class="feat-gen" aria-hidden="true" style={`--a:${a};--b:${b}`}><Thumb src={null} seed={e.id} glyph="puzzle" size={260} /></span>
+                  <div class="feat-body">
+                    <span class="kicker" style="color:#ffb27f"><Icon name="sparkles" size={15} /> {t(lang, 'home.featured')}</span>
+                    <div class="feat-row"><Thumb src={null} seed={e.id} glyph="puzzle" size={64} /><div><h3>{e.name}</h3><span style="color:rgba(255,255,255,.75)">{t(lang, 'card.by')} {e.author} · {t(lang, 'home.featOfficial')}</span></div></div>
+                    <p>{e.summary[lang] ?? e.summary.en}</p>
+                    <div class="chips">{e.games.map((g) => <span class="chip">{gameName(g)}</span>)}</div>
+                  </div>
+                </a>
+              );
+            })}
+            {slideCount > 1 && (
               <div class="feat-nav">
                 <button type="button" class="feat-arrow" data-prev aria-label={t(lang, 'home.featPrev')}><Icon name="chevron-left" size={20} /></button>
                 <div class="feat-dots" role="tablist">
-                  {featured.map((m, i) => <button type="button" class={`feat-dot ${i === 0 ? 'on' : ''}`} data-dot={i} role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={m.name}></button>)}
+                  {[...featured.map((m) => m.name), ...extras.map((e) => e.name)].map((name, i) => <button type="button" class={`feat-dot ${i === 0 ? 'on' : ''}`} data-dot={i} role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={name}></button>)}
                 </div>
                 <button type="button" class="feat-arrow" data-next aria-label={t(lang, 'home.featNext')}><Icon name="chevron-right" size={20} /></button>
               </div>
@@ -130,7 +148,7 @@ const publicServers = servers.filter((s) => !s.sample).length;
           </div>
         </div>
         <div>
-          <div class="sec-h"><h2>{t(lang, 'nav.events')}</h2>{eventsSample && <span class="badge sample">{t(lang, 'chip.sample')}</span>}<a class="more" href={L('/events/')}>{t(lang, 'home.calendar')} <Icon name="arrow-right" size={16} /></a></div>
+          <div class="sec-h"><h2>{t(lang, 'nav.events')}</h2><a class="more" href={L('/events/')}>{t(lang, 'home.calendar')} <Icon name="arrow-right" size={16} /></a></div>
           <div class="ev-list">{upcoming.map((e) => <EventCard e={e} compact lang={lang} />)}</div>
         </div>
       </div>
@@ -164,6 +182,28 @@ const publicServers = servers.filter((s) => !s.sample).length;
     <DevBlock lang={lang} />
   </div>
 </Layout>
+
+<script is:inline>
+  // Hero numbers: build-time servers and players (ManiaPlanet, TM2020) plus the hub's live list (servers that answered
+  // its direct query, their players summed). Refreshed every 60 s like /servers. The two sources never overlap: the build data
+  // has no Forever/ESWC/Sunrise/Original servers (site.ts HUB_LIVE_GAMES).
+  (function () {
+    var box = document.getElementById('hero-stats'); if (!box || !box.dataset.hub) return;
+    var bp = Number(box.dataset.basePlayers) || 0, bs = Number(box.dataset.baseServers) || 0;
+    var loc = { en: 'en-GB', de: 'de-DE', pl: 'pl-PL', fr: 'fr-FR' }[box.dataset.lang] || 'en-GB';
+    var fmt = function (n) { return n < 1000 ? String(n) : new Intl.NumberFormat(loc, { notation: 'compact', maximumFractionDigits: n < 10000 || n >= 1e6 ? 1 : 0 }).format(n); };
+    function load() {
+      fetch(box.dataset.hub + 'v1/servers', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (a) {
+        if (!Array.isArray(a)) return;
+        var on = a.filter(function (s) { return s.state === 'online'; });
+        document.getElementById('stat-players').textContent = fmt(bp + on.reduce(function (n, s) { return n + (Number(s.players) || 0); }, 0));
+        document.getElementById('stat-servers').textContent = String(bs + on.length);
+      }).catch(function () { /* keep the build-time numbers */ });
+    }
+    load();
+    setInterval(function () { if (!document.hidden) load(); }, 60000);
+  })();
+</script>
 
 <script is:inline>
   // Featured carousel: advances every 7 s, pauses while hovered or focused, never moves on its own with reduced motion.

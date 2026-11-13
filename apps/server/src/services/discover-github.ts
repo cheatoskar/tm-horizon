@@ -351,7 +351,7 @@ async function freeSlug(ctx: Ctx, name: string, owner: string): Promise<string> 
 }
 
 /** Accepts one discovered repository as an unclaimed, link-only project (no install, no source: the crawler never touches it). */
-export async function acceptDiscovered(ctx: Ctx, repo: string, actor: string, over: { games?: GameId[]; type?: HubProjectType } = {}): Promise<string> {
+export async function acceptDiscovered(ctx: Ctx, repo: string, actor: string, over: { games?: GameId[]; type?: HubProjectType; /** Main link instead of the repository's homepage (an openplanet.dev page). */ homepage?: string; /** Openplanet plugin: install through Openplanet's plugin manager. */ openplanet?: boolean } = {}): Promise<string> {
   const row = await ctx.db.selectFrom('discovered').selectAll().where('repo', '=', repo.toLowerCase()).executeTakeFirst();
   if (!row) throw notFound('Not in the discovered list');
   if (row.state === 'accepted' && row.project_slug) return row.project_slug;
@@ -365,10 +365,11 @@ export async function acceptDiscovered(ctx: Ctx, repo: string, actor: string, ov
   const summary = (row.description ?? '').trim();
   const links: Record<string, string> = { source: row.html_url, issues: `${row.html_url}/issues` };
   if (row.homepage) links.homepage = row.homepage;
+  if (over.homepage) links.homepage = over.homepage;
   const p = await createProject(ctx, {
     name: row.name.slice(0, 64).padEnd(2, '_'), slug: await freeSlug(ctx, row.name, row.owner), type: over.type ?? guessType(topics, row.language),
     summary: (summary.length >= 10 ? summary : `${row.name} for TrackMania`).slice(0, 200),
-    description: `${summary}\n\n*Found on GitHub by the TM Horizon crawler. Link only: the files are on GitHub. Not claimed by its author yet.*`,
+    description: `${summary}\n\n*Found on GitHub by the TM Horizon crawler. Link only: ${over.openplanet ? 'install it with the plugin manager inside Openplanet (Plugins, Plugin Manager)' : 'the files are on GitHub'}. Not claimed by its author yet.*`,
     categories: [], tags: [], games, installs: {}, license: row.license, links, dependencies: [], conflicts: [], tmloaderProduct: null,
   }, null, { author_name: row.owner, source_url: row.html_url, state: 'listed' });
   await ctx.db.updateTable('discovered').set({ state: 'accepted', project_slug: p.slug, decided_at: nowIso(), decided_by: actor }).where('repo', '=', row.repo).execute();
@@ -398,15 +399,24 @@ export async function acceptWithTopics(ctx: Ctx, actor: string): Promise<{ accep
 /** Public list for the website: accepted repositories (listed projects), newest push first. */
 export async function publicGithubProjects(ctx: Ctx, q: { game?: string; language?: string; q?: string; page: number; limit: number }) {
   let query = ctx.db.selectFrom('discovered').innerJoin('projects', 'projects.slug', 'discovered.project_slug').where('discovered.state', '=', 'accepted').where('projects.state', '=', 'listed');
-  if (q.game) query = query.where('discovered.games', 'like', `%"${q.game.replace(/[^a-z0-9-]/g, '')}"%`);
+  // the project's games (curation sets TM2020 for Openplanet plugins), not the topic guess of the discovery row
+  if (q.game) query = query.where('projects.games', 'like', `%"${q.game.replace(/[^a-z0-9-]/g, '')}"%`);
   if (q.language) query = query.where('discovered.language', '=', q.language);
   for (const t of (q.q ?? '').toLowerCase().split(/\s+/).filter(Boolean).slice(0, 5)) {
     const like = `%${t.replace(/[%_\\]/g, '')}%`;
     query = query.where((eb) => eb.or([eb('discovered.repo', 'like', like), eb('discovered.description', 'like', like), eb('discovered.topics', 'like', like)]));
   }
   const total = Number((await query.select((eb) => eb.fn.countAll().as('n')).executeTakeFirst())?.n ?? 0);
-  const rows = await query.selectAll('discovered').select(['projects.claimed as claimed']).orderBy('discovered.pushed_at', 'desc').orderBy('discovered.repo').limit(q.limit).offset((q.page - 1) * q.limit).execute();
-  return { total, page: q.page, items: rows.map((r) => ({ ...toPublic(toDiscovered(r)), claimed: !!r.claimed })) };
+  const rows = await query.selectAll('discovered').select(['projects.claimed as claimed', 'projects.type as ptype', 'projects.games as pgames', 'projects.links as plinks', 'projects.summary as psummary']).orderBy('discovered.pushed_at', 'desc').orderBy('discovered.repo').limit(q.limit).offset((q.page - 1) * q.limit).execute();
+  return { total, page: q.page, items: rows.map((r) => {
+      const links = parseJson<{ homepage?: string }>(r.plinks, {});
+      const opPage = links.homepage && /^https:\/\/openplanet\.dev\/plugin\/[\w.-]+$/.test(links.homepage) ? links.homepage : null;
+      return {
+        ...toPublic(toDiscovered(r)), claimed: !!r.claimed,
+        // For the launcher's per-game "More projects": game ids of the project, its type (openplanet-plugin or a repository kind), a short text and ONE link (openplanet.dev page when known, else the repository).
+        games: parseJson<GameId[]>(r.pgames, parseJson<GameId[]>(r.games, [])), type: r.ptype, summary: r.psummary, openplanetPage: opPage, link: opPage ?? r.html_url,
+      };
+    }) };
 }
 
 const toPublic = (d: DiscoveredItem) => ({

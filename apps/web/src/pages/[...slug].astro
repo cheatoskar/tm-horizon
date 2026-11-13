@@ -12,6 +12,7 @@ import Mod from '../views/Mod.astro';
 import CatalogMod from '../views/CatalogMod.astro';
 import Download from '../views/Download.astro';
 import AddServer from '../views/AddServer.astro';
+import LiveServers from '../views/LiveServers.astro';
 import DiscoverType from '../views/DiscoverType.astro';
 import Legal from '../views/Legal.astro';
 import DevHome from '../views/DevHome.astro';
@@ -33,6 +34,7 @@ export async function getStaticPaths() {
     add('', 'home');
     add('events', 'events');
     add('add-server', 'addserver');
+    add('servers', 'liveservers');
     add('launcher', 'launcher');
     add('download', 'download');
     add('authors', 'authors');
@@ -51,7 +53,7 @@ export async function getStaticPaths() {
 }
 
 const { view, ...props } = Astro.props as { view: string; [k: string]: any };
-const views: Record<string, any> = { home: Home, events: Events, addserver: AddServer, launcher: Launcher, authors: Authors, directory: Directory, games: Games, game: Game, mod: Mod, catalogmod: CatalogMod, download: Download, type: DiscoverType, legal: Legal, devhome: DevHome, devdoc: DevDoc, github: GithubProjects };
+const views: Record<string, any> = { home: Home, events: Events, addserver: AddServer, liveservers: LiveServers, launcher: Launcher, authors: Authors, directory: Directory, games: Games, game: Game, mod: Mod, catalogmod: CatalogMod, download: Download, type: DiscoverType, legal: Legal, devhome: DevHome, devdoc: DevDoc, github: GithubProjects };
 const View = views[view];
 ---
 <View {...props} />

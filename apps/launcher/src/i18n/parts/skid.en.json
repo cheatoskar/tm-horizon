@@ -15,7 +15,7 @@
   "skid.tmlTip": "Installs the TMLoader product Skid Marks and turns it on in this profile.",
   "skid.direct": "Game files",
   "skid.directTip": "Change the texture in the game folder instead (needs admin there).",
-  "skid.admin": "The game is in Program Files: this needs TM Horizon as administrator.",
+  "skid.admin": "The game is in Program Files: Windows asks for admin rights once.",
   "skid.useTml": "Use TMLoader",
   "hist.k.skid-tml": "Skid marks set to clean (TMLoader)",
   "hist.k.skid-tml-remove": "Skid marks TMLoader product removed"

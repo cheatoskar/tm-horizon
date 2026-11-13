@@ -260,30 +260,58 @@ export async function announce(ctx: Ctx, token: string, a: Announce): Promise<{ 
 }
 
 export async function approvedServers(ctx: Ctx): Promise<HubIndexServer[]> {
-  const rows = await ctx.db.selectFrom('game_servers').select(['game', 'address', 'name', 'homepage', 'status', 'owner']).where('status', 'in', LISTED).orderBy('created_at').execute();
+  const rows = await ctx.db.selectFrom('game_servers').select(['game', 'address', 'name', 'homepage', 'status', 'owner']).where('status', 'in', LISTED).where('address', '!=', '').orderBy('created_at').execute();
   return rows.map((r) => ({ game: r.game as ServerGame, address: r.address, name: r.name, homepage: r.homepage, ...(r.status === 'verified' && !r.owner ? { suggested: true } : {}) }));
 }
 
-export interface PublicServer extends HubIndexServer {
-  online: boolean; announcedAt: string | null; players: number | null; maxPlayers: number | null; map: string | null;
+/** A server counts as offline after this many failed polls in a row. */
+export const OFFLINE_AFTER = 3;
+
+export interface PublicServer {
+  game: ServerGame;
+  /** "host:port"; null when the address is not known (JoinGuide only). */
+  address: string | null;
+  /** Server login for tmtp://#join=<login> (Forever) or the in-game search (ESWC). */
+  login: string | null;
+  name: string; homepage: string | null;
+  /** online: answered the last polls; offline: OFFLINE_AFTER failed polls in a row; unknown: no live data (not queried, address unknown, never answered yet). */
+  state: 'online' | 'offline' | 'unknown';
+  online: boolean; announcedAt: string | null;
+  players: number | null; maxPlayers: number | null; spectators: number | null; map: string | null; mode: string | null;
+  password: boolean | null; country: string | null; zone: string | null;
+  /** Round trip of the last query from the hub, ms. */
+  pingMs: number | null;
+  /** Last time the server answered (or announced). */
+  lastSeen: string | null;
   /** Listed by a community member, not (yet) claimed by the operator. */
   suggested: boolean;
 }
 
-export async function publicServers(ctx: Ctx): Promise<PublicServer[]> {
-  const rows = await ctx.db.selectFrom('game_servers').selectAll().where('status', 'in', LISTED).orderBy('created_at').execute();
-  return rows.map((r) => {
+export async function publicServers(ctx: Ctx, opts: { game?: string } = {}): Promise<PublicServer[]> {
+  let q = ctx.db.selectFrom('game_servers').selectAll().where('status', 'in', LISTED);
+  // United players can join Nations servers, so the tmuf list carries the tmnf ones too (each row has its own game).
+  if (opts.game) q = q.where('game', 'in', opts.game === 'tmuf' ? ['tmuf', 'tmnf'] : [opts.game]);
+  const rows = await q.orderBy('created_at').execute();
+  const now = Date.now();
+  const out = rows.map((r): PublicServer => {
     const a = r.announce ? (JSON.parse(r.announce) as Announce) : null;
-    const announced = !!r.announced_at && Date.now() - Date.parse(r.announced_at) < ONLINE_WINDOW_MS;
-    const checked = !announced && !r.offline_since && !!r.last_ok_at && Date.now() - Date.parse(r.last_ok_at) < CHECK_ONLINE_MS;
-    const c = checked && r.check_info ? (JSON.parse(r.check_info) as PublicInfo) : null;
-    const live = announced && a ? { players: a.players, maxPlayers: a.maxPlayers, map: a.map ?? null } : c ? { players: c.players, maxPlayers: c.maxPlayers, map: c.map } : null;
+    const announced = !!r.announced_at && now - Date.parse(r.announced_at) < ONLINE_WINDOW_MS;
+    const polled = !!r.last_ok_at && (r.poll_fail ?? 0) < OFFLINE_AFTER;
+    const c = polled && (r.live ?? r.check_info) ? (JSON.parse((r.live ?? r.check_info)!) as Partial<PublicInfo> & { maxSpectators?: number }) : null;
+    const fresher = announced && a && (!c || Date.parse(r.announced_at!) > Date.parse(r.last_ok_at!));
+    const state: PublicServer['state'] = polled || announced ? 'online' : (r.poll_fail ?? 0) >= OFFLINE_AFTER ? 'offline' : 'unknown';
+    const src = fresher ? { players: a.players, maxPlayers: a.maxPlayers, spectators: a.spectators ?? null, map: a.map ?? null, mode: a.mode ?? null, password: null as boolean | null }
+      : c ? { players: c.players ?? null, maxPlayers: c.maxPlayers ?? null, spectators: c.spectators ?? null, map: c.map ?? null, mode: c.mode ?? null, password: c.password ?? null }
+      : null;
     return {
-      game: r.game as ServerGame, address: r.address, name: r.name, homepage: r.homepage, online: announced || checked, announcedAt: r.announced_at,
-      players: live?.players ?? null, maxPlayers: live?.maxPlayers ?? null, map: live?.map ?? null,
-      suggested: r.status === 'verified' && !r.owner,
+      game: r.game as ServerGame, address: r.address || null, login: r.login, name: r.name, homepage: r.homepage, state, online: state === 'online', announcedAt: r.announced_at,
+      players: src?.players ?? null, maxPlayers: src?.maxPlayers ?? null, spectators: src?.spectators ?? null, map: src?.map ?? null, mode: src?.mode ?? null,
+      password: src?.password ?? null, country: r.country, zone: r.zone, pingMs: polled ? r.ping_ms : null,
+      lastSeen: fresher ? r.announced_at : r.last_ok_at, suggested: r.status === 'verified' && !r.owner,
     };
   });
+  const rank = { online: 0, unknown: 1, offline: 2 } as const;
+  return out.sort((x, y) => rank[x.state] - rank[y.state] || (y.players ?? -1) - (x.players ?? -1) || x.name.localeCompare(y.name));
 }
 
 // ---- re-check job
@@ -295,21 +323,21 @@ export async function recheckServer(ctx: Ctx, id: string, opts: { wait?: boolean
   const at = nowIso();
   try {
     const pub = toPublicInfo((await queryServer(row.game, row.address, opts)).info);
-    const set: Record<string, unknown> = { last_check_at: at, last_ok_at: at, offline_since: null, check_info: JSON.stringify(pub) };
+    const set: Record<string, unknown> = { last_check_at: at, last_ok_at: at, offline_since: null, check_info: JSON.stringify(pub), live: JSON.stringify(pub), poll_fail: 0 };
     if (row.status === 'verified' && pub.name.length >= 3) set.name = pub.name;
     await ctx.db.updateTable('game_servers').set(set).where('id', '=', id).execute();
     return 'online';
   } catch (e) {
     if (e instanceof QueryError && e.kind === 'busy') return 'skipped';
     if (!(e instanceof QueryError)) throw e;
-    await ctx.db.updateTable('game_servers').set({ last_check_at: at, offline_since: row.offline_since ?? at }).where('id', '=', id).execute();
+    await ctx.db.updateTable('game_servers').set({ last_check_at: at, offline_since: row.offline_since ?? at, poll_fail: OFFLINE_AFTER }).where('id', '=', id).execute();
     return 'offline';
   }
 }
 
 /** All listed servers one after another (the global query cap spaces them out), then removal of the long-offline ones. Returns the ids removed. */
 export async function recheckAll(ctx: Ctx): Promise<{ checked: number; removed: string[] }> {
-  const rows = await ctx.db.selectFrom('game_servers').select('id').where('status', 'in', LISTED).orderBy('last_check_at').execute();
+  const rows = await ctx.db.selectFrom('game_servers').select('id').where('status', 'in', LISTED).where('address', '!=', '').orderBy('last_check_at').execute();
   for (const r of rows) await recheckServer(ctx, r.id, { wait: true });
   return { checked: rows.length, removed: await removeLongOffline(ctx) };
 }
@@ -317,7 +345,7 @@ export async function recheckAll(ctx: Ctx): Promise<{ checked: number; removed: 
 /** Soft removal: status removed with a note that says where it was; an admin can restore it. */
 export async function removeLongOffline(ctx: Ctx, now = Date.now()): Promise<string[]> {
   const cutoff = new Date(now - REMOVE_AFTER_OFFLINE_MS).toISOString();
-  const rows = await ctx.db.selectFrom('game_servers').select(['id', 'status']).where('status', 'in', LISTED).where('offline_since', '<', cutoff).execute();
+  const rows = await ctx.db.selectFrom('game_servers').select(['id', 'status']).where('status', 'in', LISTED).where('offline_since', '<', cutoff).where((eb) => eb.or([eb('source', 'is', null), eb('source', '!=', 'seed')])).execute();
   for (const r of rows) {
     await ctx.db.updateTable('game_servers').set({ status: 'removed', note: `auto:offline:${r.status}`, decided_at: nowIso() }).where('id', '=', r.id).execute();
     await ctx.audit('system', 'server.auto_remove', r.id);

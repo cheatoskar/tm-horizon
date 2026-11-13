@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/server",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "TM Horizon Hub backend: projects, versions, upload checks, signed index, developer portal API.",
   "license": "AGPL-3.0-only",
@@ -13,6 +13,10 @@
     "start": "node --disable-warning=ExperimentalWarning src/main.ts",
     "seed": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/seed.ts",
     "import-catalog": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/import-catalog.ts",
+    "check-sources": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/check-sources.ts",
+    "curate-discovered": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/curate-discovered.ts",
+    "recheck-dinput8": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/recheck-dinput8.ts",
+    "import-server-seeds": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/import-server-seeds.ts",
     "generate-key": "node scripts/generate-key.ts",
     "openapi": "node scripts/write-openapi.ts",
     "typecheck": "tsc --noEmit",

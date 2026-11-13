@@ -1,0 +1,38 @@
+/* 0.5.2: Performance card (src/ui/PerfPanel.tsx). Each tab is a stack of blocks: a small head (title, badge),
+   option rows (text left, its switch or select right, like the settings rows) and one action bar per block
+   (`ctl-bar sm`, so buttons, selects and inputs share one height, see styles-controls.css). No borders between
+   rows, one line between blocks; everything wraps at narrow widths instead of squeezing labels. */
+.perf-block { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; min-width: 0; }
+.perf-block + .perf-block { border-top: 1px solid var(--line); }
+.perf-tabs + .perf-block, .section-head + .perf-block { padding-top: 4px; }
+.perf-block:last-child { padding-bottom: 0; }
+.perf-block p, .perf-block ul { margin: 0; }
+.perf-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-height: 22px; }
+.perf-head h3 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.01em; }
+.perf-head .pill.tiny { margin-left: 0; }
+
+.perf-opt { display: flex; align-items: center; gap: 12px; min-height: 32px; }
+.perf-opt-text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.perf-label { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.perf-opt > .toggle, .perf-opt > .pill, .perf-opt > .btn, .perf-opt > select { flex: none; }
+.perf-opt > select.text-in { max-width: 50%; }
+
+.perf-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.perf-actions > :is(select.text-in, input.text-in) { height: var(--bar-h); box-sizing: border-box; }
+.perf-actions > select.text-in { flex: 1 1 150px; min-width: 0; max-width: 100%; }
+.perf-actions > input.text-in[type="text"] { flex: 1 1 140px; min-width: 0; }
+.perf-actions > input.text-in[type="number"] { width: 64px; flex: none; }
+
+.perf-fields { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.perf-fields > label { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.perf-fields input.text-in[type="number"] { width: 72px; height: var(--ctl-h-sm); box-sizing: border-box; }
+
+.perf-tips { padding-left: 18px; }
+.perf-tips li::marker { color: var(--warn); }
+.perf-tips li + li { margin-top: 2px; }
+
+.perf-hint { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--dim); }
+.perf-block + .perf-hint { margin-top: 0; }
+.perf-hint > svg { flex: none; margin-top: 2px; color: var(--acc); }
+
+.perf-block .table { margin-top: 2px; }

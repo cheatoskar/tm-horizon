@@ -311,12 +311,30 @@ pub fn save_prefs(data: &Path, p: &Prefs) -> Result<(), String> {
     crate::fsx::write(&data.join("perf-prefs.json"), serde_json::to_string_pretty(p).map_err(|e| e.to_string())?.as_bytes())
 }
 
-/// Is the game's exe (or, for Forever, TMLoader) running?
+/// Is the game itself running? Only the game's exe counts (`TmForever.exe` for TMNF/TMUF): TMLoader's
+/// window or tray icon often stays open after the game closed, and nothing the callers write (files next to
+/// the game exe, the config in Documents, replays, the Play button's state) belongs to TMLoader.
 pub fn game_running(st: &crate::state::AppState, game: &str) -> bool {
     let exe = st.install(game).and_then(|i| i.exe);
-    let want = crate::discord::process_names(game, exe.as_deref());
-    let running = crate::platform::running_process_names();
-    running.iter().any(|p| want.iter().any(|w| p.eq_ignore_ascii_case(w)) || p.eq_ignore_ascii_case("tmloader.exe") && matches!(game, "tmnf" | "tmuf"))
+    game_running_in(&crate::platform::running_process_names(), game, exe.as_deref())
+}
+
+/// `game_running` on a given process list.
+pub fn game_running_in(running: &[String], game: &str, exe: Option<&str>) -> bool {
+    let want = crate::discord::process_names(game, exe);
+    running.iter().any(|p| want.iter().any(|w| p.eq_ignore_ascii_case(w)))
+}
+
+/// Why a change has to wait, as a message (None: go ahead). `exes` = the game's own processes; `tmloader` =
+/// the change writes into TMLoader's install (its products or profiles): only then an open TMLoader counts.
+pub fn close_first(running: &[String], exes: &[&str], tmloader: bool) -> Option<String> {
+    if let Some(p) = running.iter().find(|p| exes.iter().any(|e| p.eq_ignore_ascii_case(e))) {
+        return Some(format!("{p} is running. Close the game first."));
+    }
+    if tmloader && running.iter().any(|p| p.eq_ignore_ascii_case("tmloader.exe")) {
+        return Some("TMLoader is open. Close it first (also its tray icon).".into());
+    }
+    None
 }
 
 // ------------------------------------------------------------------ commands
@@ -443,6 +461,29 @@ pub fn perf_prefs_set(st: tauri::State<crate::state::AppState>, prefs: Prefs) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn procs(v: &[&str]) -> Vec<String> {
+        v.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn only_the_game_exe_counts_as_running() {
+        // TMLoader's window or tray icon alone: the game is closed.
+        assert!(!game_running_in(&procs(&["explorer.exe", "TMLoader.exe"]), "tmnf", Some(r"C:\TmNationsForever\TmForever.exe")));
+        assert!(!game_running_in(&procs(&["TMLoader.exe"]), "tmuf", None));
+        assert!(game_running_in(&procs(&["TMLoader.exe", "TmForever.exe"]), "tmuf", None));
+        assert!(game_running_in(&procs(&["TmSunrise.exe"]), "tm-sunrise", None));
+        assert!(!game_running_in(&procs(&["TmForever.exe"]), "tm-sunrise", None));
+    }
+
+    #[test]
+    fn close_first_names_tmloader_only_where_it_matters() {
+        let exes = ["tmforever.exe"];
+        assert_eq!(close_first(&procs(&["TMLoader.exe"]), &exes, false), None);
+        assert!(close_first(&procs(&["TMLoader.exe"]), &exes, true).unwrap().starts_with("TMLoader is open"));
+        assert!(close_first(&procs(&["TMLoader.exe", "TmForever.exe"]), &exes, true).unwrap().starts_with("TmForever.exe is running"));
+        assert_eq!(close_first(&procs(&["explorer.exe"]), &exes, true), None);
+    }
     use std::collections::HashMap;
 
     #[derive(Default)]

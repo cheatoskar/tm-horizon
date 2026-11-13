@@ -1855,7 +1855,7 @@
   "perf.dxvk.err.running": "Le jeu est en cours. Fermez-le d'abord.",
   "perf.dxvk.err.blocked": "Ce dossier est protégé.",
   "perf.dxvk.err.notWritable": "Le dossier du jeu n'est pas modifiable (Program Files demande les droits administrateur).",
-  "perf.dxvk.err.foreignDll": "Un autre mod d3d9.dll est déjà dans le dossier du jeu (p. ex. TM Vibrant Shaders) ; DXVK ne peut pas passer derrière.",
+  "perf.dxvk.err.foreignDll": "Un d3d9.dll est déjà dans le dossier du jeu (p. ex. TM Vibrant Shaders). DXVK ne peut pas tourner derrière : retirez d’abord ce mod.",
   "perf.dxvk.err.foreignConf": "Le dossier du jeu contient déjà un dxvk.conf que le lanceur n'a pas écrit.",
   "perf.dxvk.err.alreadyOn": "DXVK est déjà activé.",
   "perf.dxvk.err.notInstalled": "Le jeu n'est pas installé.",

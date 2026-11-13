@@ -37,3 +37,10 @@ export function useFormatTime() {
     return m < 60 ? t('playtime.min', { m }) : t('playtime.hm', { h: Math.floor(m / 60), m: m % 60 });
   };
 }
+
+/** Short form for big numbers: "1577 h" from 100 h on, otherwise like useFormatTime. */
+export function useFormatTimeShort() {
+  const t = useT();
+  const full = useFormatTime();
+  return (s: number) => (s >= 100 * 3600 ? t('playtime.h', { h: Math.round(s / 3600) }) : full(s));
+}

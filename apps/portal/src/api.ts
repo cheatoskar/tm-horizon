@@ -91,6 +91,8 @@ export interface DiscoveredItem {
   stars: number; forks: number; isFork: boolean; archived: boolean; license: string | null; pushed: string | null; score: number; games: string[]; gamesGuessed: boolean;
   hasReadme: boolean | null; state: string; note: string | null; projectSlug: string | null; firstSeen: string;
 }
+export type CurationItem = DiscoveredItem & { bucket: 'approve' | 'reject' | 'pending'; code: string; reason: string; openplanet: boolean; openplanetPage: string | null };
+export interface DiscoveredCuration { counts: Record<string, { n: number; codes: Record<string, number> }>; items: CurationItem[] }
 export interface DiscoveredList { enabled: boolean; counts: Record<string, number>; last: { at: string; seen: number; added: number; error: string | null } | null; items: DiscoveredItem[] }
 export interface Notice { kind: string; text: string; url?: string; at: string }
 export type StatementInput = { facts: string; ground: string; groundType: 'terms' | 'law'; automated: boolean; redress?: string };
@@ -147,6 +149,7 @@ export const api = {
 
   addSource: (slug: string, b: { url: string; product?: string | null }) => post(`/v1/projects/${q(slug)}/sources`, b),
   checkSource: (id: string) => post(`/v1/sources/${q(id)}/check`),
+  refreshGithub: (slug: string) => post<{ changed: string[]; skipped: string[]; ran: boolean }>(`/v1/projects/${q(slug)}/refresh-github`),
   chooseAsset: (id: string, tag: string, asset: string) => post(`/v1/sources/${q(id)}/choose`, { tag, asset }),
   removeSource: (id: string) => send('DELETE', `/v1/sources/${q(id)}`),
 
@@ -191,6 +194,8 @@ export const api = {
   discovered: (state: string) => get<DiscoveredList>(`/v1/admin/discovered?state=${q(state)}`),
   acceptDiscovered: (repo: string) => post<{ slug: string }>(`/v1/admin/discovered/${repo.split('/').map(q).join('/')}/accept`),
   decideDiscovered: (repo: string, what: 'hide' | 'ignore' | 'restore') => post(`/v1/admin/discovered/${repo.split('/').map(q).join('/')}/${what}`),
+  curation: () => get<DiscoveredCuration>('/v1/admin/discovered-curation'),
+  bulkDiscovered: (repos: string[], action: 'accept' | 'hide') => post<{ rejected: number; approved: number; failed: { repo: string; error: string }[] }>('/v1/admin/discovered/bulk', { repos, action }),
   acceptWithTopics: () => post<{ accepted: string[]; failed: { repo: string; error: string }[] }>('/v1/admin/discovered/accept-with-topics'),
   runDiscovery: () => post<{ added: number; requests: number; error: string | null }>('/v1/admin/discovered/run'),
 };

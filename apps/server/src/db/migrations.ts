@@ -151,6 +151,27 @@ export const migrationsFor = (sqlite: boolean): Record<string, Migration> => ({
       await db.schema.createIndex('discovered_state').on('discovered').columns(['state', 'score']).execute();
     },
   },
+  // Catalog entry of an imported project (sources/catalog-import.ts): what the signed index lists for unclaimed catalog projects without versions.
+  '0008-catalog-entry': {
+    async up(db: Kysely<unknown>) {
+      await db.schema.alterTable('projects').addColumn('catalog_entry', 'text').execute();
+    },
+  },
+  // More than one file per version (browser add-ons: one file per browser): JSON list of {name,size,sha256,storage_key,label}.
+  '0009-version-extra-files': {
+    async up(db: Kysely<unknown>) {
+      await db.schema.alterTable('versions').addColumn('extra_files', 'text').execute();
+    },
+  },
+  // Live server list (services/serverpoll.ts): the server login (join link), country, what the last direct query returned, ping, failures in a row, next poll.
+  '0010-server-poll': {
+    async up(db: Kysely<unknown>) {
+      for (const [col, type] of [['login', 'text'], ['country', 'text'], ['zone', 'text'], ['live', 'text'], ['ping_ms', 'integer'], ['poll_fail', 'integer'], ['next_poll_at', 'text'], ['source', 'text']] as const) {
+        await db.schema.alterTable('game_servers').addColumn(col, type).execute();
+      }
+      await db.schema.createIndex('game_servers_login').on('game_servers').column('login').execute();
+    },
+  },
 });
 
 export async function migrate(db: Db, sqlite: boolean, opts: { direct?: boolean } = {}): Promise<void> {

@@ -70,15 +70,15 @@ fn game_exes(game: &str) -> &'static [&'static str] {
         "tmn-eswc" => &["tmnationseswc.exe"],
         "tm-sunrise" => &["tmsunrise.exe"],
         "tm-original" => &["tmoriginal.exe", "trackmania.exe"],
-        "tmnf" | "tmuf" => &["tmforever.exe", "tmloader.exe"],
+        "tmnf" | "tmuf" => &["tmforever.exe"],
         _ => &["tmnationseswc.exe", "tmsunrise.exe", "tmoriginal.exe", "trackmania.exe", "tmforever.exe"],
     }
 }
 
+/// The Legacy Loader goes into the game folder of a legacy game, never into TMLoader: TMLoader does not count.
 fn game_running(game: &str) -> Result<(), String> {
-    let exes = game_exes(game);
-    match platform::running_process_names().into_iter().find(|p| exes.iter().any(|e| p.eq_ignore_ascii_case(e))) {
-        Some(p) => Err(format!("{p} is running. Close the game first.")),
+    match crate::optimize::close_first(&platform::running_process_names(), game_exes(game), false) {
+        Some(m) => Err(m),
         None => Ok(()),
     }
 }

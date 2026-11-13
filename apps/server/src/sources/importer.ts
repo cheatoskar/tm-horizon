@@ -11,7 +11,8 @@ import { isPe } from '../checks/pe.ts';
 import { discordInMarkdown, downloadAsset, getReleases, getRepo, githubDownloadTotal, githubHeaders, globMatch, parseGithubRepo, pickAsset, repoImages } from './github.ts';
 import { catalogEntryForRepo, seedShowcase } from '../services/catalog-seeds.ts';
 import { sql } from 'kysely';
-import { addSource, checkSource, fetchTmlIndex, normalizeServer } from './crawler.ts';
+import { ALL_ASSETS, addSource, checkSource, fetchTmlIndex, normalizeServer } from './crawler.ts';
+import { browserLabel } from '../services/versions.ts';
 import { createProject, needsInstall, updateProject } from '../services/projects.ts';
 import { rebuildIndex } from '../services/hubindex.ts';
 import { storeImage } from '../services/images.ts';
@@ -114,6 +115,7 @@ function typeOfTopics(topics: string[]): HubProjectType | null {
   if (t.has('openplanet') || t.has('openplanet-plugin')) return 'openplanet-plugin';
   if (t.has('tminterface')) return 'tmi-plugin';
   if (t.has('tas')) return 'tas';
+  if (['presets', 'preset', 'tmvs-presets', 'content-pack', 'resource-pack', 'luts'].some((x) => t.has(x))) return 'content';
   return null;
 }
 
@@ -167,9 +169,16 @@ async function previewInner(ctx: Ctx, url: string, product: string | null, inspe
     const fromCatalog = entry ? projectTypeOfCatalog(entry.category, entry.modType) : null;
     const fromTopics = typeOfTopics(r.topics);
     const fromFiles = typeOfInstall(install, browser);
-    const type = fromCatalog ?? fromTopics ?? fromFiles;
+    // No releases but an index.json in the root: a content repository (presets, packs) that is read directly.
+    let fromIndex: HubProjectType | null = null;
+    if (!latest && !fromCatalog && !fromTopics) {
+      try { const ix = await ctx.fetch(`https://raw.githubusercontent.com/${r.fullName}/HEAD/index.json`, { method: 'HEAD' }); if (ix.ok) fromIndex = 'content'; } catch { /* no index */ }
+    }
+    const type = fromCatalog ?? fromTopics ?? fromFiles ?? fromIndex;
     const typeReason = fromCatalog ? `The TM Horizon catalog lists it as "${entry!.category}${entry!.modType ? ` / ${entry!.modType}` : ''}".`
-      : fromTopics ? 'From the repository topics.' : fromFiles ? 'From the files in the newest release.' : 'Not clear from the repository; choose one.';
+      : fromTopics ? 'From the repository topics.' : fromFiles ? 'From the files in the newest release.'
+      : fromIndex ? 'No releases, but an index.json: a content repository (presets, packs) that is read straight from GitHub.' : 'Not clear from the repository; choose one.';
+    if (fromIndex) warnings.splice(warnings.indexOf('No releases yet. The hub imports the first release as soon as it appears.'), 1);
     const assetInfo = pick.candidates.map((a) => ({ name: a.name, size: a.size, downloads: a.downloads ?? 0 }));
     let githubDownloads: number | null = null;
     try { githubDownloads = await githubDownloadTotal(ctx, r.fullName); } catch { /* shown as unknown */ }
@@ -247,7 +256,9 @@ export async function importFromUrl(ctx: Ctx, opts: ImportOptions, owner: { id: 
   if (pv.existing && (owner || !pv.existing.viaRepo)) throw new HttpError(409, 'source_exists', `This source belongs to the project "${pv.existing.slug}" already${pv.existing.claimed ? '' : ' (unclaimed: claim it instead)'}`, pv.existing);
   if (pv.kind === 'tmloader' && !pv.product) throw new HttpError(400, 'pick_product', 'Pick the product first');
   // Several release files fit and none was chosen: the project would sit in "needs a choice" forever.
-  if (opts.importLatest !== false && pv.kind === 'github' && pv.assets.length > 1 && !pv.asset && !(opts.assetPattern && pv.assets.some((a) => globMatch(opts.assetPattern!, a)))) {
+  // A browser add-on takes all its per-browser files ("[all]", also the default when every file names a browser).
+  const allBrowsers = opts.type === 'browser-extension' && (opts.assetPattern === ALL_ASSETS || pv.assets.every((a) => browserLabel(a)));
+  if (opts.importLatest !== false && pv.kind === 'github' && pv.assets.length > 1 && !pv.asset && !allBrowsers && !(opts.assetPattern && pv.assets.some((a) => globMatch(opts.assetPattern!, a)))) {
     throw new HttpError(400, 'pick_asset', 'Several release files fit: choose the one to install');
   }
   const pictures = [...(opts.images ?? []), ...(opts.banner ? [opts.banner] : [])];

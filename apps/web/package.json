@@ -2,7 +2,7 @@
   "name": "@tm-hub/web",
   "private": true,
   "type": "module",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "scripts": {
     "data": "node scripts/build-data.mjs && node scripts/build-github-projects.mjs",
     "dev": "npm run data && astro dev",

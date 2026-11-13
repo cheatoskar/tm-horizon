@@ -25,6 +25,10 @@ const EXCLUDE = [
   /^docs\/tmf-master\//,
   /^docs\/hub\/staging\.md$/,
   /^scripts\/deploy-staging\.sh$/,
+  // Production box specifics stay private (self-hosting docs: docs/hub/deploy-oracle.md).
+  /^docs\/hub\/production\.md$/,
+  /^scripts\/deploy-prod\.sh$/,
+  /^apps\/server\/deploy\/prod\//,
   /(^|\/)\.env(\..*)?$/,
   /\.pcapng?$/i,
   /^screens\//,

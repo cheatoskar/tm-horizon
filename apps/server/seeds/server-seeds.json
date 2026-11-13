@@ -1,0 +1,838 @@
+{
+ "date": "2026-11-12",
+ "servers": [
+  {
+   "game": "tmnf",
+   "address": "84.83.178.80:2370",
+   "login": "racing_room_speed",
+   "name": "FreeZone FULLSPEED",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "51.83.133.164:2353",
+   "login": "nsxstadium",
+   "name": "FreeZone NSX Easy FS",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "91.122.55.213:2312",
+   "login": "mask_fs",
+   "name": "FreeZone Short Tech",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "5.175.222.165:7000",
+   "login": "nsf_grassslide",
+   "name": "GrassSlide!",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "5.175.222.165:7007",
+   "login": "nsf_shorttech",
+   "name": "Short Tech",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "5.175.222.165:7012",
+   "login": "nsf_fullspeed",
+   "name": "Fullspeed / Lucky LOL",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "5.175.222.165:7010",
+   "login": "nsf_shorts",
+   "name": "NSF Shorts",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "57.131.192.66:2678",
+   "login": "dirt_freezone",
+   "name": "FreeZone Dirt / very short / lol / Poland RPG / LetsRock (dirt_freezone)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "57.131.192.66:2360",
+   "login": "arifshort",
+   "name": "FreeZone Dirt / very short / lol / Poland RPG / LetsRock (arifshort)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "57.131.192.66:2440",
+   "login": "lolsport_fz",
+   "name": "FreeZone Dirt / very short / lol / Poland RPG / LetsRock (lolsport_fz)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "57.131.192.66:2374",
+   "login": "polandrpg",
+   "name": "FreeZone Dirt / very short / lol / Poland RPG / LetsRock (polandrpg)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "57.131.192.66:2354",
+   "login": "lukaszjozwiak",
+   "name": "FreeZone Dirt / very short / lol / Poland RPG / LetsRock (lukaszjozwiak)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.14.17.75:23040",
+   "login": "pureshort.60k",
+   "name": "FreeZone (31.14.17.75) (pureshort.60k)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.14.17.75:23050",
+   "login": "puredirt.60k",
+   "name": "FreeZone (31.14.17.75) (puredirt.60k)",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "31.14.17.75:23060",
+   "login": "fnutten.speed60k",
+   "name": "FreeZone (31.14.17.75) (fnutten.speed60k)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.14.17.75:23070",
+   "login": "puretech.60k",
+   "name": "FreeZone (31.14.17.75) (puretech.60k)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.14.17.75:23080",
+   "login": "purespeed.90k",
+   "name": "FreeZone (31.14.17.75) (purespeed.90k)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.14.17.75:23090",
+   "login": "funspeed.90k",
+   "name": "FreeZone (31.14.17.75) (funspeed.90k)",
+   "country": null
+  },
+  {
+   "game": "tmnf",
+   "address": "game.100tmx.com:2350",
+   "login": "100tmx-tmnf",
+   "name": "100% TMX (TMNF)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.237.52.153:2352",
+   "login": "ROVERADMIN4",
+   "name": "FreeZone Lucky Jump ARENA / HUNT (ROVERADMIN4)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.237.52.153:2363",
+   "login": "ROVERADMIN6",
+   "name": "FreeZone Lucky Jump ARENA / HUNT (ROVERADMIN6)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.237.52.153:2364",
+   "login": "ROVERADMIN5",
+   "name": "FreeZone Lucky Jump ARENA / HUNT (ROVERADMIN5)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.237.52.153:15155",
+   "login": "ARENASYSTEM2",
+   "name": "FreeZone Lucky Jump ARENA / HUNT (ARENASYSTEM2)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2693",
+   "login": "zavalosserver",
+   "name": "116.202.114.119 (many) (zavalosserver)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2697",
+   "login": "FAMWAR",
+   "name": "116.202.114.119 (many) (FAMWAR)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2754",
+   "login": "berkinrpg",
+   "name": "116.202.114.119 (many) (berkinrpg)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2759",
+   "login": "g3ck0_server",
+   "name": "116.202.114.119 (many) (g3ck0_server)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2761",
+   "login": "azy_server",
+   "name": "116.202.114.119 (many) (azy_server)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2790",
+   "login": "ilu_event",
+   "name": "116.202.114.119 (many) (ilu_event)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2793",
+   "login": "buzz_world",
+   "name": "116.202.114.119 (many) (buzz_world)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2795",
+   "login": "tzig_server",
+   "name": "116.202.114.119 (many) (tzig_server)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2840",
+   "login": "trt_short",
+   "name": "116.202.114.119 (many) (trt_short)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2845",
+   "login": "lol_sv",
+   "name": "116.202.114.119 (many) (lol_sv)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2874",
+   "login": "redoutable_kacky",
+   "name": "116.202.114.119 (many) (redoutable_kacky)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": ":2898",
+   "login": "watt_kk",
+   "name": "116.202.114.119 (many) (watt_kk)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "176.9.157.24:2356",
+   "login": "dgfmini",
+   "name": "FreeZone SPEED MINIS",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "178.104.197.107:2372",
+   "login": "playerxy_event",
+   "name": "playerxy event (playerxy_event)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "178.104.197.107:2362",
+   "login": "CornysRampage",
+   "name": "playerxy event (CornysRampage)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.64.158.239:2352",
+   "login": "eagle-rpg",
+   "name": "FreeZone Eagle-RPG",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "93.123.85.43:2391",
+   "login": "cloud7rpg",
+   "name": "skidz RPG Trial",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "193.237.139.48:2351",
+   "login": "modesl",
+   "name": "wasp very short",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "3.72.250.227:2350",
+   "login": "garethbale1111111",
+   "name": "House of Chonks",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.210.232.232:15133",
+   "login": "rse1",
+   "name": "lolsport (rse1)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "87.210.232.232:2335",
+   "login": "rse12",
+   "name": "lolsport (rse12)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "185.223.28.226:2350",
+   "login": "e-race-speed2",
+   "name": "A01 variations / e-race (e-race-speed2)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "185.223.28.226:2351",
+   "login": "e-race-tech",
+   "name": "A01 variations / e-race (e-race-tech)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "185.223.28.226:2352",
+   "login": "e-race-speed",
+   "name": "A01 variations / e-race (e-race-speed)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "185.223.28.226:2353",
+   "login": "a01-variations",
+   "name": "A01 variations / e-race (a01-variations)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "78.31.67.66:2388",
+   "login": "huck_heathcliff",
+   "name": "Huck's Fullspeeders",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "138.199.145.173:2358",
+   "login": "a12wrhunt",
+   "name": "A12 Speed WR Hunt",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "88.99.252.152:15007",
+   "login": "tmnascarf",
+   "name": "NASCAR4ever",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "94.130.135.45:2370",
+   "login": "bordel.short",
+   "name": "bordel short / mix (bordel.short)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "94.130.135.45:2350",
+   "login": "bordel.mix",
+   "name": "bordel short / mix (bordel.mix)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2350",
+   "login": "MiniDrtWTG",
+   "name": "WTG minis (MiniDrtWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2352",
+   "login": "MiniSpdWTG",
+   "name": "WTG minis (MiniSpdWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2354",
+   "login": "MiniLolWTG",
+   "name": "WTG minis (MiniLolWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2356",
+   "login": "MiniObsWTG",
+   "name": "WTG minis (MiniObsWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2358",
+   "login": "MiniRPGWTG",
+   "name": "WTG minis (MiniRPGWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2360",
+   "login": "MiniTechWTG",
+   "name": "WTG minis (MiniTechWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "62.83.34.89:2365",
+   "login": "MiniFSWTG",
+   "name": "WTG minis (MiniFSWTG)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "194.62.157.200:2351",
+   "login": "dcn.roc",
+   "name": "dcn Stadium 100k",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "37.187.254.229:2364",
+   "login": "la_beuze_tmu_serv1",
+   "name": "beuze RPG",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "77.98.100.86:2354",
+   "login": "tw1_rpg_pro",
+   "name": "tw1 RPG PRO",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "88.198.59.136:15097",
+   "login": "chris_Trial",
+   "name": "ZR2 RPG/Trial / Fofocampsite (chris_Trial)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "88.198.59.136:15019",
+   "login": "Fofocampsite",
+   "name": "ZR2 RPG/Trial / Fofocampsite (Fofocampsite)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "89.162.39.140:2374",
+   "login": "maniaspeed",
+   "name": "SPEEDFUN CLASSIC",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "5.175.245.133:2378",
+   "login": "slikzspeed",
+   "name": "slikz MixedSpeed",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "5.186.72.130:2320",
+   "login": "gnu-retro",
+   "name": "Gnu Retro",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "134.3.72.234:50004",
+   "login": "LetsRock90",
+   "name": "LetsRock Pro 2.0",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "178.26.243.192:9004",
+   "login": "jat_minilol",
+   "name": "JAT Mini/Lol",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "172.14.53.147:2372",
+   "login": "supercharn3",
+   "name": "cashmoney RPG",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "185.239.237.215:2352",
+   "login": "adc-s2",
+   "name": "Mini Dirt Cup",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "31.223.10.59:2351",
+   "login": "tur-1",
+   "name": "tur-1",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2350",
+   "login": "furious_speed",
+   "name": "Furious (furious_speed)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2351",
+   "login": "furious_mspd",
+   "name": "Furious (furious_mspd)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2352",
+   "login": "furious_lol",
+   "name": "Furious (furious_lol)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2354",
+   "login": "furious_dirt",
+   "name": "Furious (furious_dirt)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2355",
+   "login": "furious_tech",
+   "name": "Furious (furious_tech)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2356",
+   "login": "furious_obs",
+   "name": "Furious (furious_obs)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2358",
+   "login": "furious_mrpg",
+   "name": "Furious (furious_mrpg)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "82.165.239.28:2359",
+   "login": "furious_rpg",
+   "name": "Furious (furious_rpg)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "45.89.127.182:2350",
+   "login": "freezone_mtc",
+   "name": "GER FreeZone Tech MTC",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2350",
+   "login": "thefaststadium",
+   "name": "TFS #1–#21 (thefaststadium)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2351",
+   "login": "tfsfullspeed",
+   "name": "TFS #1–#21 (tfsfullspeed)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2352",
+   "login": "tfsminilol",
+   "name": "TFS #1–#21 (tfsminilol)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2353",
+   "login": "tfstech",
+   "name": "TFS #1–#21 (tfstech)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2354",
+   "login": "tfslol",
+   "name": "TFS #1–#21 (tfslol)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2355",
+   "login": "tfsrpg",
+   "name": "TFS #1–#21 (tfsrpg)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2356",
+   "login": "tfsspeed",
+   "name": "TFS #1–#21 (tfsspeed)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2357",
+   "login": "tfsobstacle",
+   "name": "TFS #1–#21 (tfsobstacle)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2358",
+   "login": "tfsspeedfun",
+   "name": "TFS #1–#21 (tfsspeedfun)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2359",
+   "login": "tfsnascar",
+   "name": "TFS #1–#21 (tfsnascar)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2360",
+   "login": "tfsclassic",
+   "name": "TFS #1–#21 (tfsclassic)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2361",
+   "login": "tfsstunt",
+   "name": "TFS #1–#21 (tfsstunt)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2362",
+   "login": "tfsminifs",
+   "name": "TFS #1–#21 (tfsminifs)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2363",
+   "login": "tfsdirtcup",
+   "name": "TFS #1–#21 (tfsdirtcup)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2364",
+   "login": "tfsmixed",
+   "name": "TFS #1–#21 (tfsmixed)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2365",
+   "login": "tfsendurance",
+   "name": "TFS #1–#21 (tfsendurance)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2366",
+   "login": "tfstrial",
+   "name": "TFS #1–#21 (tfstrial)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2367",
+   "login": "tfsroyal",
+   "name": "TFS #1–#21 (tfsroyal)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2368",
+   "login": "tfsshortfs",
+   "name": "TFS #1–#21 (tfsshortfs)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2369",
+   "login": "tfsminitech",
+   "name": "TFS #1–#21 (tfsminitech)",
+   "country": null
+  },
+  {
+   "game": "tmuf",
+   "address": "135.125.189.183:2370",
+   "login": "tfsultrafs",
+   "name": "TFS #1–#21 (tfsultrafs)",
+   "country": null
+  },
+  {
+   "game": "eswc",
+   "address": "game.100tmx.com:2352",
+   "login": "100tmx-eswc",
+   "name": "100% TMX (Nations ESWC)",
+   "country": null
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "airforceone",
+   "name": "AirForceOne",
+   "country": "DE"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "tekkmedia",
+   "name": "tekkmedia",
+   "country": "DE"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague1",
+   "name": "ESWC League (eswcleague1)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague2",
+   "name": "ESWC League (eswcleague2)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague3",
+   "name": "ESWC League (eswcleague3)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague4",
+   "name": "ESWC League (eswcleague4)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague66",
+   "name": "ESWC League (eswcleague66)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "eswcleague67",
+   "name": "ESWC League (eswcleague67)",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "skserver",
+   "name": "skserver",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "starserver",
+   "name": "starserver",
+   "country": "FR"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "xkr47-dedicated",
+   "name": "xkr47-dedicated",
+   "country": "FI"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "radplserver",
+   "name": "radplserver",
+   "country": "PL"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "arpublic",
+   "name": "arpublic",
+   "country": "GB"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "bugslide",
+   "name": "bugslide",
+   "country": "AT"
+  },
+  {
+   "game": "eswc",
+   "address": "",
+   "login": "vrba_eswc",
+   "name": "vrba_eswc",
+   "country": "SI"
+  }
+ ]
+}

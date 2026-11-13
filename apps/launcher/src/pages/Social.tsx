@@ -9,6 +9,7 @@ import { LiveServers } from '../ui/LiveServers';
 import { QGAMES, type QGame } from '../data/serverQuery';
 import { AddServerButton, HubEventRow, OwnerLinks, ServerAddress, ServerStatus, SubmitEventButton } from './CommunityServices';
 import { useT } from '../i18n';
+import { masterLine } from '../data/masterLine';
 import { JoinGuideButton, needsJoinGuide } from '../ui/JoinGuide';
 import { HostServers } from './HostServers';
 
@@ -67,6 +68,8 @@ function ServerList() {
     }), [f, q, all, sort]);
   const players = all.reduce((n, s) => n + s.players, 0);
   const masters = serversFile.masterServers ?? [];
+  // ESWC servers in the list below (hub polls, often without live data): the master line must not read as "none".
+  const eswcKnown = all.filter((s) => s.game === 'eswc').length;
   const foreverRows = all.filter((s) => s.game === 'tmnf' || s.game === 'tmuf');
   const forever = serversFile.notAvailable.find((n) => n.game === 'forever');
   const zone = (z: string | null) => (z ? z.split('|').slice(-2).join(' · ') : '-');
@@ -111,7 +114,7 @@ function ServerList() {
             <div className="live-master" key={m.id}>
               <GameChip id="tmn-eswc" />
               <b>{m.name}</b>
-              <span className="dim small">{m.level ? m.level + ' · ' : ''}{t('server.masterCounts', { players: m.players, servers: m.servers })}</span>
+              <span className="dim small">{m.level ? m.level + ' · ' : ''}{(({ key, vars }) => t(key, vars))(masterLine(m.players, m.servers, eswcKnown))}</span>
             </div>
           ))}
         </div>

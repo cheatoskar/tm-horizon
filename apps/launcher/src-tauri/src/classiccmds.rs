@@ -229,7 +229,7 @@ pub fn steamfix_apply_ini(st: State<AppState>, game: String) -> Result<steamfix:
     if !steamfix::is_steam_install(&dir) {
         return Err("Only for Steam installs".into());
     }
-    if let Some(p) = running(&["tmforever.exe", "tmloader.exe"]) {
+    if let Some(p) = running(&["tmforever.exe"]) {
         return Err(format!("Close the game first ({p} is running)."));
     }
     let watches = vec![crate::history::Watch::File(dir.join("Nadeo.ini")), crate::history::Watch::File(dir.join(steamfix::BACKUP_NAME))];
@@ -240,7 +240,7 @@ pub fn steamfix_apply_ini(st: State<AppState>, game: String) -> Result<steamfix:
 #[tauri::command(async)]
 pub fn steamfix_undo_ini(st: State<AppState>, game: String) -> Result<steamfix::Status, String> {
     let dir = forever_dir(&st, &game)?;
-    if let Some(p) = running(&["tmforever.exe", "tmloader.exe"]) {
+    if let Some(p) = running(&["tmforever.exe"]) {
         return Err(format!("Close the game first ({p} is running)."));
     }
     steamfix::undo_ini(&dir)?;
@@ -272,7 +272,7 @@ pub async fn steamfix_run(app: AppHandle, game: String) -> Result<(), String> {
         if !steamfix::is_steam_install(&dir) {
             return Err("Only for Steam installs".into());
         }
-        if let Some(p) = running(&["tmforever.exe", "tmloader.exe"]) {
+        if let Some(p) = running(&["tmforever.exe"]) {
             return Err(format!("Close the game first ({p} is running)."));
         }
         let exe = setups_dir(&st).join(steamfix::UPDATE_FILE);
@@ -336,7 +336,7 @@ pub async fn highlands_install(app: tauri::AppHandle, path: String, confirmed: b
     crate::bg::run(move || -> Result<Option<String>, String> {
         let st = tauri::Manager::state::<AppState>(&app);
         let dir = forever_dir(&st, "tmuf")?;
-        if let Some(p) = running(&["tmforever.exe", "tmloader.exe"]) {
+        if let Some(p) = running(&["tmforever.exe"]) {
             return Err(format!("Close the game first ({p} is running)."));
         }
         suggest::install(&st.data_dir, "tmuf", &dir, Path::new(&path), &suggest::highlands_spec(), confirmed)
@@ -360,7 +360,7 @@ pub async fn highlands_set_enabled(app: AppHandle, on: bool) -> Result<suggest::
     crate::bg::run(move || {
         let st = tauri::Manager::state::<AppState>(&app);
         let dir = forever_dir(&st, "tmuf")?;
-        if let Some(p) = running(&["tmforever.exe", "tmloader.exe"]) {
+        if let Some(p) = running(&["tmforever.exe"]) {
             return Err(format!("Close the game first ({p} is running)."));
         }
         suggest::highlands_set_enabled(&dir, on)

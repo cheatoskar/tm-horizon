@@ -19,7 +19,8 @@ function ProjectCard({ p, versions }: Row) {
   const held = versions.filter((v) => v.status === 'held').length;
   const review = versions.filter((v) => v.status === 'review').length;
   const choice = p.sources.filter((s) => s.needsChoice).length;
-  const errors = p.sources.filter((s) => s.lastError).length;
+  const setup = p.sources.some((s) => s.setupNeeded);
+  const errors = p.sources.filter((s) => s.lastError && !s.setupNeeded).length;
   return (
     <div className="card">
       <div className="row" style={{ flexWrap: 'nowrap' }}>
@@ -41,8 +42,9 @@ function ProjectCard({ p, versions }: Row) {
         {held > 0 && <Badge tone="warn">{held} held</Badge>}
         {review > 0 && <Badge tone="warn">{review} in review</Badge>}
         {choice > 0 && <Badge tone="accent">{choice} needs a choice</Badge>}
+        {setup && <Link to={`/projects/${p.slug}?tab=import`} title="Choose the games and how it installs, then releases come in."><Badge tone="accent">Setup needed</Badge></Link>}
         {errors > 0 && <Badge tone="bad">{errors} source error</Badge>}
-        {!held && !review && !choice && !errors && p.claimed && <span className="muted small">Nothing pending</span>}
+        {!held && !review && !choice && !errors && !setup && p.claimed && <span className="muted small">Nothing pending</span>}
       </div>
       <div className="row" style={{ marginTop: 'auto', paddingTop: 'var(--tm-s-2)' }}>
         <Link className="btn sm primary" to={`/projects/${p.slug}`}>Edit</Link>

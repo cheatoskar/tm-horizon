@@ -24,6 +24,7 @@ const STATUS_HELP: Record<string, string> = {
 function VersionCard({ v, canEdit, reload }: { v: HubVersion; canEdit: boolean; reload: () => void }) {
   const [open, setOpen] = useState(v.status === 'review' || v.status === 'rejected' || v.status === 'held');
   const { busy, error, run } = useAction();
+  const admin = useAuth().user?.role === 'admin';
   return (
     <div className="card">
       <div className="row">
@@ -43,10 +44,11 @@ function VersionCard({ v, canEdit, reload }: { v: HubVersion; canEdit: boolean; 
           </div>
         </div>
       )}
-      {v.status === 'review' && canEdit && (
+      {v.status === 'review' && (canEdit || admin) && (
         <div className="row" style={{ marginTop: 'var(--tm-s-3)' }}>
-          <span className="muted small">Waiting for a decision.</span>
-          <button className="btn sm danger right" disabled={busy} onClick={() => void run(async () => { await api.cancelVersion(v.id); reload(); })}>Withdraw</button>
+          <span className="muted small">Waiting for a review by a hub admin. The first version of every project is looked at by a person; later clean updates go live after the hold.</span>
+          {admin && <Link className="btn sm primary" to="/admin">Review</Link>}
+          {canEdit && <button className="btn sm danger right" disabled={busy} onClick={() => void run(async () => { await api.cancelVersion(v.id); reload(); })}>Withdraw</button>}
         </div>
       )}
       {error && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="err">{error}</Notice></div>}
@@ -57,7 +59,7 @@ function VersionCard({ v, canEdit, reload }: { v: HubVersion; canEdit: boolean; 
           {v.changelog && <div className="mdbox"><Markdown text={v.changelog} /></div>}
           {v.files.length > 0 && (
             <div className="tablewrap"><table><tbody>
-              {v.files.map((f) => <tr key={f.name}><td className="wrapword">{f.name}</td><td className="nowrap">{fmtSize(f.size)}</td><td className="mono small wrapword" title={f.sha256}>{f.sha256.slice(0, 16)}</td></tr>)}
+              {v.files.map((f) => <tr key={f.name}><td className="wrapword">{f.name}{f.label ? <span className="muted small"> ({f.label})</span> : null}</td><td className="nowrap">{fmtSize(f.size)}</td><td className="mono small wrapword" title={f.sha256}>{f.sha256.slice(0, 16)}</td></tr>)}
             </tbody></table></div>
           )}
           {v.report ? <CheckReportView report={v.report} /> : <div className="muted small">No check report yet.</div>}
@@ -154,8 +156,15 @@ function SourceState({ p, s, canEdit, reload }: { p: HubProject; s: HubSource | 
         <span className="muted small">Last check {s.lastCheck ? fmtDate(s.lastCheck) : 'not yet'}</span>
         {canEdit && <button className="btn sm right" disabled={busy} onClick={() => void run(async () => { await api.checkSource(s.id); setInfo('Checked.'); reload(); })}>Check now</button>}
       </div>
-      {missingInstall(p) && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="warn">Games and install type are not set, so no release can be taken yet. <Link to={`/projects/${p.slug}?tab=import`}>Import from GitHub</Link> or the Details tab sets them.</Notice></div>}
-      {s.lastError && !missingInstall(p) && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="err">{s.lastError}</Notice></div>}
+      {missingInstall(p) && (
+        <div className="msg warn" style={{ marginTop: 'var(--tm-s-3)' }}>
+          <div className="row">
+            <span><b>Setup needed.</b> {p.sources.find((x) => x.setupReason)?.setupReason ?? 'Choose the games and how it installs; then the releases come in.'}</span>
+            {canEdit && <Link className="btn sm primary right" to={`/projects/${p.slug}?tab=import`}>Set up</Link>}
+          </div>
+        </div>
+      )}
+      {s.lastError && !missingInstall(p) && !s.setupNeeded && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="err">{s.lastError}</Notice></div>}
       {error && <Notice tone="err">{error}</Notice>}
       {info && <Notice tone="ok">{info}</Notice>}
       {s.needsChoice && (
@@ -163,7 +172,7 @@ function SourceState({ p, s, canEdit, reload }: { p: HubProject; s: HubSource | 
           <span className="lbl">Release {s.needsChoice.tag} has several files</span>
           <span className="hint">Pick the one to install. The hub remembers it for later releases.</span>
           <RadioCards name={`vasset-${s.id}`} ariaLabel={`Files in release ${s.needsChoice.tag}`} columns={1} value={asset || null} onChange={setAsset}
-            options={s.needsChoice.assets.map((a) => ({ value: a, label: a }))} />
+            options={[...(p.type === 'browser-extension' ? [{ value: '[all]', label: 'All of them (one per browser)' }] : []), ...s.needsChoice.assets.map((a) => ({ value: a, label: a }))]} />
           <div style={{ marginTop: 'var(--tm-s-2)' }}>
             <button className="btn sm primary" disabled={busy || !asset || !canEdit} onClick={() => void run(async () => { await api.chooseAsset(s.id, s.needsChoice!.tag, asset); reload(); })}>Use this file</button>
           </div>

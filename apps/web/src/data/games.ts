@@ -119,10 +119,12 @@ export function gameArt(id: string, kind: ArtKind): string | null {
   if (own) return own;
   const local = localFile(id, kind);
   if (local) return local;
-  if (kind === 'cover') { const i = igdbArt(id); if (i) return i; }
+  if (kind === 'cover') { const w = GAMETDB[id]; if (w) return w; const i = igdbArt(id); if (i) return i; }
   if (g.steam) return steamArt(g.steam, kind);
   return ownArt(id, kind);
 }
+/** Wii cover from GameTDB through our proxy (/ext-img/gametdb/<region>/<id>.png, apps/web/deploy/ext-img.conf); IGDB has no checked cover for it. */
+const GAMETDB: Record<string, string> = { 'tm-wii': '/ext-img/gametdb/EN/R6RPHH.png' };
 export const hasSteamArt = (id: string) => !!gameById[id]?.steam;
 /** Our own design is the cover (no official one): pages show it as it is instead of blurring a box scan. */
 export const isOwnCover = (id: string) => !!gameById[id] && !!gameArt(id, 'cover')?.startsWith('/img/covers');

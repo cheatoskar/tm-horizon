@@ -12,6 +12,12 @@
 //! Known hashes (MD5 as the community lists them): original `cfce03a39422e08c856dd36376227cf2`,
 //! clean `f137127c1d507472c5bc3544a2ced4d4`. Both games ship identical files.
 //!
+//! Game folder in Program Files: the switch runs as one elevated copy (`elevate.rs`, one UAC prompt) of a
+//! known file onto AsphaltMarks.dds (Clean: the game's GrassMarkFenceIntens.dds; Classic: AsphaltMarks.bak or
+//! the original from the History store), checked by hash afterwards and recorded in the History like any switch.
+//! With TMLoader the card prefers the "Skid Marks" product, unless the game folder is already Clean or
+//! Custom: then it says so ("game folder") and offers Classic only through that direct way (`mode`).
+//!
 //! DirtMarks.dds is left alone: it is 64x256 DXT5 (9 mips), the road texture is 128x256, so the
 //! clean texture does not fit its layout.
 
@@ -56,6 +62,22 @@ pub struct SkidState {
     pub protected: bool,
     /// The TMLoader product way (filled by the commands; default in `state`).
     pub tml: TmlSkid,
+    /// Which way the card shows (`ui_mode`): "direct" (the game file), "tml" (the TMLoader product) or
+    /// "gameFolder" (TMLoader is there, but the game file is already Clean/Custom: the product would be redundant).
+    pub mode: &'static str,
+}
+
+/// The card's way for a state: the TMLoader product only while the game file is still Classic (or missing),
+/// the game folder in Program Files and TMLoader there; a game file that is already Clean or Custom is shown
+/// as it is, whatever the TMLoader product says.
+pub fn ui_mode(s: &SkidState) -> &'static str {
+    if !(s.protected && s.tml.available) {
+        return "direct";
+    }
+    match s.mark {
+        Mark::Clean | Mark::Custom => "gameFolder",
+        Mark::Classic | Mark::Missing => "tml",
+    }
 }
 
 fn img_dir(game_dir: &Path) -> PathBuf {
@@ -94,15 +116,15 @@ pub fn state(data: &Path, game: &str, game_dir: &Path, k: &Known) -> SkidState {
         Some(_) => Mark::Custom,
     };
     let can_clean = sha_of(&dir.join("GrassMarkFenceIntens.dds")).as_deref() == Some(k.clean.as_str());
-    let can_restore = mark != Mark::Classic && mark != Mark::Missing && (bak_with_original(&dir, k).is_some() || history_entry(data, game, &asphalt, k).is_some());
-    SkidState { mark, can_clean, can_restore, protected: protected(game_dir), tml: TmlSkid::default() }
+    let can_restore = mark != Mark::Classic && mark != Mark::Missing && (original_source(data, &dir, k).is_some() || history_entry(data, game, &asphalt, k).is_some());
+    SkidState { mark, can_clean, can_restore, protected: protected(game_dir), tml: TmlSkid::default(), mode: "direct" }
 }
 
 fn friendly(e: String, game: &str) -> String {
     let l = e.to_lowercase();
     if l.contains("os error 5") || l.contains("denied") || l.contains("zugriff") {
         let name = if game == "tmnf" { "Nations Forever" } else { "United Forever" };
-        format!("{name} is in a protected folder. Run TM Horizon as administrator once to change this.")
+        format!("{name} is in a protected folder. Use the switch with admin rights.")
     } else {
         format!("{e} Nothing was changed.")
     }
@@ -144,8 +166,50 @@ pub fn restore(data: &Path, game: &str, game_dir: &Path, k: &Known, running: &[S
         if !r.ok {
             return Err(format!("Could not put the original back ({}). Use Settings > History.", r.code));
         }
+    } else if let Some(src) = original_source(data, &dir, k) {
+        let bytes = std::fs::read(&src).map_err(|e| format!("{}: {e}", src.display()))?;
+        write_marks(data, game, &dir, &bytes, "skid-classic")?;
     } else {
         return Err("No copy of the original texture found.".into());
+    }
+    Ok(state(data, game, game_dir, k))
+}
+
+/// The original AsphaltMarks.dds to restore from: the `.bak` in the game folder, else the History store's copy.
+fn original_source(data: &Path, dir: &Path, k: &Known) -> Option<PathBuf> {
+    bak_with_original(dir, k).or_else(|| {
+        let blob = history::root(data).join("blobs").join(&k.orig);
+        (sha_of(&blob).as_deref() == Some(k.orig.as_str())).then_some(blob)
+    })
+}
+
+/// The switch for a game folder the user cannot write: one elevated copy of a known file onto
+/// AsphaltMarks.dds, recorded in the History, then checked by hash. `elevated` = `elevate::run` in the app.
+pub fn set_admin(data: &Path, game: &str, game_dir: &Path, k: &Known, clean: bool, elevated: &dyn Fn(&[crate::elevate::Op]) -> Result<(), String>) -> Result<SkidState, String> {
+    let dir = img_dir(game_dir);
+    let asphalt = dir.join("AsphaltMarks.dds");
+    if sha_of(&asphalt).is_none() {
+        return Err("AsphaltMarks.dds is missing in this game folder.".into());
+    }
+    let (src, want) = if clean {
+        let src = dir.join("GrassMarkFenceIntens.dds");
+        if sha_of(&src).as_deref() != Some(k.clean.as_str()) {
+            return Err("GrassMarkFenceIntens.dds in this game folder is not the known file, nothing was changed.".into());
+        }
+        (src, k.clean.clone())
+    } else {
+        (original_source(data, &dir, k).ok_or("No copy of the original texture found.")?, k.orig.clone())
+    };
+    let rec = Recorder::start(data, Op::for_game(game, if clean { "skid-clean" } else { "skid-classic" }, "Skid marks"), vec![history::Watch::File(asphalt.clone())]);
+    let r = elevated(&[crate::elevate::Op::Copy { from: src, to: asphalt.clone() }]);
+    rec.finish();
+    match r {
+        Err(e) if e == "cancelled" => return Err("Cancelled. Nothing was changed.".into()),
+        Err(e) => return Err(format!("The copy with admin rights failed ({e}).")),
+        Ok(()) => {}
+    }
+    if sha_of(&asphalt).as_deref() != Some(want.as_str()) {
+        return Err("The copied texture could not be verified. Check Settings > History.".into());
     }
     Ok(state(data, game, game_dir, k))
 }
@@ -285,6 +349,7 @@ pub async fn skid_state(app: tauri::AppHandle, game: String) -> Option<SkidState
         dir_of(&st, &game).ok().map(|d| {
             let mut s = state(&st.data_dir, &game, &d, &known());
             s.tml = tml_state(st.tmloader_root().as_deref(), &known());
+            s.mode = ui_mode(&s);
             s
         })
     })
@@ -318,6 +383,7 @@ pub async fn skid_tml_install(app: tauri::AppHandle, game: String, profiles: Vec
         crate::commands::refresh_tmloader(&st);
         let mut s = state(&st.data_dir, &game, &dir, &known());
         s.tml = tml_state(Some(&root), &known());
+        s.mode = ui_mode(&s);
         Ok(s)
     })
     .await
@@ -341,23 +407,35 @@ pub async fn skid_tml_remove(app: tauri::AppHandle, game: String) -> Result<Skid
         crate::commands::refresh_tmloader(&st);
         let mut s = state(&st.data_dir, &game, &dir, &known());
         s.tml = tml_state(Some(&root), &known());
+        s.mode = ui_mode(&s);
         Ok(s)
     })
     .await
 }
 
-/// `clean` true = clean marks, false = classic (original) marks.
+/// `clean` true = clean marks, false = classic (original) marks. `admin`: the game folder needs admin rights,
+/// switch with one UAC prompt (`set_admin`).
 #[tauri::command]
-pub async fn skid_set(app: tauri::AppHandle, game: String, clean: bool) -> Result<SkidState, String> {
+pub async fn skid_set(app: tauri::AppHandle, game: String, clean: bool, admin: Option<bool>) -> Result<SkidState, String> {
     crate::bg::run(move || {
         let st = tauri::Manager::state::<crate::state::AppState>(&app);
         let dir = dir_of(&st, &game)?;
+        // The game folder only: an open TMLoader does not matter here.
         let running = crate::platform::running_process_names();
-        let procs = history::processes_for(&[game.clone()]);
-        if let Some(p) = running.iter().find(|r| procs.iter().any(|x| x.eq_ignore_ascii_case(r))) {
-            return Err(format!("Close the game first ({p} is running)."));
+        if let Some(m) = crate::optimize::close_first(&running, &["tmforever.exe"], false) {
+            return Err(m);
         }
-        if clean { set_clean(&st.data_dir, &game, &dir, &known()) } else { restore(&st.data_dir, &game, &dir, &known(), &running) }
+        let needs_admin = crate::elevate::writable(&img_dir(&dir)) == Ok(false);
+        let mut s = if needs_admin && admin == Some(true) {
+            set_admin(&st.data_dir, &game, &dir, &known(), clean, &crate::elevate::run)?
+        } else if clean {
+            set_clean(&st.data_dir, &game, &dir, &known())?
+        } else {
+            restore(&st.data_dir, &game, &dir, &known(), &running)?
+        };
+        s.tml = tml_state(st.tmloader_root().as_deref(), &known());
+        s.mode = ui_mode(&s);
+        Ok(s)
     })
     .await
 }
@@ -379,6 +457,64 @@ mod tests {
         std::fs::write(img.join("AsphaltMarks.dds"), b"original").unwrap();
         std::fs::write(img.join("GrassMarkFenceIntens.dds"), b"clean-marks").unwrap();
         (data, game, Known { orig: sha(b"original"), clean: sha(b"clean-marks") })
+    }
+
+    fn st(mark: Mark, protected: bool, tml: bool, installed: bool) -> SkidState {
+        SkidState { mark, can_clean: true, can_restore: true, protected, tml: TmlSkid { available: tml, installed, ..Default::default() }, mode: "direct" }
+    }
+
+    #[test]
+    fn ui_mode_shows_the_game_file_truthfully() {
+        // The owner's case: TMUF in Program Files, TMLoader there, the game file already Clean.
+        assert_eq!(ui_mode(&st(Mark::Clean, true, true, false)), "gameFolder");
+        assert_eq!(ui_mode(&st(Mark::Clean, true, true, true)), "gameFolder", "even with the product on");
+        assert_eq!(ui_mode(&st(Mark::Custom, true, true, false)), "gameFolder");
+        assert_eq!(ui_mode(&st(Mark::Classic, true, true, false)), "tml");
+        assert_eq!(ui_mode(&st(Mark::Classic, true, true, true)), "tml");
+        assert_eq!(ui_mode(&st(Mark::Missing, true, true, false)), "tml");
+        // No TMLoader or a writable folder: the game file directly.
+        assert_eq!(ui_mode(&st(Mark::Clean, true, false, false)), "direct");
+        assert_eq!(ui_mode(&st(Mark::Classic, false, true, false)), "direct");
+    }
+
+    /// Stand-in for the UAC step.
+    fn fake_elevated(ops: &[crate::elevate::Op]) -> Result<(), String> {
+        crate::elevate::cmd_params(ops)?;
+        for op in ops {
+            if let crate::elevate::Op::Copy { from, to } = op {
+                std::fs::copy(from, to).map_err(|e| e.to_string())?;
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn admin_switch_from_bak_and_history_store() {
+        let t = tempfile::tempdir().unwrap();
+        let (data, game, k) = setup(t.path());
+        let img = img_dir(&game);
+        // Clean, then Classic from the History store (no .bak).
+        let s = set_admin(&data, "tmuf", &game, &k, true, &fake_elevated).unwrap();
+        assert_eq!(s.mark, Mark::Clean);
+        let s = set_admin(&data, "tmuf", &game, &k, false, &fake_elevated).unwrap();
+        assert_eq!(s.mark, Mark::Classic);
+        assert_eq!(std::fs::read(img.join("AsphaltMarks.dds")).unwrap(), b"original");
+        // A community .bak wins as the source.
+        std::fs::write(img.join("AsphaltMarks.bak"), b"original").unwrap();
+        std::fs::write(img.join("AsphaltMarks.dds"), b"clean-marks").unwrap();
+        assert_eq!(set_admin(&data, "tmuf", &game, &k, false, &fake_elevated).unwrap().mark, Mark::Classic);
+        // Declined prompt: nothing changed.
+        let cancel = |_: &[crate::elevate::Op]| -> Result<(), String> { Err("cancelled".into()) };
+        assert!(set_admin(&data, "tmuf", &game, &k, true, &cancel).unwrap_err().starts_with("Cancelled"));
+        assert_eq!(state(&data, "tmuf", &game, &k).mark, Mark::Classic);
+        // A copy that arrives changed is reported.
+        let bad = |ops: &[crate::elevate::Op]| -> Result<(), String> {
+            if let crate::elevate::Op::Copy { to, .. } = &ops[0] {
+                std::fs::write(to, b"other").unwrap();
+            }
+            Ok(())
+        };
+        assert!(set_admin(&data, "tmuf", &game, &k, true, &bad).unwrap_err().contains("verified"));
     }
 
     #[test]

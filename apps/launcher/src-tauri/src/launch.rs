@@ -5,7 +5,7 @@
 //! | Game | Start | Open a map |
 //! |---|---|---|
 //! | Forever + TMLoader profile | `TMLoader.exe run TmForever "<profile>"` | same + `"/file=<map>"` |
-//! | Forever, no mods | `TmForever.exe` (Steam: `steam://rungameid/<id>`) | `TmForever.exe /useexedir /singleinst /file="<map>"` |
+//! | Forever, no mods | `TmForever.exe` (Steam: `steam://rungameid/<id>`; `TmForeverLauncher.exe` with "Start with the game's launcher") | `TmForever.exe /useexedir /singleinst /file="<map>"` |
 //! | Nations ESWC 1.80 | `TmNationsESWC.exe` (or its Nadeo launcher) | `TmNationsESWC.exe /file="<map>"` only when its exe has a `/file` switch (`exe_switches`), else saved + started |
 //! | ManiaPlanet titles | `ManiaPlanet.exe /title=<TitleId>` | `ManiaPlanet.exe /useexedir /singleinst /title=<TitleId> /file="<map>"` |
 //! | Trackmania (2020) | `uplay://launch/5595/0`, `steam://rungameid/2225070` or the Epic URL | `Trackmania.exe /useexedir /singleinst /file="<map>"` |
@@ -209,8 +209,10 @@ pub struct PlanInput<'a> {
     pub tmloader_exe: Option<&'a Path>,
     /// TMLoader profile name; None = start without mods.
     pub profile: Option<&'a str>,
-    /// ESWC: start the Nadeo launcher (settings dialog) instead of the game exe.
-    pub eswc_use_launcher: bool,
+    /// Start the game's own Nadeo launcher (menu with the settings, then Play) instead of the game exe:
+    /// ESWC (`TmNationsESWCLauncher.exe`) and Forever (`TmForeverLauncher.exe`, only without a TMLoader
+    /// profile and without a join link). Ignored when the install has no launcher exe.
+    pub use_launcher: bool,
     /// tmtp:// or maniaplanet:// join link.
     pub join: Option<&'a str>,
 }
@@ -272,6 +274,8 @@ pub fn plan_launch(p: &PlanInput) -> Result<LaunchTarget, String> {
                     args: vec![Arg::raw("/useexedir"), Arg::raw("/singleinst"), Arg::raw(format!("/url=\"{j}\""))],
                     cwd: cwd_of(i),
                 }
+            } else if let (Some(l), true) = (&i.launcher, p.use_launcher) {
+                LaunchTarget::Exe { exe: PathBuf::from(l), args: vec![], cwd: cwd_of(i) }
             } else if let Some(url) = &i.launch {
                 LaunchTarget::Url { url: url.clone() }
             } else {
@@ -279,7 +283,7 @@ pub fn plan_launch(p: &PlanInput) -> Result<LaunchTarget, String> {
             }
         }
         Family::Eswc => {
-            let exe = match (&i.launcher, p.eswc_use_launcher) {
+            let exe = match (&i.launcher, p.use_launcher) {
                 (Some(l), true) => PathBuf::from(l),
                 _ => exe_of(i)?,
             };
@@ -397,7 +401,7 @@ mod tests {
     }
 
     fn input<'a>(game: &'a str, i: &'a InstallInfo) -> PlanInput<'a> {
-        PlanInput { game_id: game, install: i, tmloader_exe: None, profile: None, eswc_use_launcher: false, join: None }
+        PlanInput { game_id: game, install: i, tmloader_exe: None, profile: None, use_launcher: false, join: None }
     }
 
     const TML: &str = r"C:\Users\me\AppData\Local\TMLoader\TMLoader.exe";
@@ -447,6 +451,25 @@ mod tests {
     }
 
     #[test]
+    fn forever_can_start_its_own_launcher() {
+        let mut i = inst(r"C:\Program Files (x86)\TmUnitedForever", "TmForever.exe");
+        // No launcher exe in the folder: the switch changes nothing.
+        assert!(plan_launch(&PlanInput { use_launcher: true, ..input("tmuf", &i) }).unwrap().display().ends_with(r#"TmForever.exe""#));
+        i.launcher = Some(r"C:\Program Files (x86)\TmUnitedForever\TmForeverLauncher.exe".into());
+        assert!(plan_launch(&input("tmuf", &i)).unwrap().display().ends_with(r#"TmForever.exe""#), "off: the game directly");
+        let on = PlanInput { use_launcher: true, ..input("tmuf", &i) };
+        assert_eq!(plan_launch(&on).unwrap().display(), r#""C:\Program Files (x86)\TmUnitedForever\TmForeverLauncher.exe""#);
+        // Steam install: on = the launcher exe, off = Steam as before.
+        let mut s = i.clone();
+        s.launch = Some("steam://rungameid/11020".into());
+        assert!(plan_launch(&PlanInput { use_launcher: true, ..input("tmnf", &s) }).unwrap().display().ends_with(r#"TmForeverLauncher.exe""#));
+        // A TMLoader profile or a join link wins: the launcher cannot pass them on.
+        let tml = PathBuf::from(TML);
+        assert!(plan_launch(&PlanInput { tmloader_exe: Some(&tml), profile: Some("p"), ..on }).unwrap().display().contains("TMLoader.exe run"));
+        assert!(plan_launch(&PlanInput { join: Some("tmtp://#join=x"), ..on }).unwrap().display().contains("TmForever.exe"));
+    }
+
+    #[test]
     fn forever_map_matches_file_association() {
         let i = inst(r"C:\Program Files (x86)\TmUnitedForever", "TmForever.exe");
         let map = Path::new(r"C:\Users\me\Documents\TrackMania\Tracks\Challenges\Downloaded\A07 Race.Challenge.Gbx");
@@ -471,7 +494,7 @@ mod tests {
         i.launcher = Some(r"C:\Users\me\Games\TMN-ESWC-inoffiziell\TmNationsESWCLauncher.exe".into());
         let t = plan_launch(&input("tmn-eswc", &i)).unwrap();
         assert_eq!(t.display(), r"C:\Users\me\Games\TMN-ESWC-inoffiziell\TmNationsESWC.exe");
-        let p = PlanInput { eswc_use_launcher: true, ..input("tmn-eswc", &i) };
+        let p = PlanInput { use_launcher: true, ..input("tmn-eswc", &i) };
         assert!(plan_launch(&p).unwrap().display().ends_with("TmNationsESWCLauncher.exe"));
         let m = plan_open_map(&input("tmn-eswc", &i), Path::new(r"C:\x\a.Challenge.Gbx")).unwrap();
         assert!(!m.direct);

@@ -60,7 +60,7 @@ const L = (p: string) => lh(lang, p);
           <>
             <div class="note-bar">
               <Icon name="radio" />
-              <span set:html={t(lang, 'servers.note', { players: `<b>${t(lang, 'servers.players', { n: compact(players, lang) })}</b>`, n: liveServers.length, time, badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} />
+              <span set:html={t(lang, 'servers.note', { players: `<b>${t(lang, 'servers.players', { n: compact(players, lang) })}</b>`, n: liveServers.length, time })} />
             </div>
             <div class="submit-bar">
               {forms.server

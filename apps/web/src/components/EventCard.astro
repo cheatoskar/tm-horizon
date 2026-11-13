@@ -14,7 +14,7 @@ const address: string | null = !e.join && e.address ? e.address : null; // ESWC,
   <div class="ev-date"><b data-day>{d.getUTCDate()}</b><span data-mon>{d.toLocaleString(locales[lang], { month: 'short', timeZone: 'UTC' })}</span></div>
   {!compact && g && <div class="ev-art"><img class={g?.steam || own ? '' : 'box'} src={art} alt="" loading="lazy" decoding="async" /></div>}
   <div class="ev-body">
-    <h3>{e.sample ? e.title.replace(/^Sample:\s*/, '') : e.title}<span class="badge live ev-live">{t(lang, 'event.live')}</span>{e.sample && <span class="badge sample">{t(lang, 'chip.sample')}</span>}</h3>
+    <h3>{e.title}<span class="badge live ev-live">{t(lang, 'event.live')}</span></h3>
     <div class="ev-meta">
       <span><Icon name="clock" size={15} /><span class="when-rel" data-d></span> · <span data-t>{d.toISOString().slice(11, 16)}</span> · <span data-dur>{duration(e.minutes, lang)}</span></span>
       {g && <span><img src={cover(e.game)} alt="" style="width:16px;height:16px;border-radius:4px;object-fit:cover;object-position:top" />{g.short}</span>}

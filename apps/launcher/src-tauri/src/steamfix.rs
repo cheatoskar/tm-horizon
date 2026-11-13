@@ -25,7 +25,7 @@ pub const UPDATE_SIZE: u64 = 22_430_056;
 
 /// Only Steam installs get the fix: the game folder lies below a `steamapps` folder.
 pub fn is_steam_install(dir: &Path) -> bool {
-    dir.components().any(|c| c.as_os_str().to_string_lossy().eq_ignore_ascii_case("steamapps"))
+    dir.to_string_lossy().split(['\\', '/']).any(|c| c.eq_ignore_ascii_case("steamapps"))
 }
 
 fn is_distro_line(line: &str) -> bool {

@@ -1869,7 +1869,7 @@
   "perf.dxvk.err.running": "Gra jest uruchomiona. Najpierw ją zamknij.",
   "perf.dxvk.err.blocked": "Ten folder jest chroniony.",
   "perf.dxvk.err.notWritable": "Folder gry jest tylko do odczytu (Program Files wymaga praw administratora).",
-  "perf.dxvk.err.foreignDll": "W folderze gry jest już inny mod d3d9.dll (np. TM Vibrant Shaders); DXVK nie może być za nim.",
+  "perf.dxvk.err.foreignDll": "W folderze gry jest już d3d9.dll (np. TM Vibrant Shaders). DXVK nie może działać za nim: najpierw usuń ten mod.",
   "perf.dxvk.err.foreignConf": "W folderze gry jest już plik dxvk.conf, którego nie zapisał launcher.",
   "perf.dxvk.err.alreadyOn": "DXVK jest już włączony.",
   "perf.dxvk.err.notInstalled": "Gra nie jest zainstalowana.",

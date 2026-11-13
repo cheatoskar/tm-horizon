@@ -29,7 +29,8 @@ export function sortCommunities(list: Community[], sort: CommSort): Community[] 
     group: (a, b) => groupRank(a.group) - groupRank(b.group) || a.section.localeCompare(b.section) || byName(a, b),
     checked: (a, b) => (a.checked == null ? 1 : 0) - (b.checked == null ? 1 : 0) || (b.checked ?? '').localeCompare(a.checked ?? ''),
   };
-  return [...list].sort((a, b) => cmp[sort](a, b) || byNum(a.members, b.members) || byName(a, b));
+  // Own entries marked featured stay on top, whatever the sort.
+  return [...list].sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || cmp[sort](a, b) || byNum(a.members, b.members) || byName(a, b));
 }
 
 function Avatar({ c }: { c: Community }) {

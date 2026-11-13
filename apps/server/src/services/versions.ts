@@ -6,8 +6,9 @@ import { z } from 'zod';
 import type { CheckReport, GameId, HubInstall, HubInstallType, HubVersion, StatementOfReasons, VersionStatus } from '@tm-hub/shared';
 import { typeOfInstall } from '@tm-hub/shared';
 import type { Ctx } from '../ctx.ts';
-import type { ProjectsTable, VersionsTable } from '../db/db.ts';
+import type { ExtraFile, ProjectsTable, VersionsTable } from '../db/db.ts';
 import { runChecks, sha256 } from '../checks/pipeline.ts';
+import { dinput8Allowed } from '../checks/dinput8.ts';
 import { isZip, unzipAll } from '../checks/zip.ts';
 import { isPe } from '../checks/pe.ts';
 import { wrapTmloader } from '../checks/zipwrite.ts';
@@ -38,6 +39,18 @@ export interface IngestInput {
   upstreamSha256?: string | null;
   /** For TMLoader server zips: executable, dependencies, priority from the index. */
   tmloader?: { executable: string | null; dependencies: { id: string; version: string | null }[]; priority?: number | null } | null;
+  /** Browser add-ons: the other files of the release (one per browser), checked like the main file. */
+  extraFiles?: { name: string; data: Buffer; label: string | null }[];
+}
+
+/** Browser of a file name ("TMX-Downloader-2.7.1-firefox.zip" -> "firefox"), or null. */
+export const browserLabel = (name: string): string | null => /chrome|chromium/i.test(name) ? 'chrome' : /firefox|mozilla/i.test(name) ? 'firefox' : /edge/i.test(name) ? 'edge' : /opera/i.test(name) ? 'opera' : null;
+
+/** All files of a version: the main one and the extra ones (browser add-ons), with their download links. */
+export function filesOf(ctx: Ctx, v: Pick<VersionsTable, 'id' | 'file_name' | 'file_size' | 'file_sha256' | 'extra_files' | 'installs'>, label?: string | null) {
+  const extras = parseJson<ExtraFile[]>(v.extra_files ?? null, []);
+  const main = { name: v.file_name, size: v.file_size, sha256: v.file_sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${v.file_name}`, ...(extras.length && (label ?? browserLabel(v.file_name)) ? { label: (label ?? browserLabel(v.file_name))! } : {}) };
+  return [main, ...extras.map((x) => ({ name: x.name, size: x.size, sha256: x.sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${x.name}`, ...(x.label ? { label: x.label } : {}) }))];
 }
 
 const statement = (s: Omit<StatementOfReasons, 'decidedAt'>): StatementOfReasons => ({ ...s, decidedAt: nowIso() });
@@ -114,9 +127,25 @@ export async function ingestVersion(ctx: Ctx, input: IngestInput): Promise<Versi
       signatureKeyId: parseJson<{ keyId: string } | null>(prev.signature, null)?.keyId ?? null, size: prev.file_size, origin: prev.origin,
     } : null,
     ownerChangedRecently: !!p.owner_changed_at && Date.now() - Date.parse(p.owner_changed_at) < 14 * 86400_000,
+    allowDinput8: dinput8Allowed(p, input.origin),
     signature, vt: ctx.vt, vtUpload: ctx.cfg.VT_UPLOAD, maxUpload: ctx.cfg.MAX_UPLOAD_MB * 1048576,
   });
   if (file.wrapped) report.findings.unshift({ severity: 'info', code: 'meta.wrapped', message: 'Wrapped into the TMLoader layout by the hub' });
+  // Extra files (browser add-ons): the same checks each; the worst verdict counts for the whole version.
+  const extras: { name: string; data: Buffer; label: string | null; hash: string }[] = [];
+  for (const x of (browser ? input.extraFiles ?? [] : []).slice(0, 4)) {
+    if (x.data.length > ctx.cfg.MAX_UPLOAD_MB * 1048576) throw new HttpError(413, 'too_large', `Files up to ${ctx.cfg.MAX_UPLOAD_MB} MB`);
+    const name = storageName(x.name);
+    if (name === fileName || extras.some((e) => e.name === name)) continue;
+    const r = await runChecks({
+      fileName: name, data: x.data, installs: {}, projectType: p.type, strip: 0, version, newProject: !published, uploaderId: input.uploaderId, origin: input.origin,
+      previous: null, ownerChangedRecently: !!p.owner_changed_at && Date.now() - Date.parse(p.owner_changed_at) < 14 * 86400_000,
+      signature: null, vt: ctx.vt, vtUpload: ctx.cfg.VT_UPLOAD, maxUpload: ctx.cfg.MAX_UPLOAD_MB * 1048576,
+    });
+    for (const f of r.findings) report.findings.push({ ...f, message: `${name}: ${f.message}` });
+    if (r.verdict === 'rejected' || (r.verdict === 'flagged' && report.verdict === 'clean')) report.verdict = r.verdict;
+    extras.push({ name, data: x.data, label: x.label, hash: sha256(x.data) });
+  }
 
   const at = nowIso();
   let status: VersionStatus;
@@ -130,11 +159,18 @@ export async function ingestVersion(ctx: Ctx, input: IngestInput): Promise<Versi
 
   const storageKey = `files/${hash}/${fileName}`;
   if (status !== 'rejected') await ctx.storage.put(storageKey, file.data, isZip(file.data) ? 'application/zip' : 'application/octet-stream');
+  const extraRows: ExtraFile[] = [];
+  for (const x of extras) {
+    const key = `files/${x.hash}/${x.name}`;
+    if (status !== 'rejected') await ctx.storage.put(key, x.data, isZip(x.data) ? 'application/zip' : 'application/octet-stream');
+    extraRows.push({ name: x.name, size: x.data.length, sha256: x.hash, storage_key: key, label: x.label });
+  }
   const row: VersionsTable = {
     id: newId('v'), project_id: p.id, version, channel: meta.channel, changelog: meta.changelog, games: browser ? p.games : JSON.stringify(Object.keys(installs)), installs: JSON.stringify(installs),
     status, publish_at: status === 'held' ? addMinutes(at, ctx.cfg.HOLD_MINUTES) : null, published_at: null, origin: input.origin, uploader_id: input.uploaderId,
     signature: meta.signature ? JSON.stringify(meta.signature) : null, verified: signature?.verified ? 1 : 0, report: JSON.stringify(report),
     decision: decision ? JSON.stringify(decision) : null, file_name: fileName, file_size: file.data.length, file_sha256: hash, storage_key: storageKey, downloads: 0, created_at: at,
+    extra_files: extraRows.length ? JSON.stringify(extraRows) : null,
   };
   await ctx.db.insertInto('versions').values(row).execute();
   await ctx.audit(input.uploaderId ?? 'crawler', `version.${status}`, row.id, { project: p.slug, version, origin: input.origin, verdict: report.verdict });
@@ -217,7 +253,7 @@ export function toHubVersion(ctx: Ctx, v: VersionsTable, uploader: { id: string;
   return {
     id: v.id, projectId: v.project_id, version: v.version, channel: v.channel as HubVersion['channel'], changelog: v.changelog, games: parseJson(v.games, []),
     installs: parseJson(v.installs, {}), status: v.status as VersionStatus, publishAt: v.publish_at, published: v.published_at,
-    files: [{ name: v.file_name, size: v.file_size, sha256: v.file_sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${v.file_name}` }],
+    files: filesOf(ctx, v),
     report: full ? parseJson(v.report, null) : null, origin: full ? v.origin : v.origin.replace(/^upload$|^api-token$/, 'upload'), uploader: full ? uploader : null,
     authorSignature: parseJson(v.signature, null), verified: !!v.verified, decision: parseJson(v.decision, null), downloads: v.downloads, created: v.created_at,
   };

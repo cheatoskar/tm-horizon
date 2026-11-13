@@ -101,6 +101,16 @@ test('DLL in a GameData pack is rejected', () => rejects(makeZip([{ name: 'x.dll
 test('fake DLL (not a PE) is rejected', () => rejects(tmloaderZip('M', '1.0.0', [], Buffer.from('not a dll')), 'type.fake-executable', { tmnf: 'tmloader-product' }));
 test('ELF binary is rejected', () => rejects(makeZip([{ name: 'tool.dds', data: Buffer.from([0x7f, 0x45, 0x4c, 0x46, 2, 1, 1]) }]), 'type.foreign-binary'));
 test('dinput8.dll is rejected', () => rejects(makeZip([{ name: 'dinput8.dll', data: makePe() }]), 'type.dinput8', { eswc: 'files:game' }));
+test('dinput8.dll is accepted (info) only when the hub allows it for that project', async () => {
+  const data = makeZip([{ name: 'dinput8.dll', data: makePe() }, { name: 'eswc_autosave.dll', data: makePe() }]);
+  const ok = await runChecks(base({ data, installs: { eswc: 'files:game' }, allowDinput8: true }));
+  assert.ok(codes(ok).includes('type.dinput8.allowed'));
+  assert.ok(!codes(ok).includes('type.dinput8'));
+  assert.notEqual(ok.verdict, 'rejected');
+  const no = await runChecks(base({ data, installs: { eswc: 'files:game' } }));
+  assert.equal(no.verdict, 'rejected');
+  assert.ok(codes(no).includes('type.dinput8'));
+});
 test('executable inside a nested pack is rejected', async () => {
   const inner = makeZip([{ name: 'evil.dll', data: makePe() }]);
   await rejects(makeZip([{ name: 'Skins/pack.zip', data: inner, method: 0 }]), 'type.executable-not-allowed', { tmnf: 'files:documents' });

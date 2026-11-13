@@ -10,6 +10,7 @@ import { DESKTOP_SCOPE } from '../http/auth.ts';
 import { createProject, downloadBreakdown, projectBySlug, projectCreateSchema, projectInputSchema, projectPatchSchema, projectTypeSchema, requireRole, toHubProject, updateProject, imageOf } from '../services/projects.ts';
 import { cancelVersion, ingestVersion, toHubVersion, versionById, versionMetaSchema } from '../services/versions.ts';
 import { rebuildIndex } from '../services/hubindex.ts';
+import { syncFromRepo } from '../services/repo-sync.ts';
 import { storeImage } from '../services/images.ts';
 import { adoptShowcase, clearShowcase, saveShowcase } from '../services/showcase.ts';
 import { requestClaim, verifyTmloaderClaim } from '../services/claims.ts';
@@ -77,6 +78,20 @@ export function authorRoutes(app: FastifyInstance, ctx: Ctx) {
     const p = await projectBySlug(ctx, params.slug);
     await requireRole(ctx, p.id, me(req).id, ['owner', 'maintainer']);
     return applyGithubImport(ctx, p, body, me(req).id);
+  });
+
+  route(app, {
+    method: 'POST', url: '/v1/projects/:slug/refresh-github', summary: 'Take name, short description, icon, pictures, games and showcase again from the repository (showcase.json, docs/logo/)', tags: ['author'], auth: 'user', params: slugParam,
+    rateLimit: { max: 20, timeWindow: '1 hour' },
+  }, async (req, { params }) => {
+    const p = await projectBySlug(ctx, params.slug);
+    await requireRole(ctx, p.id, me(req).id, ['owner', 'maintainer']);
+    const src = await ctx.db.selectFrom('sources').select('target').where('project_id', '=', p.id).where('kind', '=', 'github').executeTakeFirst();
+    const repo = src?.target ?? /github\.com\/([^/]+\/[^/#?]+)/.exec(p.source_url ?? '')?.[1]?.replace(/\.git$/, '');
+    if (!repo) throw new HttpError(400, 'no_repo', 'No GitHub repository connected');
+    const r = await syncFromRepo(ctx, p, repo, { force: true });
+    if (p.state === 'listed') await rebuildIndex(ctx);
+    return r;
   });
 
   route(app, { method: 'PATCH', url: '/v1/projects/:slug', summary: 'Edit project details (slug never changes)', tags: ['author'], auth: 'user', params: slugParam, body: projectPatchSchema }, async (req, { params, body }) => {

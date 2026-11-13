@@ -7,9 +7,11 @@ import type { Ctx } from '../ctx.ts';
 import type { ProjectsTable, SourcesTable } from '../db/db.ts';
 import { addMinutes, compareVersions, newId, nowIso, parseJson } from '../util.ts';
 import { downloadAsset, getReleases, githubDownloadTotal, globMatch, patternFromName, pickAsset, type GhRelease } from './github.ts';
-import { ingestVersion, versionMetaSchema } from '../services/versions.ts';
+import { browserLabel, ingestVersion, versionMetaSchema } from '../services/versions.ts';
 import { refreshRepoShowcase } from '../services/showcase.ts';
+import { syncFromRepo } from '../services/repo-sync.ts';
 import { needsInstall } from '../services/projects.ts';
+import { autoSetup } from '../services/autosetup.ts';
 
 export interface TmlIndexVersion { download_link?: string; hash_sha256?: string; executable?: string; dependencies?: { id: string; version?: string | null }[]; changelog?: string; priority?: number }
 export interface TmlIndex { products?: Record<string, { name?: string; author?: string; description?: string; homepage?: string; versions?: Record<string, TmlIndexVersion> }> }
@@ -44,6 +46,10 @@ const validVersion = (v: string) => versionMetaSchema.shape.version.safeParse(v)
 async function seen(ctx: Ctx, sourceId: string, ref: string) {
   return !!(await ctx.db.selectFrom('source_seen').select('ref').where('source_id', '=', sourceId).where('ref', '=', ref).executeTakeFirst());
 }
+async function setKv(ctx: Ctx, key: string, value: string) {
+  await ctx.db.deleteFrom('kv').where('key', '=', key).execute();
+  await ctx.db.insertInto('kv').values({ key, value }).execute();
+}
 async function markSeen(ctx: Ctx, sourceId: string, ref: string, status: string) {
   await ctx.db.deleteFrom('source_seen').where('source_id', '=', sourceId).where('ref', '=', ref).execute();
   await ctx.db.insertInto('source_seen').values({ source_id: sourceId, ref, status, at: nowIso() }).execute();
@@ -60,14 +66,38 @@ export async function refreshGithubDownloads(ctx: Ctx, p: ProjectsTable, repo: s
 export interface CheckResult { imported: string[]; skipped: string[]; needsChoice: { tag: string; assets: string[] } | null; unchanged: boolean; error: string | null }
 
 async function importGithubRelease(ctx: Ctx, s: SourcesTable, p: ProjectsTable, rel: GhRelease, res: CheckResult): Promise<'imported' | 'choice' | 'skipped'> {
-  if (needsInstall(p)) throw new Error('Choose the games and how it installs first (Import from GitHub or the Details tab)');
+  // A setup step, not an error: the project page says "Setup needed" (HubSource.setupNeeded); releases wait unseen.
+  if (needsInstall(p)) { res.skipped.push(`${rel.tag} (setup needed: games and install type)`); return 'choice'; }
   const version = versionOf(rel.tag);
   if (!validVersion(version)) {
     await markSeen(ctx, s.id, rel.tag, 'skipped');
     res.skipped.push(`${rel.tag} (not a version number)`);
     return 'skipped';
   }
-  const { asset, candidates } = pickAsset(rel.assets, s.asset_pattern);
+  const { asset, candidates } = pickAsset(rel.assets, s.asset_pattern === ALL_ASSETS ? null : s.asset_pattern);
+  // Browser add-on with one file per browser: all of them go into the one version (chosen as "[all]", or
+  // automatically when every file names a browser).
+  const perBrowser = candidates.filter((a) => browserLabel(a.name));
+  if (p.type === 'browser-extension' && candidates.length > 1 && (s.asset_pattern === ALL_ASSETS || (!asset && perBrowser.length === candidates.length))) {
+    const files = s.asset_pattern === ALL_ASSETS && perBrowser.length < candidates.length ? candidates : perBrowser;
+    const [main, ...rest] = files;
+    try {
+      await ingestVersion(ctx, {
+        project: p, fileName: main!.name, data: await downloadAsset(ctx, main!.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), origin: `github:${s.target}@${rel.tag}`, uploaderId: null,
+        meta: { version, channel: rel.prerelease ? 'beta' : 'stable', changelog: rel.body ?? '' },
+        extraFiles: await Promise.all(rest.map(async (a) => ({ name: a.name, data: await downloadAsset(ctx, a.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), label: browserLabel(a.name) }))),
+      });
+    } catch (e) {
+      await markSeen(ctx, s.id, rel.tag, 'failed');
+      res.skipped.push(`${rel.tag} (${(e as Error).message})`);
+      return 'skipped';
+    }
+    if (s.asset_pattern !== ALL_ASSETS) await ctx.db.updateTable('sources').set({ asset_pattern: ALL_ASSETS }).where('id', '=', s.id).execute();
+    await markSeen(ctx, s.id, rel.tag, 'imported');
+    await ctx.db.updateTable('sources').set((eb) => ({ imported: eb('imported', '+', 1), needs_choice: null })).where('id', '=', s.id).execute();
+    res.imported.push(version);
+    return 'imported';
+  }
   if (!asset) {
     if (!candidates.length) {
       await markSeen(ctx, s.id, rel.tag, 'skipped');
@@ -105,35 +135,45 @@ export async function checkSource(ctx: Ctx, sourceId: string, opts: { force?: bo
   const res: CheckResult = { imported: [], skipped: [], needsChoice: null, unchanged: false, error: null };
   const s = await ctx.db.selectFrom('sources').selectAll().where('id', '=', sourceId).executeTakeFirst();
   if (!s) throw new Error('source not found');
-  const p = await ctx.db.selectFrom('projects').selectAll().where('id', '=', s.project_id).executeTakeFirstOrThrow();
+  let p = await ctx.db.selectFrom('projects').selectAll().where('id', '=', s.project_id).executeTakeFirstOrThrow();
   const now = nowIso();
   let hadRelease = false;
   try {
     if (p.state === 'removed') throw new Error('project removed');
     if (s.kind === 'github') {
+      // The repository's public face first (a release problem below must not keep it out). Claimed projects take
+      // name, summary, icon, pictures and games from it; unclaimed ones only the showcase page.
+      if (p.claimed) {
+        const sync = await syncFromRepo(ctx, p, s.target, { force: !!opts.force }).catch(() => null);
+        if (sync?.changed.length) p = await ctx.db.selectFrom('projects').selectAll().where('id', '=', p.id).executeTakeFirstOrThrow();
+      } else await refreshRepoShowcase(ctx, p, s.target).catch(() => 'skipped');
       const r = await getReleases(ctx, s.target, opts.force ? null : s.etag);
       if (r.status === 404) throw new Error('repository not found (deleted, renamed or private)');
       res.unchanged = r.status === 304;
+      if (!res.unchanged) await setKv(ctx, `srcrel.${s.id}`, String(r.releases.length));
       if (!res.unchanged) {
-        const first = !s.last_check;
+        // First check, or a source that never imported or saw anything (its releases waited for the setup): only the newest ones come in.
+        const first = !s.last_check || (s.imported === 0 && !(await ctx.db.selectFrom('source_seen').select('ref').where('source_id', '=', s.id).executeTakeFirst()));
         let todo = [];
         for (const rel of r.releases) if (!(await seen(ctx, s.id, rel.tag))) todo.push(rel);
         if (first) {
-          const stable = todo.find((x) => !x.prerelease);
-          const beta = todo.find((x) => x.prerelease);
-          const keep = [stable, beta && (!stable || Date.parse(beta.published ?? '') > Date.parse(stable.published ?? '')) ? beta : undefined].filter(Boolean) as GhRelease[];
+          // GitHub lists by creation date, which is not always the version order: the highest version counts as newest.
+          const byVersion = [...todo].sort((x, y) => compareVersions(versionOf(y.tag), versionOf(x.tag)));
+          const stable = byVersion.find((x) => !x.prerelease);
+          const beta = byVersion.find((x) => x.prerelease);
+          const keep = [stable, beta && (!stable || compareVersions(versionOf(beta.tag), versionOf(stable.tag)) > 0) ? beta : undefined].filter(Boolean) as GhRelease[];
           for (const x of todo) if (!keep.includes(x)) await markSeen(ctx, s.id, x.tag, 'skipped');
           todo = keep;
         }
+        // Games and install type from the repository and the release file, so releases do not wait for a form.
+        if (needsInstall(p) && r.releases.length) p = await autoSetup(ctx, p, s, r.releases).catch(() => p);
         for (const rel of todo.reverse()) {
           const out = await importGithubRelease(ctx, s, p, rel, res);
           if (out === 'choice') break;
         }
         hadRelease = r.releases.some((x) => x.published && Date.now() - Date.parse(x.published) < 60 * 86400_000);
-        await ctx.db.updateTable('sources').set({ etag: res.needsChoice ? null : r.etag }).where('id', '=', s.id).execute();
+        await ctx.db.updateTable('sources').set({ etag: res.needsChoice || needsInstall(p) ? null : r.etag }).where('id', '=', s.id).execute();
       }
-      // showcase.json of the repository (unless the author wrote the showcase in the portal); a failure here never fails the check
-      await refreshRepoShowcase(ctx, p, s.target).catch(() => 'skipped');
       // GitHub's download counts of the release files, at most once a day (or on "Check now").
       await refreshGithubDownloads(ctx, p, s.target, !!opts.force).catch(() => undefined);
     } else {
@@ -185,10 +225,13 @@ export async function checkSource(ctx: Ctx, sourceId: string, opts: { force?: bo
 }
 
 /** The author picked the asset for an ambiguous release: remember the pattern and import it. */
+/** asset_pattern of a browser add-on that takes every file of a release (one per browser) into one version. */
+export const ALL_ASSETS = '[all]';
+
 export async function chooseAsset(ctx: Ctx, sourceId: string, tag: string, assetName: string): Promise<CheckResult> {
   const s = await ctx.db.selectFrom('sources').selectAll().where('id', '=', sourceId).executeTakeFirstOrThrow();
-  const pattern = patternFromName(assetName);
-  if (!globMatch(pattern, assetName)) throw new Error('bad asset name');
+  const pattern = assetName === ALL_ASSETS ? ALL_ASSETS : patternFromName(assetName);
+  if (pattern !== ALL_ASSETS && !globMatch(pattern, assetName)) throw new Error('bad asset name');
   await ctx.db.updateTable('sources').set({ asset_pattern: pattern, needs_choice: null }).where('id', '=', s.id).execute();
   await ctx.db.deleteFrom('source_seen').where('source_id', '=', s.id).where('ref', '=', tag).execute();
   return checkSource(ctx, sourceId, { force: true });

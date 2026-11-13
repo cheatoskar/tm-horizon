@@ -9,6 +9,7 @@ import { HttpError, newId, nowIso, randomToken } from '../util.ts';
 import { isRepoAdmin } from '../sources/github.ts';
 import { rebuildIndex } from './hubindex.ts';
 import { connectGithubSource } from '../sources/importer.ts';
+import { syncFromRepo } from './repo-sync.ts';
 
 export async function grantClaim(ctx: Ctx, p: ProjectsTable, userId: string, how: string, actor: string) {
   const user = await ctx.db.selectFrom('users').select(['id', 'name']).where('id', '=', userId).executeTakeFirstOrThrow();
@@ -48,6 +49,9 @@ export async function githubClaim(ctx: Ctx, userId: string, slug: string, ghToke
       await grantClaim(ctx, p, userId, `github admin of ${repo}${dev ? ' (dev)' : ''}`, userId);
       // The verified repository becomes the project's source and is checked right away (a failure here never undoes the claim).
       await connectGithubSource(ctx, p, repo).catch(() => undefined);
+      // The owner-verified repository replaces the seeded catalog data (name, summary, icon, pictures, games).
+      const fresh = await ctx.db.selectFrom('projects').selectAll().where('id', '=', p.id).executeTakeFirstOrThrow();
+      await syncFromRepo(ctx, fresh, repo, { force: true }).then(() => rebuildIndex(ctx)).catch(() => undefined);
       return `/projects/${slug}?claimed=1`;
     }
   }

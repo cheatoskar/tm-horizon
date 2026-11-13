@@ -24,6 +24,17 @@ Runtime: `webkit2gtk-4.1`, `gtk3`; for the games `wine`, or `umu-launcher`, or S
 Only the AppImage updates itself (Settings > Updates); .deb, .rpm and the Arch packages update
 through the package manager.
 
+Build the AppImage on an old distribution (CI: ubuntu-22.04, glibc 2.35). An AppImage built on
+current Arch bundles Arch's WebKitGTK, GLib and curl and then needs glibc 2.43 on the user's
+system, so it does not start on Ubuntu 22.04/24.04 or SteamOS. The experimental Linux assets of
+0.5.1 and 0.5.2 were built in an Ubuntu 22.04 chroot inside WSL Arch (`debootstrap jammy`, the CI packages,
+rustup, Node 24, `TMHUB_RELEASE_PREVIEW=1`, `npx tauri build --bundles appimage,deb`).
+
+linuxdeploy runs its plugins as AppImages; with `APPIMAGE_EXTRACT_AND_RUN=1` they unpack into
+`$TMPDIR/appimage_extracted_<hash>`. A leftover folder of that name owned by root (from an earlier
+build as root) makes the bundling stop with "failed to run linuxdeploy"; a private `TMPDIR`
+avoids it.
+
 ## How the games are found
 
 Code: `src-tauri/src/platform/wine.rs` (prefix logic, compiles and is unit tested on every OS)
@@ -143,6 +154,9 @@ with `/silent` and no other tweaks.
   (`HOME=<fake home> USER=tester cargo test fake_home -- --ignored --nocapture`); prints what is
   found and how TMLoader would start. Nothing is started.
 - The app starts in WSLg with that fake home.
+- 0.5.1 experimental assets: the AppImage (built on Ubuntu 22.04) starts in WSLg on Arch and inside
+  an Ubuntu 22.04 chroot (glibc 2.35), shows the setup, the news and the server list; the Arch
+  package's binary starts in WSLg. The window class is `tm-horizon` (desktop files use it).
 - Guided game setup, `e2e_setup` (ignored by default; WSL Arch, Wine 11.21, throwaway HOME):
   `HOME=/tmp/tmh-e2e USER=tester TMHUB_E2E=tmnf TMHUB_E2E_SETUP=<tmnationsforever_setup.exe> TMHUB_E2E_TMLOADER=1 cargo test e2e_setup -- --ignored --nocapture`.
   Creates the prefix, imports the registry fixes, downloads and checks DXVK 3.1.1, installs TMNF

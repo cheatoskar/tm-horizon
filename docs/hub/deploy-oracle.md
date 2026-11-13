@@ -140,6 +140,8 @@ there without consent). Every remote picture is referenced same-origin under `/e
 | `/ext-img/gh-rel/<owner>/<repo>/<tag>/<file>` | `github.com/.../releases/download/...`, one redirect to GitHub's file hosts | showcase pictures as release assets |
 | `/ext-img/gh-att/<uuid>` | `github.com/user-attachments/assets/...`, one redirect to `private-user-images.githubusercontent.com` | README pictures |
 | `/ext-img/imgur/<id>.<ext>` | `i.imgur.com` | showcase pictures |
+| `/ext-img/gametdb/<region>/<id>.png` | `art.gametdb.com/wii/cover/...` | Wii cover (launcher) |
+| `/ext-img/tmx/<site>/<track id>/thumbnail` or `image/<1-9>` | `trackshow/<id>/...` on `tmnf.exchange`, `tmuf.exchange`, `nations.`/`sunrise.`/`original.tm-exchange.com` (site = tmnf, tmuf, nations, sunrise, original) | track thumbnails (launcher, website); same rate limit as everything under `/ext-img/` |
 
 nginx fetches them from that strict allowlist and caches them:
 

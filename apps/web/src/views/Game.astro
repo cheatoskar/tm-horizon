@@ -6,7 +6,7 @@ import Thumb from '../components/Thumb.astro';
 import ResultCard from '../components/ResultCard.astro';
 import EventCard from '../components/EventCard.astro';
 import type { Game } from '../data/games';
-import { modItems, serverItems, catalogItem, catalog, events, eventsSample } from '../data/site';
+import { modItems, serverItems, catalogItem, catalog, events } from '../data/site';
 import { forms, formsOpen } from '../data/links';
 import { gameLink } from '../lib/links';
 import { compact } from '../lib/fmt';
@@ -133,7 +133,6 @@ const host = g.exchange ? new URL(g.exchange.url).host : '';
             <a href={L(`/directory/?games=${g.id}`)}><Icon name="library" size={17} />{t(lang, 'game.toolsSites', { n: tools })}<Icon name="arrow-right" size={14} /></a>
           </div>
         </div>
-        {eventsSample && evs.length > 0 && <p class="muted" style="font-size:13px" set:html={t(lang, 'game.sampleEvents', { badge: `<span class="badge sample">${t(lang, 'chip.sample')}</span>` })} />}
       </aside>
     </div>
   </div>

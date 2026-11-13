@@ -84,13 +84,11 @@ pub(crate) fn do_scan(st: &AppState) -> scan::Snapshot {
     snap
 }
 
-/// Is one of the game's processes running? (Used to switch Play to "Running".)
+/// Is the game's own process running? (Used to switch Play to "Running".) TMLoader alone does not count:
+/// its window or tray icon stays open after the game closed.
 #[tauri::command(async)]
 pub fn game_running(st: State<AppState>, game_id: String) -> bool {
-    let exe = st.install(&game_id).and_then(|i| i.exe);
-    let want = crate::discord::process_names(&game_id, exe.as_deref());
-    let running = platform::running_process_names();
-    running.iter().any(|p| want.iter().any(|w| p.eq_ignore_ascii_case(w)) || p.eq_ignore_ascii_case("tmloader.exe") && (game_id == "tmnf" || game_id == "tmuf"))
+    crate::optimize::game_running(&st, &game_id)
 }
 
 /// The last scan result from disk (shown instantly at start-up while a fresh scan runs).
@@ -263,7 +261,7 @@ pub(crate) fn plan_input<'a>(st: &AppState, game: &'a str, install: &'a scan::In
         install,
         tmloader_exe: tml.as_deref(),
         profile,
-        eswc_use_launcher: st.settings().eswc_use_launcher,
+        use_launcher: st.settings().uses_launcher(game),
         join,
     }
 }
@@ -864,6 +862,8 @@ pub struct SettingsPatch {
     pub hub_url: Option<String>,
     pub update_url: Option<String>,
     pub eswc_use_launcher: Option<bool>,
+    /// Per game: start through the game's own launcher (merged into the stored map).
+    pub use_launcher: Option<std::collections::BTreeMap<String, bool>>,
     pub protocol_asked: Option<bool>,
     pub discord_presence: Option<bool>,
     pub discord_tas: Option<bool>,
@@ -891,6 +891,11 @@ pub async fn save_settings(app: tauri::AppHandle, patch: SettingsPatch) -> Resul
             }
             if let Some(v) = patch.eswc_use_launcher {
                 s.eswc_use_launcher = v;
+            }
+            for (g, on) in patch.use_launcher.unwrap_or_default() {
+                if matches!(g.as_str(), "tmnf" | "tmuf" | "tmn-eswc") {
+                    s.set_use_launcher(&g, on);
+                }
             }
             if let Some(v) = patch.protocol_asked {
                 s.protocol_asked = v;

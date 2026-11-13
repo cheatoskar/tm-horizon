@@ -821,7 +821,7 @@ mod imp {
                 }
                 if self.cancelled() || t0.elapsed() > timeout {
                     let why = if self.cancelled() { "Cancelled" } else { "Took too long" };
-                    let _ = Command::new("kill").args(["-TERM", &format!("-{}", child.id())]).status();
+                    crate::hosting::procs::term_group(child.id());
                     std::thread::sleep(Duration::from_millis(500));
                     let _ = child.kill();
                     let _ = child.wait();

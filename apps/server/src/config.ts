@@ -52,6 +52,8 @@ const Env = z.object({
   MAX_IMAGE_MB: z.coerce.number().default(5),
   HOLD_MINUTES: z.coerce.number().default(60),
   CRAWLER: bool.default(true),
+  /** Live game server list: ask every listed server directly every 90 s (services/serverpoll.ts). */
+  SERVER_POLL: bool.default(true),
   /** Daily GitHub search for TrackMania projects nobody listed yet (docs/hub/discover-github.md). Off by default. */
   DISCOVER_GITHUB: bool.default(false),
   CRAWL_ACTIVE_MIN: z.coerce.number().default(20),

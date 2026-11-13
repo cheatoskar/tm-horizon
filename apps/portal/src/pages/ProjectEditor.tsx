@@ -1,7 +1,8 @@
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import type { HubProject, ProjectInput } from '@tm-hub/shared';
 import { api } from '../api.ts';
-import { Async, Badge, Notice, PageHead, Pic, Tabs, useAsync } from '../ui/common.tsx';
+import { useState } from 'react';
+import { Async, Badge, Notice, PageHead, Pic, Tabs, useAction, useAsync } from '../ui/common.tsx';
 import { ProjectForm } from '../ui/ProjectForm.tsx';
 import { Downloads, TypeIcon, typeLabel } from '../ui/ProjectType.tsx';
 import { StatementView } from '../ui/ReportView.tsx';
@@ -37,6 +38,9 @@ function Editor({ p, reload }: { p: HubProject; reload: () => void }) {
   const claimedNow = sp.get('claimed') === '1';
   const bare = !p.icon || (p.gallery.length === 0 && !p.banner);
   const pending = p.sources.filter((s) => s.needsChoice).length;
+  const setup = p.sources.some((s) => s.setupNeeded);
+  const refresh = useAction();
+  const [refreshed, setRefreshed] = useState<string | null>(null);
   // Pictures the import could not take (too small for a banner, not a picture): said once after the import.
   const pictureErrors = ((useLocation().state as { pictureErrors?: string[] } | null)?.pictureErrors ?? []);
 
@@ -46,13 +50,22 @@ function Editor({ p, reload }: { p: HubProject; reload: () => void }) {
         <Badge tone={p.state === 'listed' ? 'ok' : p.state === 'removed' ? 'bad' : 'warn'}>{p.state}</Badge>
         {!p.claimed && <Badge tone="warn">Unclaimed</Badge>}
         {pending > 0 && <Badge tone="accent">Source needs a choice</Badge>}
+        {setup && canEdit && <Link className="btn sm primary" to={`/projects/${p.slug}?tab=import`} title="Choose the games and how it installs; then releases come in.">Setup needed</Link>}
         {canImport && <Link className="btn sm" to={`/projects/${p.slug}?tab=import`}>Import from GitHub</Link>}
+        {canImport && p.claimed && (
+          <button className="btn sm" disabled={refresh.busy} title="Name, short description, icon, pictures, games and showcase from the repository (showcase.json, docs/logo/)."
+            onClick={() => void refresh.run(async () => { const r = await api.refreshGithub(p.slug); setRefreshed(r.changed.length ? `Updated: ${r.changed.join(', ')}.${r.skipped.length ? ` Skipped: ${r.skipped.join('; ')}.` : ''}` : `Nothing new in the repository.${r.skipped.length ? ` ${r.skipped.join('; ')}.` : ''}`); reload(); })}>
+            {refresh.busy ? 'Refreshing' : 'Refresh from GitHub'}
+          </button>
+        )}
         <Link className="btn sm right" to={`/p/${p.slug}`}>View page</Link>
       </PageHead>
       <div className="row projmeta">
         <span className="row typechip" title="Project type">{p.type ? <TypeIcon type={p.type} /> : null}{typeLabel(p.type)}{!p.type && canEdit && <Link to={`/projects/${p.slug}?tab=details`} className="small">Choose</Link>}</span>
         <Downloads d={p.downloadStats} />
       </div>
+      {refresh.error && <Notice tone="err">{refresh.error}</Notice>}
+      {refreshed && <Notice tone="ok">{refreshed}</Notice>}
       {claimedNow && canImport && bare && <Notice tone="info">This project has no icon or pictures yet. <Link to={`/projects/${p.slug}?tab=import`}>Import from GitHub</Link> takes them from the repository.</Notice>}
       {pictureErrors.length > 0 && <Notice tone="warn">Some pictures were not imported: {pictureErrors.join('; ')}. Add them under Images.</Notice>}
       {p.state === 'removed' && p.removal && <StatementView s={p.removal} title="This project was taken down" />}

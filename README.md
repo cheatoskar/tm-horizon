@@ -6,7 +6,9 @@
 
 It also installs and updates the other TM Horizon projects: [Horizon Client](https://github.com/cheatoskar/horizon-client) (an in-game menu with modules for Nations ESWC, Sunrise, Original and, experimentally, Nations/United Forever), [Legacy Essentials](https://github.com/cheatoskar/eswc-autosave) and [TM Vibrant Shaders](https://github.com/cheatoskar/TM-Vibrant-Shaders).
 
-Version 0.5.1 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
+Built-in mod library: TMLoader mods, Openplanet and tools for every game, installed and updated in one click; modular and open to new mods.
+
+Version 0.5.2 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
 
 > [!NOTE]
 > TM Horizon is a community project: bug reports, ideas, fixes and new features are welcome as [issues](https://github.com/cheatoskar/tm-horizon/issues), [discussions](https://github.com/cheatoskar/tm-horizon/discussions) and pull requests. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -23,7 +25,7 @@ Six projects, built to work together. TM Horizon installs and updates the others
 
 | Project | What it is | Games | How to get it | Repo |
 |---|---|---|---|---|
-| **TM Horizon** (this repo) | Launcher for every TrackMania game on Windows: library, mods, maps, servers, statistics. Installs and updates Horizon Client, Legacy Essentials and TM Vibrant Shaders. | All, from TrackMania (2003) to Trackmania (2020) | Installer from the releases (0.5.1, Launcher Preview) | [cheatoskar/tm-horizon](https://github.com/cheatoskar/tm-horizon) |
+| **TM Horizon** (this repo) | Launcher for every TrackMania game on Windows: library, mods, maps, servers, statistics. Installs and updates Horizon Client, Legacy Essentials and TM Vibrant Shaders. | All, from TrackMania (2003) to Trackmania (2020) | Installer from the releases (0.5.2, Launcher Preview) | [cheatoskar/tm-horizon](https://github.com/cheatoskar/tm-horizon) |
 | **Horizon Client** | In-game menu and mod loader with modules: Legacy Essentials, TMX Browser, TMX Upload, WR Hunter, Input Display, Horizon Performance, Horizon Scripts. | ESWC, Sunrise, Original; TMNF and TMUF through TMLoader (experimental) | TM Horizon (game page), or a zip per game (0.3.1) | [cheatoskar/horizon-client](https://github.com/cheatoskar/horizon-client) |
 | **Legacy Essentials** | Autosave, controller fix, login fix and game settings. A standalone `dinput8.dll` mod with its own menu (`Ctrl+F2`). The same features are the "Legacy Essentials" group in Horizon Client. | ESWC, Sunrise, Original | A zip per game (1.3.1); TM Horizon installs it on ESWC | [cheatoskar/eswc-autosave](https://github.com/cheatoskar/eswc-autosave) |
 | **Legacy Randomizer** | Random Map Challenge with maps from TMX, inside the game. A Horizon Client module. | ESWC, Sunrise, Original (solo) | A zip with Horizon Client, or the plugin alone (0.3.1) | [cheatoskar/legacy-randomizer](https://github.com/cheatoskar/legacy-randomizer) |
@@ -40,7 +42,7 @@ TMNF/TMUF = TrackMania Nations/United Forever, ESWC = TrackMania Nations ESWC, T
 
 ## Install (Windows)
 
-1. Download `TM-Horizon_0.5.1_x64-setup.exe` from the [latest release](https://github.com/cheatoskar/tm-horizon/releases/latest) and run it. It installs for your user only, no admin needed. `SHA256SUMS` in the release has the checksums if you want to check the download.
+1. Download `TM-Horizon_0.5.2_x64-setup.exe` from the [latest release](https://github.com/cheatoskar/tm-horizon/releases/latest) and run it. It installs for your user only, no admin needed. `SHA256SUMS` in the release has the checksums if you want to check the download.
 2. The installer is not code-signed (a certificate costs money), so SmartScreen shows "Windows protected your PC". Click "More info", then "Run anyway".
 3. TM Horizon looks for your games (Steam, Ubisoft Connect, Epic, the folders you add, a drive scan). A game it does not find can be added with "Add folder" in the library.
 
@@ -52,13 +54,13 @@ Updates come through the app (Settings > Updates: channel Stable or Beta, "Check
 
 The Linux build is new and **not tested on real hardware yet**: it is built and started in WSL (Arch Linux, WSLg) on a Windows PC, no game has been played through it on a Linux desktop, and the Steam Deck is untested. Testers are welcome; please report what works and what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). The games stay Windows games and run through Wine or Proton.
 
-1. Download `TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage` from the [v0.5.1 release](https://github.com/cheatoskar/tm-horizon/releases/tag/v0.5.1) and check it against `SHA256SUMS-linux`.
+1. Download `TM-Horizon_0.5.2_linux-x86_64-experimental.AppImage` from the [v0.5.2 release](https://github.com/cheatoskar/tm-horizon/releases/tag/v0.5.2) and check it against `SHA256SUMS-linux`.
 2. Make it executable and start it:
 
 ```
 sha256sum -c --ignore-missing SHA256SUMS-linux
-chmod +x TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage
-./TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage
+chmod +x TM-Horizon_0.5.2_linux-x86_64-experimental.AppImage
+./TM-Horizon_0.5.2_linux-x86_64-experimental.AppImage
 ```
 
 3. For the games: `wine` (or `wine-staging`), or `umu-launcher`, or Steam with Proton. TM Horizon finds games inside Wine/Proton prefixes (Steam, Lutris, Bottles, Heroic, `~/Games`, `~/.wine`, own prefixes under Settings > Linux). Nations/United Forever can be set up from the game page ("Set up": prefix, DXVK, official setup, TMLoader).
@@ -66,11 +68,11 @@ chmod +x TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage
 Status and known gaps:
 
 - Needs an x86_64 distribution with glibc 2.35 or newer (Ubuntu 22.04 and newer, Fedora, current Arch). It was started in WSL (Arch) and in an Ubuntu 22.04 userland; SteamOS should qualify but is untested.
-- Built from the same 0.5.1 code as the Windows release plus Linux-only fixes; the app shows version 0.5.1.
-- Updates: Linux updates through the app come with the next release. Until then, download the new AppImage by hand.
+- Built from the same 0.5.2 code as the Windows release.
+- Updates: the AppImage updates itself through the app (Settings > Updates), signed with the same key as the Windows build. The Arch package updates through pacman (download the new package).
 - Not read yet: Trackmania (2020) from Epic/Heroic, Openplanet folders inside a prefix. The embedded TMX/ManiaPark view may misbehave on Wayland.
-- Arch Linux: `tm-horizon-0.5.1-1-x86_64-experimental.pkg.tar.zst` from the same release (`sudo pacman -U <file>`), built from the same code. PKGBUILDs: [packaging/arch/](packaging/arch/).
-- No FUSE on the system (the AppImage then does not start): `./TM-Horizon_0.5.1_linux-x86_64-experimental.AppImage --appimage-extract-and-run`.
+- Arch Linux: `tm-horizon-0.5.2-1-x86_64-experimental.pkg.tar.zst` from the same release (`sudo pacman -U <file>`), built from the same code. PKGBUILDs: [packaging/arch/](packaging/arch/).
+- No FUSE on the system (the AppImage then does not start): `./TM-Horizon_0.5.2_linux-x86_64-experimental.AppImage --appimage-extract-and-run`.
 
 Details: [apps/launcher/docs/linux.md](apps/launcher/docs/linux.md).
 
@@ -121,7 +123,7 @@ The left bar has these pages: Home, News, Library, Mods, Maps, Skins & mods, Med
 | Steam fix, Highlands, skid marks | ✓ | – | – | – | – | – | – | – |
 | TAS tools | ✓ (TMInterface, ForeverTAS) | – | – | – | – | placeholder ("Tick") | – | – |
 
-"By hand" and "its own setup": the project works in that game, but TM Horizon 0.5.1 does not install it there yet; use the project's release.
+"By hand" and "its own setup": the project works in that game, but TM Horizon 0.5.2 does not install it there yet; use the project's release.
 
 ---
 
@@ -214,7 +216,32 @@ The goal is one shared project instead of many separate forks. Improvements, fix
 
 TM Horizon already runs on its own hub, with versioned releases, update checks and a review step. Mods can be showcased in the launcher and, later, published through TM Horizon. Help with porting or building cross-over mods for the older games (Nations ESWC, Sunrise, Original) is welcome, with the original author's permission.
 
-Public access for other authors is planned. It needs coordination with the community and TMX first, and there is no date. Mod authors who want in are invited to open an issue or a discussion.
+Sign-in for authors with GitHub or Discord, and publishing and showcasing mods through the hub, are built and in preparation; the Launcher Preview does not include them. Public access for other authors follows after coordination with the community and TMX, and there is no date. Mod authors who want in are invited to open an issue or a discussion.
+
+## Developer docs
+
+The developer pages live in this repository (they are also the source of the website's developer section):
+
+- Tutorials
+  - [Your first Horizon script](apps/web/src/content/dev/tutorial-first-script.md): an AngelScript overlay that runs in TMNF, TMUF, ESWC and Sunrise, no compiler needed.
+  - [Your first Horizon plugin](apps/web/src/content/dev/tutorial-first-plugin.md): a native 32-bit DLL for Horizon Client, for when a script is not enough.
+  - [Publish your mod on TM Horizon](apps/web/src/content/dev/tutorial-publish.md): from a GitHub release to a mod page in the launcher.
+  - [Port a mod to ESWC, Sunrise and the other games](apps/web/src/content/dev/tutorial-crossover.md): one native mod for several game executables.
+- Horizon Client
+  - [Plugin guide and ABI](apps/web/src/content/dev/plugin-abi.md): what the host provides to plugins and how they are loaded.
+  - [Horizon Scripts (AngelScript)](apps/web/src/content/dev/scripting.md): the scripting plugin and its API.
+  - [Talking to the launcher: the bridge](apps/web/src/content/dev/client-bridge.md): how plugins reach the internet through the launcher.
+  - [Roadmap](apps/web/src/content/dev/roadmap.md): state of the plugin ABI and what comes next.
+- Porting
+  - [Porting kit](apps/web/src/content/dev/porting-kit.md): one mod source for Nations/United Forever, ESWC and Sunrise.
+  - [Porting guide](apps/web/src/content/dev/porting.md): from hard-coded addresses to named ones, step by step.
+  - [Porting with a coding agent](apps/web/src/content/dev/ai-porting.md): the same rules written for coding agents.
+  - [What ports how easily](apps/web/src/content/dev/assessment.md): which kinds of mods port well and which do not.
+- Publishing
+  - [Publishing mods](apps/web/src/content/dev/publishing.md) and [docs/mod-publishing.md](docs/mod-publishing.md): how mods get onto the hub and safely onto players' PCs.
+  - [Showcase pages](apps/web/src/content/dev/showcase.md): a designed page per mod, shown in the launcher.
+  - [Review, claims and appeals](apps/web/src/content/dev/review-and-claims.md): review of versions, rejections, appeals and project claims.
+  - [Public API](apps/web/src/content/dev/public-api.md): the hub server and the static data files the launcher reads.
 
 ## Credits
 

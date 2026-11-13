@@ -38,7 +38,7 @@ export const MOD_TYPE_ICONS: Record<string, string> = {
 /** Hub project types (hub.ts HUB_PROJECT_TYPES), shown next to the type choice in the portal. Not part of ICON_GLYPHS. */
 export const PROJECT_TYPE_ICONS: Record<string, string> = {
   mod: 'puzzle', skin: 'paint-bucket', 'texture-pack': 'layers', 'sound-pack': 'volume-2', maps: 'map', 'openplanet-plugin': 'plug-zap', 'tmi-plugin': 'braces',
-  tool: 'wrench', tas: 'timer', editor: 'pencil-ruler', server: 'server', library: 'package', 'browser-extension': 'globe', docs: 'book-open', community: 'users', event: 'calendar-days',
+  tool: 'wrench', tas: 'timer', editor: 'pencil-ruler', server: 'server', library: 'package', 'browser-extension': 'globe', docs: 'book-open', community: 'users', event: 'calendar-days', content: 'layers',
 };
 export const modTypeIcon = (id: string) => MOD_TYPE_ICONS[id] ?? 'puzzle';
 /** Type of a catalog mod entry for its icon: the Openplanet loader is a platform, else its modType. */

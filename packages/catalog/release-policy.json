@@ -2,6 +2,7 @@
   "about": "Public builds of the launcher (TMHUB_PUBLIC_BUILD=1 or TMHUB_RELEASE_PREVIEW=1) apply this list to catalog.json. Rules from docs/legal/permissions.md, checked 2026-11-12 (GitHub licences via the GitHub API). hide: the entry is not shown at all. linkOnly: shown, but the launcher does not download the file itself (no installSpec); the player opens the author's page. noShowcase: the showcase page (third-party pictures without permission) is not used. installLicences: GitHub repositories the launcher may download release files from (OSI licence or my own), checked by check-release.mjs.",
   "checked": "2026-11-12",
   "hide": {
+    "mod-trackmania-hub": "StarForce bypass launcher: never listed",
     "mod-simple-menu-enhance": "Discord attachment only, no licence",
     "mod-bay-buildings": "Discord attachment only, no licence",
     "mod-turbo2-blocks-eswc": "Discord attachment only, no licence",

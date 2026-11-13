@@ -47,6 +47,10 @@ Bilder dürfen in `showcase.json` als Pfad im Repository stehen (`docs/images/a.
 
 `theme.accent`: `blue`, `cyan`, `green`, `lime`, `amber`, `orange`, `red`, `pink`, `violet`, `slate`. Jede Farbe hat eine helle und eine dunkle Fassung; die Seite folgt dem Thema des Launchers beziehungsweise der Webseite.
 
+`icon` (optional, seit 2026-11-12): Projekt-Icon, quadratisch, PNG oder WebP, höchstens 512 KB, `https` auf `raw.githubusercontent.com` oder als GitHub-Release-Anhang (ein Pfad im Repository wie `docs/logo/logo-256.png` geht auch). Ohne `icon` nimmt der Hub `docs/logo/logo-256.png` oder `docs/logo/logo-512.png` aus dem Repository, falls vorhanden. Ältere Dateien ohne `icon` bleiben gültig; ältere Launcher ignorieren das Feld.
+
+**Was der Hub daraus übernimmt (übernommene Projekte):** Beim Übernehmen per GitHub, bei jeder Prüfung der GitHub-Quelle (nur wenn sich `showcase.json` geändert hat) und mit „Refresh from GitHub“ im Portal: Name = `hero.title`, Kurzbeschreibung = `hero.tagline`, Banner = `hero.image`, Galerie = Bilder des ersten `gallery`-Blocks, Spiele = `compat`-Zeilen mit `works` oder `partial`, Icon = `icon` bzw. `docs/logo/`. Das Repository gewinnt gegen die Katalogdaten. Code: `apps/server/src/services/repo-sync.ts`.
+
 | Block (`type`) | Felder | Grenzen |
 |---|---|---|
 | `hero` | `title`, `tagline`, `image`, `video`, `badges` | Titel 60, Tagline 140, bis zu 3 Badges je 24 Zeichen. Höchstens ein Hero. |
@@ -95,6 +99,8 @@ Every mod author can design a page for their mod; the launcher shows it above th
 A showcase is data, not HTML: an ordered list of up to 30 blocks (`hero`, `features`, `gallery`, `compare`, `video`, `text`, `compat`, `hotkeys`, `changelog`, `faq`, `cta`) and an accent colour from a fixed palette (light and dark safe). No HTML, CSS or scripts from authors; text is always text, links are https only.
 
 Where it comes from: `showcase.json` in the repository root (or a `showcase` key in `plugin.json`), read at import and at every source check; or the **Showcase** tab of the dev portal (block list with add, remove, reorder and a live preview with the launcher's renderer; saving there replaces the repository copy); or the catalog's seed showcases (`packages/catalog/showcases`), which catalog projects get at import and every project can take over with "Copy from catalog" (`POST /v1/projects/<slug>/showcase/adopt`). An empty Showcase tab offers a one-click starter template. Pictures may be repository paths (`docs/images/a.png`), the hub does the rest.
+
+Optional top-level `icon` (square PNG/WebP, max 512 KB, on GitHub); fallback `docs/logo/logo-256.png` or `logo-512.png`. For claimed projects the hub takes name (hero title), summary (tagline), banner, gallery, games (compat) and icon from the repository on claim, on source checks when showcase.json changed, and on "Refresh from GitHub".
 
 Pictures: https, `.png .jpg .webp .gif`, on the hub storage, `raw.githubusercontent.com`, GitHub release assets or `i.imgur.com`; up to 5 MB, 3840 px. Videos: YouTube, Vimeo or Streamable; loaded only after a click (privacy-friendly embeds, no thumbnail request).
 

@@ -21,6 +21,9 @@ export function ImportGithubTab({ p }: { p: HubProject }) {
   const { busy, error, run } = useAction();
   const look = () => run(async () => { setPv(await api.preview(url)); });
   useEffect(() => { if (repo) void look(); /* once, for the known repository */ }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Versions already taken from the repository and waiting: said up front, so nobody wonders why nothing new comes in.
+  const [waiting, setWaiting] = useState<string[]>([]);
+  useEffect(() => { void api.versions(p.slug).then((vs) => setWaiting(vs.filter((v) => v.status === 'review').map((v) => v.version))).catch(() => undefined); }, [p.slug]);
   return (
     <div className="imp-page">
       <div className="card">
@@ -31,6 +34,7 @@ export function ImportGithubTab({ p }: { p: HubProject }) {
           <button className="btn primary" disabled={busy || url.trim().length < 3}>{busy ? 'Looking' : 'Preview'}</button>
         </form>
         {error && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="err">{error}</Notice></div>}
+        {waiting.length > 0 && <div style={{ marginTop: 'var(--tm-s-3)' }}><Notice tone="info">Already imported: {waiting.join(', ')}, waiting for review by a hub admin (the first version of every project is looked at by a person). See the <a href={`/projects/${p.slug}?tab=versions`}>Versions</a> tab.</Notice></div>}
       </div>
       {pv && <Preview key={pv.target} pv={pv} url={url} existing={p} onProduct={() => {}} />}
     </div>

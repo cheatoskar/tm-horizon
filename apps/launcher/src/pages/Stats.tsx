@@ -13,7 +13,7 @@ import { tp, useI18n } from '../i18n';
 import { stripTm } from '../data/tmformat.ts';
 import { TmRich } from '../ui/hosting/TmPreview';
 import { go, useHubState } from '../state';
-import { useFormatTime } from '../ui/Playtime';
+import { useFormatTime, useFormatTimeShort } from '../ui/Playtime';
 import { GameArt, useCachedImage } from '../ui/common';
 import { openRelated } from '../data/links';
 import { InspectButton } from '../ui/InspectButton';
@@ -97,6 +97,7 @@ function Head({ title, sub, note, children }: { title: string; sub?: string; not
 function GameTiles({ games, fam, setFam }: { games: GameCard[]; fam: string; setFam: (f: string) => void }) {
   const { t, locale } = useI18n();
   const fmt = useFormatTime();
+  const fmtShort = useFormatTimeShort();
   const hub = useHubState();
   const n = (x: number) => x.toLocaleString(locale);
   const sorted = [...games].sort((a, b) => sumSeconds(b) - sumSeconds(a) || b.runs - a.runs);
@@ -113,7 +114,7 @@ function GameTiles({ games, fam, setFam }: { games: GameCard[]; fam: string; set
             <span className="st-gt-shade" />
             <span className="st-gt-body">
               <span className="st-gt-name">{FAMILY_NAME[g.family] ?? g.family}</span>
-              <b className="st-gt-time">{total ? fmt(total) : `${n(g.runs)} ${t('stats2.runsShort')}`}</b>
+              <b className="st-gt-time" title={total ? fmt(total) : undefined}>{total ? fmtShort(total) : `${n(g.runs)} ${t('stats2.runsShort')}`}</b>
               <span className="st-gt-nums">
                 {total > 0 && <span><b>{n(g.runs)}</b> {t('stats2.runsShort')}</span>}
                 <span><b>{n(g.maps)}</b> {t('stats2.mapsShort')}</span>
