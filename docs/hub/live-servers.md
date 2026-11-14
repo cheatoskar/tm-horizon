@@ -22,6 +22,14 @@ master server, uses no account or game key, and only stores what a server tells 
   without live data (Join works by login).
 - Stored per server: name, map, mode, players / max, spectators, password flag, ping from the hub (connect + answer),
   last time it answered (`last_ok_at`), country (from the seed, the query has none). The query does not return a zone.
+- Nations ESWC: the poller asks an ESWC entry with an address like the others (legacy query, version 5; a server
+  that wants 4 gets a second try with 4). In practice there is no ESWC live data yet (checked 2026-11-14): 15 of the
+  16 seeded ESWC servers are known only by login, and a login becomes an address only through the Nadeo master
+  server, which the hub never asks; the one entry with an address, `game.100tmx.com:2352`, resolves to
+  `141.144.230.233` (never contacted, see above). No real ESWC answer has been captured for the test vectors either.
+  The launcher (0.5.3) shows players and mode of an ESWC row as soon as the hub has them (`state: online`); until
+  then the row says "no live data". Ways to get it: an ESWC server registered with its address, or a decision to let
+  the hub query the 100% TMX ESWC port.
 - TMNF or TMUF: both answer alike except for the title pack in the answer (`Stadium` = Nations, `United`); the poller
   sets `game` from it.
 

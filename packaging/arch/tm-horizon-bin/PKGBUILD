@@ -5,7 +5,7 @@
 pkgname=tm-horizon-bin
 _pkgname=tm-horizon
 # pkgver cannot contain "-": the release tag v0.3.0-beta.1 becomes 0.3.0_beta.1 here.
-_tag=0.5.2
+_tag=0.5.3
 pkgver=${_tag//-/_}
 pkgrel=1
 pkgdesc="One launcher for every TrackMania: games, TMLoader mods, maps, servers (games run through Wine/Proton)"

@@ -27,7 +27,7 @@ through the package manager.
 Build the AppImage on an old distribution (CI: ubuntu-22.04, glibc 2.35). An AppImage built on
 current Arch bundles Arch's WebKitGTK, GLib and curl and then needs glibc 2.43 on the user's
 system, so it does not start on Ubuntu 22.04/24.04 or SteamOS. The experimental Linux assets of
-0.5.1 and 0.5.2 were built in an Ubuntu 22.04 chroot inside WSL Arch (`debootstrap jammy`, the CI packages,
+0.5.1 to 0.5.3 were built in an Ubuntu 22.04 chroot inside WSL Arch (`debootstrap jammy`, the CI packages,
 rustup, Node 24, `TMHUB_RELEASE_PREVIEW=1`, `npx tauri build --bundles appimage,deb`).
 
 linuxdeploy runs its plugins as AppImages; with `APPIMAGE_EXTRACT_AND_RUN=1` they unpack into

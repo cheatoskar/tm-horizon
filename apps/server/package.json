@@ -1,6 +1,6 @@
 {
   "name": "@tm-hub/server",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "description": "TM Horizon Hub backend: projects, versions, upload checks, signed index, developer portal API.",
   "license": "AGPL-3.0-only",

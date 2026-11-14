@@ -36,3 +36,6 @@
 .perf-hint > svg { flex: none; margin-top: 2px; color: var(--acc); }
 
 .perf-block .table { margin-top: 2px; }
+
+/* 0.5.3: Performance sits in the wide main column of the game page; the pickers keep a picker width there. */
+.game-grid > .col:not(.side) .perf-actions > select { flex: 0 1 280px; width: auto; }

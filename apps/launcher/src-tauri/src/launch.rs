@@ -5,6 +5,7 @@
 //! | Game | Start | Open a map |
 //! |---|---|---|
 //! | Forever + TMLoader profile | `TMLoader.exe run TmForever "<profile>"` | same + `"/file=<map>"` |
+//! | Forever, join a server | game running: `TmForever.exe /useexedir /singleinst /url="tmtp://#join=<login>"` (hand-off, no TMLoader); closed with a TMLoader profile: TMLoader without the link, the hand-off once the game is ready (`plan_join`, `ReadyWatch`) | - |
 //! | Forever, no mods | `TmForever.exe` (Steam: `steam://rungameid/<id>`; `TmForeverLauncher.exe` with "Start with the game's launcher") | `TmForever.exe /useexedir /singleinst /file="<map>"` |
 //! | Nations ESWC 1.80 | `TmNationsESWC.exe` (or its Nadeo launcher) | `TmNationsESWC.exe /file="<map>"` only when its exe has a `/file` switch (`exe_switches`), else saved + started |
 //! | ManiaPlanet titles | `ManiaPlanet.exe /title=<TitleId>` | `ManiaPlanet.exe /useexedir /singleinst /title=<TitleId> /file="<map>"` |
@@ -265,15 +266,12 @@ pub fn plan_launch(p: &PlanInput) -> Result<LaunchTarget, String> {
     Ok(match fam {
         Family::Forever => {
             if let Some((exe, profile)) = tmloader(p) {
-                let extra = p.join.map(|j| vec![Arg::plain(format!("/url={j}"))]).unwrap_or_default();
-                tmloader_run(exe, profile, extra)
+                // Never `/url` through TMLoader: the game would try the join at once, before it is logged in
+                // online ("unable to connect"), and a running game would get a second copy. `plan_join`
+                // sends the link to the game once it is ready.
+                tmloader_run(exe, profile, vec![])
             } else if let Some(j) = p.join {
-                // Same as the tmtp: association.
-                LaunchTarget::Exe {
-                    exe: exe_of(i)?,
-                    args: vec![Arg::raw("/useexedir"), Arg::raw("/singleinst"), Arg::raw(format!("/url=\"{j}\""))],
-                    cwd: cwd_of(i),
-                }
+                forever_handoff(i, j)?
             } else if let (Some(l), true) = (&i.launcher, p.use_launcher) {
                 LaunchTarget::Exe { exe: PathBuf::from(l), args: vec![], cwd: cwd_of(i) }
             } else if let Some(url) = &i.launch {
@@ -308,6 +306,131 @@ pub fn plan_launch(p: &PlanInput) -> Result<LaunchTarget, String> {
             None => LaunchTarget::Exe { exe: exe_of(i)?, args: vec![], cwd: cwd_of(i) },
         },
     })
+}
+
+/// `TmForever.exe /useexedir /singleinst /url="<link>"`, the same command as the game's tmtp: association:
+/// with the game running, `/singleinst` hands the link to that copy and the new process ends.
+pub fn forever_handoff(i: &InstallInfo, link: &str) -> Result<LaunchTarget, String> {
+    Ok(LaunchTarget::Exe {
+        exe: exe_of(i)?,
+        args: vec![Arg::raw("/useexedir"), Arg::raw("/singleinst"), Arg::raw(format!("/url=\"{link}\""))],
+        cwd: cwd_of(i),
+    })
+}
+
+/// How a server join is carried out.
+#[derive(Debug, Clone, PartialEq)]
+pub enum JoinPlan {
+    /// Forever, the game is running: the link goes to that copy (`/singleinst`). No TMLoader, no second game.
+    Handoff(LaunchTarget),
+    /// Forever with a TMLoader profile, the game is closed: TMLoader starts it without the link, and `join`
+    /// is run once the game is ready (`ReadyWatch`), so the join comes after the online login.
+    StartThenJoin { start: LaunchTarget, join: LaunchTarget },
+    /// Everything else: one command that starts the game with the link (Forever without TMLoader = the
+    /// tmtp: association; ManiaPlanet `/url`).
+    Start(LaunchTarget),
+}
+
+impl JoinPlan {
+    /// Short name for the log.
+    pub fn path(&self) -> &'static str {
+        match self {
+            JoinPlan::Handoff(_) => "handoff to the running game",
+            JoinPlan::StartThenJoin { .. } => "TMLoader start, join when the game is ready",
+            JoinPlan::Start(_) => "start with the link",
+        }
+    }
+}
+
+/// The plan for `p.join` (must be set). `running`: the game's exe is running now.
+pub fn plan_join(p: &PlanInput, running: bool) -> Result<JoinPlan, String> {
+    let j = p.join.ok_or("No join link")?;
+    if !valid_join(j) {
+        return Err("Not a valid join link".into());
+    }
+    if family(p.game_id) != Some(Family::Forever) {
+        return plan_launch(p).map(JoinPlan::Start);
+    }
+    let handoff = forever_handoff(p.install, j)?;
+    if running {
+        return Ok(JoinPlan::Handoff(handoff));
+    }
+    Ok(match tmloader(p) {
+        Some((exe, profile)) => JoinPlan::StartThenJoin { start: tmloader_run(exe, profile, vec![]), join: handoff },
+        None => JoinPlan::Start(handoff),
+    })
+}
+
+/// What the game looks like from outside right now (platform::probe_window).
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub struct WindowProbe {
+    /// The game's process exists.
+    pub running: bool,
+    /// It has a visible window with a title.
+    pub window: bool,
+    /// Windows says the window does not answer (`IsHungAppWindow`, the loading bar of a long scan).
+    pub hung: bool,
+}
+
+/// Waits for a game started by TMLoader to be ready for a join. Horizon Client has no "logged in" event
+/// yet, so this goes by what is visible from outside: the process appears (TMLoader may update first,
+/// up to `NO_PROCESS_MS`), its window shows, then the window has to answer for `RESPONSIVE_MS` in a row
+/// and at least `AFTER_WINDOW_MS` must have passed since it appeared (intro, menu, online login).
+#[derive(Debug, Clone, Default)]
+pub struct ReadyWatch {
+    start: u64,
+    seen: bool,
+    window_at: Option<u64>,
+    answering_at: Option<u64>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Ready {
+    Wait,
+    Go,
+    /// The game was running and is gone (closed or crashed).
+    Gone,
+    /// It never started, or never got ready within `MAX_WAIT_MS`.
+    TimedOut,
+}
+
+impl ReadyWatch {
+    pub const NO_PROCESS_MS: u64 = 180_000;
+    pub const AFTER_WINDOW_MS: u64 = 30_000;
+    pub const RESPONSIVE_MS: u64 = 10_000;
+    pub const MAX_WAIT_MS: u64 = 600_000;
+
+    pub fn new(now: u64) -> Self {
+        ReadyWatch { start: now, ..Default::default() }
+    }
+
+    pub fn step(&mut self, now: u64, w: WindowProbe) -> Ready {
+        let waited = now.saturating_sub(self.start);
+        if !w.running {
+            return if self.seen {
+                Ready::Gone
+            } else if waited > Self::NO_PROCESS_MS {
+                Ready::TimedOut
+            } else {
+                Ready::Wait
+            };
+        }
+        self.seen = true;
+        if waited > Self::MAX_WAIT_MS {
+            return Ready::TimedOut;
+        }
+        if !w.window || w.hung {
+            self.answering_at = None;
+            return Ready::Wait;
+        }
+        let shown = *self.window_at.get_or_insert(now);
+        let answering = *self.answering_at.get_or_insert(now);
+        if now.saturating_sub(shown) >= Self::AFTER_WINDOW_MS && now.saturating_sub(answering) >= Self::RESPONSIVE_MS {
+            Ready::Go
+        } else {
+            Ready::Wait
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -564,6 +687,88 @@ mod tests {
         let i = inst(r"C:\TMUF", "TmForever.exe");
         let p = PlanInput { join: Some("tmtp://#join=myserver"), ..input("tmuf", &i) };
         assert_eq!(plan_launch(&p).unwrap().display(), r#"C:\TMUF\TmForever.exe /useexedir /singleinst /url="tmtp://#join=myserver""#);
+    }
+
+    const HANDOFF: &str = r#""C:\Program Files (x86)\TmNationsForever\TmForever.exe" /useexedir /singleinst /url="tmtp://#join=nutt3n_speed""#;
+
+    #[test]
+    fn join_with_tmloader_never_passes_the_link_to_tmloader() {
+        let i = inst(r"C:\Program Files (x86)\TmNationsForever", "TmForever.exe");
+        let tml = PathBuf::from(TML);
+        let p = PlanInput { tmloader_exe: Some(&tml), profile: Some("default"), join: Some("tmtp://#join=nutt3n_speed"), ..input("tmnf", &i) };
+        // Game closed: TMLoader without /url, the link goes to the game afterwards.
+        match plan_join(&p, false).unwrap() {
+            JoinPlan::StartThenJoin { start, join } => {
+                assert_eq!(start.display(), r#"C:\Users\me\AppData\Local\TMLoader\TMLoader.exe run TmForever default"#);
+                assert_eq!(join.display(), HANDOFF);
+            }
+            other => panic!("{other:?}"),
+        }
+        // Game running: only the hand-off, no TMLoader (no second game).
+        let h = plan_join(&p, true).unwrap();
+        match &h {
+            JoinPlan::Handoff(t) => assert_eq!(t.display(), HANDOFF),
+            other => panic!("{other:?}"),
+        }
+        assert_eq!(h.path(), "handoff to the running game");
+        // plan_launch (Play without the join step) never adds /url to TMLoader either.
+        assert!(!plan_launch(&p).unwrap().display().contains("/url"));
+    }
+
+    #[test]
+    fn join_without_tmloader_and_other_games() {
+        let i = inst(r"C:\Program Files (x86)\TmNationsForever", "TmForever.exe");
+        let p = PlanInput { join: Some("tmtp://#join=nutt3n_speed"), ..input("tmnf", &i) };
+        // Same command closed or running: the tmtp: association handles both.
+        assert_eq!(plan_join(&p, false).unwrap(), JoinPlan::Start(plan_launch(&p).unwrap()));
+        assert!(matches!(plan_join(&p, true).unwrap(), JoinPlan::Handoff(_)));
+        // A Steam install still hands the link to the exe, not to steam://.
+        let mut s = i.clone();
+        s.launch = Some("steam://rungameid/11020".into());
+        let sp = PlanInput { join: Some("tmtp://#join=x"), ..input("tmnf", &s) };
+        assert!(plan_join(&sp, false).unwrap().path().starts_with("start"));
+        match plan_join(&sp, true).unwrap() {
+            JoinPlan::Handoff(t) => assert!(t.display().contains("/singleinst")),
+            other => panic!("{other:?}"),
+        }
+        // ManiaPlanet keeps its one command.
+        let mp = inst(r"C:\ManiaPlanet", "ManiaPlanet.exe");
+        let m = PlanInput { join: Some("maniaplanet://#join=tm2_relay@TMStadium@nadeo"), ..input("tm2-stadium", &mp) };
+        assert!(matches!(plan_join(&m, true).unwrap(), JoinPlan::Start(_)));
+        // Bad or missing links are refused.
+        assert!(plan_join(&input("tmnf", &i), false).is_err());
+        assert!(plan_join(&PlanInput { join: Some(r#"tmtp://x" /evil"#), ..input("tmnf", &i) }, true).is_err());
+    }
+
+    #[test]
+    fn ready_watch_waits_for_an_answering_window() {
+        let up = |window: bool, hung: bool| WindowProbe { running: true, window, hung };
+        let mut w = ReadyWatch::new(0);
+        assert_eq!(w.step(1_000, WindowProbe::default()), Ready::Wait, "TMLoader still busy");
+        assert_eq!(w.step(5_000, up(false, false)), Ready::Wait, "process, no window yet");
+        assert_eq!(w.step(6_000, up(true, false)), Ready::Wait, "window just appeared");
+        // Hung during the loading bar: the answering time starts again.
+        assert_eq!(w.step(20_000, up(true, true)), Ready::Wait);
+        assert_eq!(w.step(30_000, up(true, false)), Ready::Wait, "answering for 0 s");
+        assert_eq!(w.step(36_000, up(true, false)), Ready::Wait, "30 s since the window, answering 6 s");
+        assert_eq!(w.step(40_000, up(true, false)), Ready::Go);
+        // A fast game still waits AFTER_WINDOW_MS after its window appeared.
+        let mut f = ReadyWatch::new(0);
+        f.step(2_000, up(true, false));
+        assert_eq!(f.step(20_000, up(true, false)), Ready::Wait);
+        assert_eq!(f.step(32_000, up(true, false)), Ready::Go);
+    }
+
+    #[test]
+    fn ready_watch_gives_up() {
+        let mut never = ReadyWatch::new(0);
+        assert_eq!(never.step(ReadyWatch::NO_PROCESS_MS + 1, WindowProbe::default()), Ready::TimedOut);
+        let mut closed = ReadyWatch::new(0);
+        closed.step(3_000, WindowProbe { running: true, window: true, hung: false });
+        assert_eq!(closed.step(4_000, WindowProbe::default()), Ready::Gone);
+        let mut stuck = ReadyWatch::new(0);
+        stuck.step(1_000, WindowProbe { running: true, window: true, hung: true });
+        assert_eq!(stuck.step(ReadyWatch::MAX_WAIT_MS + 1, WindowProbe { running: true, window: true, hung: true }), Ready::TimedOut);
     }
 
     #[test]

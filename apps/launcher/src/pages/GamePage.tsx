@@ -346,6 +346,9 @@ export function GamePage({ id }: { id: string }) {
             </section>
           )}
 
+          {/* Performance in the main column: the biggest card, it made the side column twice as long as this one. */}
+          {g.installed && g.family !== 'console' && <PerfPanel game={g.id} profile={profile?.name} />}
+
           {isNative && (g.family === 'eswc' || g.family === 'legacy') && qGameOf(g.id) && (
             <section className="panel"><LiveServers games={[qGameOf(g.id)!]} compact title={t('nav.servers')} /></section>
           )}
@@ -358,7 +361,6 @@ export function GamePage({ id }: { id: string }) {
           {g.installed && <InstallInfoPanel g={g} profile={profile} />}
           {g.installed && g.family !== 'console' && <HealthCheckCard game={g.id} />}
           {g.installed && g.family !== 'console' && <HistoryCard game={g.id} />}
-          {g.installed && g.family !== 'console' && <PerfPanel game={g.id} profile={profile?.name} />}
           <Recent g={g} />
           {g.id === 'tmuf' && <UnitedHint />}
           {!g.installed && (g.family === 'classic' || g.family === 'console') && <WhereToGet g={g} />}

@@ -128,12 +128,15 @@ function useHub() {
   }, []);
 
   const dismiss = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), []);
-  const toast = useCallback((r: ActionResult | Omit<Toast, 'id'>) => {
+  const toast = useCallback((r: ActionResult | Omit<Toast, 'id'>): number => {
     const id = Date.now() + Math.random();
     const t: Toast = { id, ...(r as Omit<Toast, 'id'>) };
     setToasts((list) => [...list.slice(-2), t]);
     if (!t.sticky) setTimeout(() => setToasts((list) => list.filter((x) => x.id !== id)), t.actions?.length ? 12000 : t.ok === false ? 9000 : 5200);
+    return id;
   }, []);
+  // The one waiting server join (joinwait.rs): its sticky toast, replaced when the join is sent, fails or is cancelled.
+  const joinToast = useRef<number | null>(null);
 
   // Separate installations: each one is a profile of its own ("inst:<id>") that starts its folder.
   const [instances, setInstances] = useState<Instance[]>([]);
@@ -220,12 +223,28 @@ function useHub() {
           toast({ message: e.error ? tr('setup.failed', { error: e.error }) : tr('setup.closed'), ok: !e.error });
           break;
         case 'modProgress': setBusy((b) => ({ ...b, ['mod:' + e.mod]: e.step })); break;
+        case 'joinState': {
+          if (joinToast.current != null) dismiss(joinToast.current);
+          joinToast.current = null;
+          if (e.state === 'waiting') {
+            joinToast.current = toast({
+              message: tr('join.waiting', { link: e.link }), sticky: true,
+              actions: [
+                { label: tr('join.now'), primary: true, run: () => { void backend.joinNow?.(); } },
+                { label: tr('common.cancel'), run: () => { void backend.joinCancel?.(); } },
+              ],
+            });
+          } else if (e.state === 'sent') toast({ message: tr('join.sent'), command: e.link, ok: true });
+          else if (e.state === 'failed') toast({ message: tr('join.failed', { error: e.message ?? '' }), command: e.link, ok: false });
+          else toast({ message: tr('join.cancelled') });
+          break;
+        }
       }
     });
     const pending = backend.info?.().pendingLinks ?? [];
     if (pending.length) handleLinks(pending);
     return off;
-  }, [handleLinks, toast]);
+  }, [handleLinks, toast, dismiss]);
 
   // Forever: play mode never lists a profile with TMInterface, TAS mode lists only those.
   const profilesFor = useCallback((gameId: string) => profiles.filter((p) => p.game === profileGameKey(gameId) && profileFits(p, mode)), [profiles, mode]);
@@ -304,6 +323,14 @@ function useHub() {
       return;
     }
     if (launching[gameId] && launching[gameId] !== 'running') return; // starting: the button shows it, no double launch
+    // A join with the game running goes to that copy (launch.rs plan_join): no second game, no question.
+    if (launching[gameId] === 'running' && join && g.family === 'forever') {
+      let r: ActionResult;
+      try { r = await backend.launch({ gameId, profileId: p?.id, profileName: tmlName(p), join, gameName: g.name, instanceId: dir ? null : p?.instance ?? null, dir }, join); }
+      catch (e) { r = { ok: false, message: String(e) }; }
+      toast(r.ok ? r : { ...r, ok: false, message: tr('play.failed', { game: g.name, error: r.message }) });
+      return;
+    }
     if (launching[gameId] === 'running' && !force) {
       // Already running: a second copy only when the user really wants one.
       setConfirm({

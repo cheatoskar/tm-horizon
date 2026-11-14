@@ -1,6 +1,6 @@
 [package]
 name = "tm-hub"
-version = "0.5.2"
+version = "0.5.3"
 description = "TM Horizon: one launcher for every TrackMania"
 edition = "2021"
 license = "AGPL-3.0-only"

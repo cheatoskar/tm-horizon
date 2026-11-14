@@ -69,6 +69,7 @@ export function createNativeBackend(bundledIndex: ModIndex): HubBackend {
         emit({ type: 'gameSetupDone', game: p.game, code: p.code, error: p.error });
       });
       on<{ mod: string; version: string; step: string }>('mod-progress', (p) => emit({ type: 'modProgress', ...p }));
+      on<{ id: number; state: 'waiting' | 'sent' | 'cancelled' | 'failed'; game: string; link: string; message: string | null }>('join-state', (p) => emit({ type: 'joinState', ...p }));
       // Fresh data in the background; the UI updates when it arrives.
       backend.refreshIndex!();
       invoke<HubFiles>('hub_data_refresh').then((data) => emit({ type: 'hubData', data })).catch(() => { /* bundled/cached copy stays */ });
@@ -101,6 +102,8 @@ export function createNativeBackend(bundledIndex: ModIndex): HubBackend {
     prewarmLaunch(gameId) { invoke('launch_prewarm', { gameId }).catch(() => {}); },
     perfLog(what, ms) { invoke('perf_log', { what, ms: Math.max(0, Math.round(ms)) }).catch(() => {}); },
     async isRunning(gameId) { try { return await invoke<boolean>('game_running', { gameId }); } catch { return false; } },
+    async joinNow() { try { return await invoke<boolean>('join_now'); } catch { return false; } },
+    async joinCancel() { try { return await invoke<boolean>('join_cancel'); } catch { return false; } },
     async rescan() { return setSnap(await invoke<Snapshot>('scan')); },
     openManiaPlanet: (dir: string) => invoke<void>('open_maniaplanet', { dir }),
     async setProfileMod(profile, modId, on) {

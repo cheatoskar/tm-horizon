@@ -1,0 +1,8 @@
+{
+  "join.waiting": "Connexion dès que le jeu est prêt : {link}",
+  "join.now": "Rejoindre maintenant",
+  "join.sent": "Envoyé au jeu. S'il ne peut pas se connecter, clique à nouveau sur Rejoindre.",
+  "join.failed": "Pas rejoint : {error}",
+  "join.cancelled": "Connexion annulée.",
+  "servers.unitedOnly": "Serveur United : nécessite TrackMania United Forever."
+}

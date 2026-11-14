@@ -240,6 +240,38 @@ pub fn running_processes(names: &[String]) -> Vec<super::Proc> {
     out
 }
 
+/// The game `exe_name` (lower case) from outside: process, a visible titled window, hung or not.
+/// Read only (process list, `EnumWindows`, `IsHungAppWindow`); nothing in the game is touched.
+pub fn probe_window(exe_name: &str) -> crate::launch::WindowProbe {
+    use windows_sys::Win32::Foundation::HWND;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{EnumWindows, GetWindowTextLengthW, GetWindowThreadProcessId, IsHungAppWindow, IsWindowVisible};
+    struct Find {
+        pids: Vec<u32>,
+        window: bool,
+        hung: bool,
+    }
+    unsafe extern "system" fn each(hwnd: HWND, lp: isize) -> i32 {
+        // SAFETY: lp is the &mut Find passed to EnumWindows below, alive for the whole call.
+        let f = unsafe { &mut *(lp as *mut Find) };
+        let mut pid = 0u32;
+        unsafe { GetWindowThreadProcessId(hwnd, &mut pid) };
+        if f.pids.contains(&pid) && unsafe { IsWindowVisible(hwnd) } != 0 && unsafe { GetWindowTextLengthW(hwnd) } > 0 {
+            f.window = true;
+            f.hung = unsafe { IsHungAppWindow(hwnd) } != 0;
+            return 0;
+        }
+        1
+    }
+    let pids: Vec<u32> = running_processes(&[exe_name.to_lowercase()]).into_iter().map(|p| p.pid).collect();
+    if pids.is_empty() {
+        return crate::launch::WindowProbe::default();
+    }
+    let mut f = Find { pids, window: false, hung: false };
+    // SAFETY: the callback only reads window data and writes into `f`, which outlives the call.
+    unsafe { EnumWindows(Some(each), &mut f as *mut Find as isize) };
+    crate::launch::WindowProbe { running: true, window: f.window, hung: f.hung }
+}
+
 fn build(spec: &CommandSpec) -> Command {
     let mut cmd = Command::new(&spec.program);
     for a in &spec.args {
