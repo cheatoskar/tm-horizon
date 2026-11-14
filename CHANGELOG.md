@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.3 "Launcher Preview" (2026-11-14)
+
+Windows, plus Linux experimental (AppImage built on Ubuntu 22.04, Arch package), built with
+`TMHUB_RELEASE_PREVIEW=1`. Release text: `docs/release/notes-0.5.3.md`.
+
+- Server join on Nations/United Forever with a TMLoader profile (`launch::plan_join`, `joinwait.rs`): the game
+  running, the join link goes to that copy (`TmForever.exe /useexedir /singleinst /url=...`, no TMLoader, no second
+  game); the game closed, TMLoader starts it without the link, and the launcher sends the link once the game window
+  has been up and answering for a while ("Joining when the game is ready", with "Join now" and "Cancel"). Before,
+  TMLoader got `/url` at start: a second game when one was running, "unable to connect" when the join came before the
+  online login. The link and the path taken go into `timings.log`. Instances with a TMLoader profile join the same way.
+- United servers: a server that reports the United pack is joined with United Forever only; with only Nations
+  installed the button says why it is off.
+- Servers: ESWC rows of the hub list show players and mode as soon as the hub's query reaches the server (none do
+  yet, see docs/hub/live-servers.md); room above "Events".
+- Game page: the Performance card moved into the main column, so the side column is no longer twice as long.
+- Legacy Essentials installs from `cheatoskar/legacy-essentials` (the renamed `eswc-autosave` repo).
+
 ## 0.5.2 "Launcher Preview" (2026-11-13)
 
 Windows, plus Linux experimental (AppImage built on Ubuntu 22.04, Arch package), built with

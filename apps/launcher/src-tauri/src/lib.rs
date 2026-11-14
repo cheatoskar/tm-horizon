@@ -33,6 +33,7 @@ pub mod horizoncmds;
 pub mod imgcache;
 pub mod instances;
 pub mod instancetml;
+pub mod joinwait;
 pub mod launch;
 pub mod linuxcmds;
 pub mod linuxsetup;
@@ -249,6 +250,8 @@ pub fn run() {
             commands::hub_data_cached,
             commands::hub_data_refresh,
             commands::launch_game,
+            joinwait::join_now,
+            joinwait::join_cancel,
             commands::launch_prewarm,
             news::exchange_news_older,
             commands::set_selected_install,

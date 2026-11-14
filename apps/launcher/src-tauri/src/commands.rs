@@ -386,17 +386,43 @@ pub(crate) fn launch_with(app: &AppHandle, st: &AppState, game_id: String, profi
         Err(e) => return fail(e),
     };
     perf::log(st, "play-step-install", t0.elapsed().as_millis());
+    let exe_name = install.exe.as_deref().and_then(|e| Path::new(e).file_name()).map(|n| n.to_string_lossy().to_lowercase()).unwrap_or_default();
+    let game_running = || !exe_name.is_empty() && platform::running_process_names().iter().any(|n| *n == exe_name);
     // A Forever instance with a TMLoader profile starts through its own TMLoader copy
     // (instancetml.rs); TMLoader knows one game folder per product, so the installed one cannot.
     if let Some(id) = instance.as_deref() {
         match instance_tmloader(st, id) {
             Ok(Some((t, tml_profile))) => {
+                // Join: same rule as below (hand the link to a running game, else start and join when ready).
+                let handoff = match join.as_deref() {
+                    Some(j) if launch::valid_join(j) => match launch::forever_handoff(&install, j) {
+                        Ok(h) => Some((j.to_string(), h)),
+                        Err(e) => return fail(e),
+                    },
+                    Some(_) => return fail("Not a valid join link"),
+                    None => None,
+                };
+                if let (Some((j, h)), true) = (&handoff, game_running()) {
+                    perf::log(st, &format!("join {j} via handoff to the running game (instance)"), t0.elapsed().as_millis());
+                    return match execute(app, h) {
+                        Ok(()) => ok("Sent to the running game", Some(h.display())),
+                        Err(e) => ActionResult { ok: false, message: e, command: Some(h.display()) },
+                    };
+                }
                 return match execute(app, &t) {
                     Ok(()) => {
                         perf::log(st, "play-spawn", t0.elapsed().as_millis());
                         start_presence(st, &game_id, game_name.as_deref(), Some(&tml_profile), install.exe.as_deref());
                         crate::playtime::track(st.data_dir.clone(), format!("{game_id}@{id}"), discord::process_names(&game_id, install.exe.as_deref()));
-                        ok("Starting", Some(t.display()))
+                        match handoff {
+                            Some((j, h)) => {
+                                perf::log(st, &format!("join {j} via TMLoader start, join when the game is ready (instance)"), t0.elapsed().as_millis());
+                                let cmd = format!("{}\n{}", t.display(), h.display());
+                                crate::joinwait::start(app.clone(), game_id.clone(), j, exe_name.clone(), h);
+                                ok("Starting. Joining when the game is ready.", Some(cmd))
+                            }
+                            None => ok("Starting", Some(t.display())),
+                        }
                     }
                     Err(e) => ActionResult { ok: false, message: e, command: Some(t.display()) },
                 };
@@ -419,7 +445,28 @@ pub(crate) fn launch_with(app: &AppHandle, st: &AppState, game_id: String, profi
     }
     perf::log(st, "play-step-horizon", t0.elapsed().as_millis());
     let p = plan_input(st, &game_id, &install, &tml, profile.as_deref(), join.as_deref());
-    match launch::plan_launch(&p) {
+    // Server join: see launch::plan_join. The link and the path taken go into timings.log.
+    let (plan, then_join) = match join.as_deref() {
+        None => (launch::plan_launch(&p), None),
+        Some(j) => match launch::plan_join(&p, game_running()) {
+            Err(e) => return fail(e),
+            Ok(jp) => {
+                perf::log(st, &format!("join {j} via {}", jp.path()), t0.elapsed().as_millis());
+                match jp {
+                    launch::JoinPlan::Handoff(h) => {
+                        // The game is running: nothing starts, no presence or play time of its own.
+                        return match execute(app, &h) {
+                            Ok(()) => ok("Sent to the running game", Some(h.display())),
+                            Err(e) => ActionResult { ok: false, message: e, command: Some(h.display()) },
+                        };
+                    }
+                    launch::JoinPlan::StartThenJoin { start, join: h } => (Ok(start), Some((j.to_string(), h))),
+                    launch::JoinPlan::Start(t) => (Ok(t), None),
+                }
+            }
+        },
+    };
+    match plan {
         Err(e) => fail(e),
         Ok(t) => match { perf::log(st, "play-step-plan", t0.elapsed().as_millis()); execute(app, &t) } {
             Ok(()) => {
@@ -428,7 +475,14 @@ pub(crate) fn launch_with(app: &AppHandle, st: &AppState, game_id: String, profi
                 start_presence(st, &game_id, game_name.as_deref(), profile.as_deref(), install.exe.as_deref());
                 crate::playtime::track(st.data_dir.clone(), game_id.clone(), discord::process_names(&game_id, install.exe.as_deref()));
                 crate::startwatch::maybe_start(st, &game_id, install.exe.as_deref());
-                ok("Starting", Some(t.display()))
+                match then_join {
+                    Some((j, h)) => {
+                        let cmd = format!("{}\n{}", t.display(), h.display());
+                        crate::joinwait::start(app.clone(), game_id.clone(), j, exe_name.clone(), h);
+                        ok("Starting. Joining when the game is ready.", Some(cmd))
+                    }
+                    None => ok("Starting", Some(t.display())),
+                }
             }
             Err(e) => ActionResult { ok: false, message: e, command: Some(t.display()) },
         },

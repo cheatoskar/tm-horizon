@@ -255,6 +255,13 @@ pub fn running_processes(names: &[String]) -> Vec<super::Proc> {
     out
 }
 
+/// The game `exe_name` from outside. Under Wine there is no window list to read here, so a running
+/// process counts as a shown, answering window (the join waits `ReadyWatch`'s minimum time after it).
+pub fn probe_window(exe_name: &str) -> crate::launch::WindowProbe {
+    let running = !running_processes(&[exe_name.to_lowercase()]).is_empty();
+    crate::launch::WindowProbe { running, window: running, hung: false }
+}
+
 /// Process names, lower case: `comm` and the file name of argv[0] (Wine processes show their
 /// Windows exe there, e.g. `C:\...\TmForever.exe`; `comm` is cut at 15 characters).
 pub fn running_process_names() -> Vec<String> {

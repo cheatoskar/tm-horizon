@@ -135,7 +135,7 @@ function ServerList() {
           const community = s.source === 'community';
           const noLive = s.source === 'hub-poll' && s.online === null;
           const full = !community && !noLive && s.players >= s.maxPlayers;
-          const tip = !installed ? t('play.gameMissing') : full ? t('servers.full') : s.join ? t('servers.opens', { join: s.join }) : s.club ? t('servers.startsClub', { club: s.club.name }) : t('servers.starts');
+          const tip = !installed ? t(s.title_ === 'tmuf' ? 'servers.unitedOnly' : 'play.gameMissing') : full ? t('servers.full') : s.join ? t('servers.opens', { join: s.join }) : s.club ? t('servers.startsClub', { club: s.club.name }) : t('servers.starts');
           return (
             <div className="tr" key={s.id}>
               <span className="srv">

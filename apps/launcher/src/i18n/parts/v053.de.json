@@ -1,0 +1,8 @@
+{
+  "join.waiting": "Beitritt, sobald das Spiel bereit ist: {link}",
+  "join.now": "Jetzt beitreten",
+  "join.sent": "An das Spiel geschickt. Kann es nicht verbinden, klicke noch einmal auf Beitreten.",
+  "join.failed": "Nicht beigetreten: {error}",
+  "join.cancelled": "Beitritt abgebrochen.",
+  "servers.unitedOnly": "United-Server: braucht TrackMania United Forever."
+}

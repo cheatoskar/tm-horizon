@@ -7,6 +7,8 @@ import type { GameServer, TmfServersResponse } from '@tm-hub/shared';
 import { backend } from './backend';
 import { getHubSource } from './hubIndex';
 import { titleOf } from './hub';
+import { liveRows as liveRowsOf } from './liveRows';
+
 
 export type TmfRow = GameServer & { title_: string | null };
 export interface TmfState {
@@ -42,36 +44,8 @@ export function usableServers(r: unknown, game: 'tmnf' | 'tmuf'): { servers: Tmf
 }
 
 const LIVE_GAMES = ['tmnf', 'tmuf', 'eswc'] as const;
-type LiveGame = (typeof LIVE_GAMES)[number];
-const LOGIN = /^[A-Za-z0-9_.-]{1,64}$/;
-
-/** Rows of the hub's own live list (GET /v1/servers, read only). Nations/United: servers that answered the hub's
- * direct query, with a join link. ESWC: every listed entry (they join by address, JoinGuide), without live data
- * (`online: null`). Rows of another game than these three are dropped. Exported for tests. */
-export function liveRows(r: unknown): TmfRow[] | null {
-  if (!Array.isArray(r)) return null;
-  const out: TmfRow[] = [];
-  for (const x of r as Record<string, unknown>[]) {
-    if (!x || typeof x.name !== 'string' || !x.name.trim()) continue;
-    const game = (x.game === 'tmn-eswc' ? 'eswc' : x.game) as LiveGame;
-    if (!LIVE_GAMES.includes(game)) continue;
-    const eswc = game === 'eswc';
-    if (!eswc && x.state !== 'online') continue;
-    const login = typeof x.login === 'string' && LOGIN.test(x.login) ? x.login : null;
-    const address = typeof x.address === 'string' && x.address ? x.address : null;
-    const num = (v: unknown) => Math.max(0, Number(v) || 0);
-    out.push({
-      id: `hub-poll:${game}:${login ?? address ?? x.name}`, source: 'hub-poll', sample: false, game, title: null,
-      name: x.name, nameRaw: x.name, description: null, login,
-      players: eswc ? 0 : num(x.players), maxPlayers: eswc ? 0 : num(x.maxPlayers), spectators: eswc || x.spectators == null ? null : num(x.spectators),
-      zone: typeof x.country === 'string' ? x.country : null, mode: !eswc && typeof x.mode === 'string' ? x.mode : null,
-      private: x.password === true, join: !eswc && login ? `tmtp://#join=${login}` : null, club: null,
-      address, online: eswc ? null : true, lastSeen: typeof x.lastSeen === 'string' ? x.lastSeen : null,
-      homepage: typeof x.homepage === 'string' ? x.homepage : null, title_: titleOf(game),
-    });
-  }
-  return out;
-}
+const liveRows = (r: unknown) => liveRowsOf(r, titleOf);
+export { liveRows };
 
 /** Servers of the hub's live list for a launcher game: United Forever also shows Nations servers (United joins
  * them), Nations only its own, ESWC its entries. Biggest first. */
@@ -109,7 +83,7 @@ function refreshLive(force: boolean): Promise<void> {
   lastTry = Date.now();
   if (state.state === 'off') set({ ...state, state: 'loading' });
   running = (async () => {
-    const parts = await Promise.all(LIVE_GAMES.map((g) => invoke<unknown>('hub_live_servers', { url: 'production', game: g }).then(liveRows, () => null)));
+    const parts = await Promise.all(LIVE_GAMES.map((g) => invoke<unknown>('hub_live_servers', { url: 'production', game: g }).then((r) => liveRowsOf(r, titleOf), () => null)));
     const ok = parts.filter((p): p is TmfRow[] => !!p);
     if (!ok.length) { set({ state: 'fallback', servers: [], fetchedAt: null, stale: false }); return; }
     const seen = new Set<string>();

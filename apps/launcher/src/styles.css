@@ -136,6 +136,8 @@ img { display: block; }
 
 .panel { background: var(--glass); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; backdrop-filter: blur(18px); }
 .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; min-height: 28px; }
+/* A section head right under a table (Servers page: Events below the server list) needs room above it. */
+.table + .section-head { margin-top: var(--s6); }
 .section-head h2 { font-family: var(--head-font); font-size: 20px; font-weight: 700; letter-spacing: 0.01em; }
 .section-head .dim { font-size: 12.5px; }
 

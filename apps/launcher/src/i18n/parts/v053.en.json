@@ -1,0 +1,8 @@
+{
+  "join.waiting": "Joining when the game is ready: {link}",
+  "join.now": "Join now",
+  "join.sent": "Sent to the game. If it cannot connect, click Join again.",
+  "join.failed": "Not joined: {error}",
+  "join.cancelled": "Join cancelled.",
+  "servers.unitedOnly": "United server: needs TrackMania United Forever."
+}

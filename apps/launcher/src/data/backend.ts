@@ -175,7 +175,9 @@ export type NativeEvent =
   | { type: 'driveScanDone'; found: FoundInstall[]; cancelled: boolean; seconds: number }
   | { type: 'gameDownload'; game: string; received: number; total: number | null }
   | { type: 'gameSetupDone'; game: string; code: number | null; error: string | null }
-  | { type: 'modProgress'; mod: string; version: string; step: string };
+  | { type: 'modProgress'; mod: string; version: string; step: string }
+  /** Server join that waits for the game TMLoader starts (joinwait.rs). */
+  | { type: 'joinState'; id: number; state: 'waiting' | 'sent' | 'cancelled' | 'failed'; game: string; link: string; message: string | null };
 
 /** The .Gbx open dialog (gbxopen.rs) and the per-user file association (fileassoc.rs). */
 export interface GbxDetected { kind: 'map' | 'replay'; uid: string | null; name: string | null; author: string | null; env: string | null; timeMs: number | null; exever: string | null; games: string[]; thumbnail: string | null }
@@ -274,6 +276,9 @@ export interface HubBackend {
   prewarmLaunch?(gameId: string): void;
   /** Is the game's process running? */
   isRunning?(gameId: string): Promise<boolean>;
+  /** The waiting server join (joinwait.rs): send it now / drop it. */
+  joinNow?(): Promise<boolean>;
+  joinCancel?(): Promise<boolean>;
   /** ESWC proxy-DLL mods: prepare (download + plan), apply after the user's OK, remove, backups. */
   eswcMods?: {
     prepare(modId: string): Promise<EswcPlan>;

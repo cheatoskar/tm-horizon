@@ -50,13 +50,15 @@ function LiveRow({ line, compact }: { line: Line; compact: boolean }) {
   const { entry, row } = line;
   const info = row?.info ?? null;
   const online = row?.state === 'ok';
-  const g = hub.game(LAUNCHER_ID[entry.game]);
+  // A server listed as Nations that reports the United pack needs United Forever (a Nations install cannot join it).
+  const united = entry.game === 'tmuf' || (entry.game === 'tmnf' && /united/i.test(info?.packMask ?? ''));
+  const g = hub.game(united ? 'tmuf' : LAUNCHER_ID[entry.game]);
   const installed = !!g?.installed;
   const link = row ? joinLink(row) : null;
   const full = online && !!info && info.players >= info.maxPlayers;
   const lim = row ? limitText(row, t) : '';
   const map = info?.maps[0];
-  const tip = !installed ? t('play.gameMissing') : full ? t('servers.full') : link ? t('servers.opens', { join: link }) : '';
+  const tip = !installed ? t(united ? 'servers.unitedOnly' : 'play.gameMissing') : full ? t('servers.full') : link ? t('servers.opens', { join: link }) : '';
   return (
     <div className={'tr live-tr' + (compact ? ' compact' : '') + (online ? '' : ' off')}>
       <span className="srv">

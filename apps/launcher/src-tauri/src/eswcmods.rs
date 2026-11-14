@@ -31,7 +31,8 @@ pub struct Spec {
 
 pub const SPECS: [Spec; 2] = [
     Spec { id: "TM Vibrant Shaders", repo: "cheatoskar/TM-Vibrant-Shaders", files: &["d3d9.dll"], keep: &[] },
-    Spec { id: "ESWC Autosave", repo: "cheatoskar/eswc-autosave", files: &["dinput8.dll", "eswc_autosave.dll", "eswc_autosave.ini"], keep: &["eswc_autosave.ini"] },
+    // Legacy Essentials: the repo was renamed from cheatoskar/eswc-autosave (GitHub redirects the old name).
+    Spec { id: "ESWC Autosave", repo: "cheatoskar/legacy-essentials", files: &["dinput8.dll", "eswc_autosave.dll", "eswc_autosave.ini"], keep: &["eswc_autosave.ini"] },
 ];
 
 pub fn spec(id: &str) -> Option<Spec> {
