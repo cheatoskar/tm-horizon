@@ -1,110 +1,110 @@
-# Hub lokal testen (Entwickler-Ablauf)
+# Testing the hub locally (developer workflow)
 
-Ein Befehl startet den Hub-Server (SQLite), das Entwicklerportal und die Website auf deinem Rechner. Angemeldet wird mit erfundenen Konten („Development login“), ohne Discord- oder GitHub-App. Nichts davon ist aus dem Netz erreichbar.
+One command starts the hub server (SQLite), the developer portal and the website on your machine. You sign in with made-up accounts ("Development login"), without a Discord or GitHub app. None of it is reachable from the network.
 
-## Einmal vorbereiten
+## One-time setup
 
-Im Repository-Ordner (oder im Worktree `tm-hub-mono-wt-legal`):
+In the repository folder (or in the worktree `tm-hub-mono-wt-legal`):
 
 ```
 npm ci
 ```
 
-Node 24 oder neuer (`node -v`).
+Node 24 or newer (`node -v`).
 
-## Starten
+## Start
 
 ```
 npm run dev:hub
 ```
 
-Beim ersten Start legt das Skript Demo-Daten an (rund 100 Katalog-Projekte, ein Demo-Projekt in jedem Zustand, eine Meldung, eine Übernahme-Anfrage) und baut einmal die Daten der Website. Danach steht im Fenster:
+On the first start the script creates demo data (about 100 catalog projects, one demo project in every state, a report, a claim request) and builds the website data once. Afterwards the window shows:
 
 ```
 ================ TM Horizon hub: local test ================
   Portal   http://localhost:5174/   (Login > Development login > admin or author)
   Website  http://localhost:4321/   (legal pages: /de/impressum/, ...)
   API      http://127.0.0.1:8787/v1/index.json (signed index)
-  Launcher (debug build): TMHUB_HUB_DEV_PUBKEYS=<Schlüssel>
+  Launcher (debug build): TMHUB_HUB_DEV_PUBKEYS=<key>
   ...
   DEVELOPMENT LOGIN IS ON (made-up accounts, this computer only)
 ```
 
-Beenden: **Strg+C** in diesem Fenster (stoppt alle drei).
-Von vorn anfangen (leere Datenbank, neue Demo-Daten): `npm run dev:hub -- --fresh`.
-Zweiter Hub neben einem laufenden (andere Ports): vorher `$env:PORTAL_PORT = "5184"; $env:HUB_PORT = "8797"; $env:WEB_PORT = "4331"` (PowerShell) setzen; das Portal ist dann `http://localhost:5184/`.
-Ohne Website: `npm run dev:hub -- --no-web`.
+Stop: **Ctrl+C** in that window (stops all three).
+Start from scratch (empty database, new demo data): `npm run dev:hub -- --fresh`.
+A second hub next to a running one (different ports): set `$env:PORTAL_PORT = "5184"; $env:HUB_PORT = "8797"; $env:WEB_PORT = "4331"` first (PowerShell); the portal is then `http://localhost:5184/`.
+Without the website: `npm run dev:hub -- --no-web`.
 
-Wichtig: Das Portal immer als **`http://localhost:5174`** öffnen, nicht als `127.0.0.1:5174`. Der Server prüft bei jeder Änderung die Herkunft der Anfrage; mit `127.0.0.1` schlagen Speichern und Hochladen fehl.
+Important: always open the portal as **`http://localhost:5174`**, not as `127.0.0.1:5174`. The server checks the origin of the request on every change; with `127.0.0.1`, saving and uploading fail.
 
-## Ablauf Schritt für Schritt
+## Step by step
 
-### 1. Als Entwickler anmelden
+### 1. Sign in as a developer
 
-1. `http://localhost:5174/` öffnen. Du landest auf „Log in“.
-2. Unten im gelb umrandeten Kasten „Development login“ auf **Author** klicken. Du bist jetzt `Dev Author`.
+1. Open `http://localhost:5174/`. You land on "Log in".
+2. In the yellow-bordered "Development login" box at the bottom, click **Author**. You are now `Dev Author`.
 
-### 2. Repository einfügen
+### 2. Paste a repository
 
-1. Links **New project**.
-2. GitHub-Adresse einfügen und **Preview** drücken. Der Hub liest Name, Beschreibung, Lizenz, README, Bilder und das neueste Release.
-3. Hat das Release mehrere Dateien, unter „Release file“ **die richtige auswählen**. (Das Portal lässt dich auch ohne Auswahl importieren; dann steht beim Projekt „Source needs a choice“ und du wählst die Datei später unter **Sources** › „Use this file“.)
-4. Unter „Games“ mindestens ein Spiel ankreuzen, Install type prüfen, **Import**.
+1. Click **New project** on the left.
+2. Paste a GitHub address and press **Preview**. The hub reads the name, description, license, README, images and the latest release.
+3. If the release has several files, **pick the right one** under "Release file". (The portal also lets you import without choosing; the project then shows "Source needs a choice" and you pick the file later under **Sources** › "Use this file".)
+4. Under "Games" tick at least one game, check the install type, **Import**.
 
-Zwei Beispiele, die ich getestet habe:
+Two examples I tested:
 
-- `https://github.com/cheatoskar/TM-Vibrant-Shaders` – eine TMLoader-Mod. Ergebnis: Versionen 1.4.2 und 1.4.3-rc.2 bestehen die Prüfungen, sind „flagged“ (erste Version eines neuen Projekts, Programmdatei mit Netzwerk/Tastatur-Hooks) und warten auf Freigabe.
-- `https://github.com/cheatoskar/TMX-Downloader` – eine **Browser-Erweiterung**. Sie steht schon als Katalog-Projekt im Hub (die Vorschau bietet dann „Claim this project“). Wer den Import selbst sehen will, löscht das Katalog-Projekt vorher aus der lokalen Datenbank. Mit Typ „Browser extension“ prüft der Hub die Datei nach den Browser-Regeln (`docs/hub/moderation.md`): die `.js`-Dateien sind erlaubt, die erste Version wartet als neues Projekt auf Freigabe.
+- `https://github.com/cheatoskar/TM-Vibrant-Shaders` – a TMLoader mod. Result: versions 1.4.2 and 1.4.3-rc.2 pass the checks, are "flagged" (first version of a new project, program file with network/keyboard hooks) and wait for approval.
+- `https://github.com/cheatoskar/TMX-Downloader` – a **browser extension**. It is already in the hub as a catalog project (the preview then offers "Claim this project"). To see the import yourself, delete the catalog project from the local database first. With the type "Browser extension" the hub checks the file against the browser rules (`docs/hub/moderation.md`): the `.js` files are allowed, and the first version waits for approval as a new project.
 
-GitHub erlaubt ohne Token 60 Abrufe pro Stunde; ein Import braucht etwa fünf. Wer mehr testen will, setzt vor dem Start ein eigenes Lese-Token: `$env:GITHUB_TOKEN = "<token>"` (PowerShell). Nötig ist es nicht.
+Without a token, GitHub allows 60 requests per hour; an import needs about five. If you want to test more, set your own read token before starting: `$env:GITHUB_TOKEN = "<token>"` (PowerShell). It is not required.
 
-### 3. Prüfungen und Warteschlange ansehen
+### 3. Look at the checks and the queue
 
-1. Im Projekt den Reiter **Versions** öffnen: Jede Version zeigt Status (review, held, published, rejected), Dateigröße, SHA-256 und die Liste der Prüfungen (reject / flag / info).
-2. Unten links **Log out**.
+1. Open the **Versions** tab in the project: each version shows its status (review, held, published, rejected), file size, SHA-256 and the list of checks (reject / flag / info).
+2. Click **Log out** at the bottom left.
 
-### 4. Als Admin freigeben
+### 4. Approve as admin
 
-1. Wieder „Development login“, diesmal **Admin**.
-2. Links **Admin**. Oben die Warteschlange: neue Projekte und auffällige Updates („review“), Updates in der Wartezeit („held“), Übernahme-Anfragen, Meldungen.
-3. Bei deiner Version **Approve**. Sie ist sofort veröffentlicht.
+1. "Development login" again, this time **Admin**.
+2. Click **Admin** on the left. At the top is the queue: new projects and suspicious updates ("review"), updates in the waiting period ("held"), claim requests, reports.
+3. Click **Approve** on your version. It is published immediately.
 
-### 5. Im signierten Index nachsehen
+### 5. Check the signed index
 
-`http://127.0.0.1:8787/v1/index.json` öffnen. Das ist der Index, den der Launcher lädt: `alg: ed25519`, `keyId`, `sig` und darin `payload` mit allen veröffentlichten Projekten und Versionen. Dein Projekt steht jetzt drin. Die öffentliche Projektseite: im Portal **View page** (`/p/<name>`).
+Open `http://127.0.0.1:8787/v1/index.json`. This is the index the launcher loads: `alg: ed25519`, `keyId`, `sig` and, inside it, `payload` with all published projects and versions. Your project is in there now. The public project page: **View page** in the portal (`/p/<name>`).
 
-### 6. Launcher auf den lokalen Hub zeigen (optional)
+### 6. Point the launcher at the local hub (optional)
 
-Geht nur mit einem **Debug-Build** des Launchers (nur der akzeptiert `http://` und einen Entwicklungsschlüssel):
+Only works with a **debug build** of the launcher (only that accepts `http://` and a development key):
 
 ```
 cd apps/launcher
-$env:TMHUB_HUB_DEV_PUBKEYS = "<Schlüssel aus der Startmeldung>"
+$env:TMHUB_HUB_DEV_PUBKEYS = "<key from the start message>"
 npx tauri dev
 ```
 
-Dann im Launcher **Einstellungen › TM Horizon Hub** einschalten und als Hub-Adresse `http://localhost:5174/` eintragen, **Aktualisieren**. Unter dem Schalter stehen Schlüssel, Index-Nummer und Zahl der Projekte. Der Schlüssel liegt in `apps/server/data/dev-index-key.txt` und bleibt gleich, bis du diese Datei löschst.
+Then turn on **Settings › TM Horizon Hub** in the launcher, enter `http://localhost:5174/` as the hub address and click **Refresh**. Below the switch you see the key, the index number and the number of projects. The key is stored in `apps/server/data/dev-index-key.txt` and stays the same until you delete that file.
 
-Dein installierter Launcher bleibt davon unberührt: Er hat den Hub ab Werk aus und nimmt keine Entwicklungsschlüssel an.
+Your installed launcher is not affected: it ships with the hub off and does not accept development keys.
 
-### 7. Rechtstexte ansehen
+### 7. Look at the legal texts
 
-- Website: `http://localhost:4321/de/impressum/`, `/de/datenschutz/` (Launcher-Abschnitt: `/de/datenschutz/#launcher`), `/de/nutzungsbedingungen/`; englisch ohne `/de/`. Links im Fuß jeder Seite.
-- Portal: Fußzeile „Impressum · Datenschutz · Nutzungsbedingungen“, oben „English version“.
-- Offene Stellen sind orange markiert. Liste: `npm run check-legal`. Was wohin gehört: `docs/hub/legal/AUSFUELLEN.md`.
+- Website: `http://localhost:4321/de/impressum/`, `/de/datenschutz/` (launcher section: `/de/datenschutz/#launcher`), `/de/nutzungsbedingungen/`; English without `/de/`. Links are in the footer of every page.
+- Portal: footer "Impressum · Datenschutz · Nutzungsbedingungen", "English version" at the top.
+- Open gaps are marked orange. List: `npm run check-legal`. What goes where: `docs/hub/legal/AUSFUELLEN.md`.
 
-## Was der Development login darf und was nicht
+## What the Development login may and may not do
 
-- Er ist nur an, wenn `HUB_DEV_LOGIN=1`, `NODE_ENV=development` **und** der Server nur auf `127.0.0.1` lauscht. Sonst startet der Server nicht.
-- Auch dann nimmt der Server die Anmeldung nur von Anfragen dieses Rechners an.
-- In Produktion (`NODE_ENV=production`) verweigert der Server den Start, sobald `HUB_DEV_LOGIN` gesetzt ist.
-- `npm run dev:hub` liest keine `.env`-Datei und keine Geheimnisse; alle Einstellungen stehen in `scripts/dev-hub.mjs`. Daten landen in `apps/server/data/devhub.sqlite` und `apps/server/data/devhub-files/` (nicht im Git).
+- It is only on if `HUB_DEV_LOGIN=1`, `NODE_ENV=development` **and** the server listens only on `127.0.0.1`. Otherwise the server does not start.
+- Even then, the server accepts the login only from requests from this machine.
+- In production (`NODE_ENV=production`) the server refuses to start as soon as `HUB_DEV_LOGIN` is set.
+- `npm run dev:hub` reads no `.env` file and no secrets; all settings are in `scripts/dev-hub.mjs`. Data ends up in `apps/server/data/devhub.sqlite` and `apps/server/data/devhub-files/` (not in Git).
 
-## Wenn etwas nicht geht
+## If something does not work
 
-| Problem | Lösung |
+| Problem | Fix |
 |---|---|
-| „Port 5174 is already in use“ oder `EADDRINUSE` | Ein alter Lauf läuft noch. Fenster schließen oder im Task-Manager die `node.exe` mit `dev-hub`, `vite` oder `astro` beenden. |
-| Speichern im Portal schlägt fehl („origin“) | Portal über `http://localhost:5174` öffnen, nicht über `127.0.0.1`. |
-| Preview meldet ein GitHub-Limit | eine Stunde warten oder `GITHUB_TOKEN` setzen (siehe oben). |
-| Website zeigt keine Spielbilder | Die Bilder sind nicht im Git; `python apps/web/scripts/fetch-game-art.py` holt sie (siehe `apps/web/README.md`). Für die Rechtstexte unwichtig. |
+| "Port 5174 is already in use" or `EADDRINUSE` | An old run is still going. Close the window, or end the `node.exe` with `dev-hub`, `vite` or `astro` in Task Manager. |
+| Saving in the portal fails ("origin") | Open the portal via `http://localhost:5174`, not via `127.0.0.1`. |
+| Preview reports a GitHub limit | Wait an hour or set `GITHUB_TOKEN` (see above). |
+| Website shows no game images | The images are not in Git; `python apps/web/scripts/fetch-game-art.py` fetches them (see `apps/web/README.md`). Irrelevant for the legal texts. |
