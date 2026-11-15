@@ -1,33 +1,29 @@
-# Showcase-Seiten für Mods / Mod showcase pages
+# Mod showcase pages
 
-Deutsch zuerst, englische Kurzfassung weiter unten.
+Every mod author can design a page for their mod: header image, features, screenshots, video, hotkeys, compatibility, FAQ and buttons.
+The launcher shows it at the top of the mod page, above the usual sections (README, changelog, versions). The website renders the same page statically.
+Without a showcase, the mod page looks as before.
 
-## Deutsch
+A showcase is **data, not HTML**: an ordered list of blocks. There is no HTML, CSS or JavaScript from the author.
+Everything is drawn by the same React components (`packages/showcase-ui`). Text is always text, and links are `https` only.
 
-Jeder Mod-Autor kann für seinen Mod eine eigene Seite gestalten: Kopfbild, Merkmale, Screenshots, Video, Tastenkürzel, Kompatibilität, FAQ und Knöpfe.
-Der Launcher zeigt sie oben auf der Mod-Seite, vor den üblichen Abschnitten (README, Changelog, Versionen). Die Webseite zeigt dieselbe Seite statisch.
-Ohne Showcase bleibt die Mod-Seite wie bisher.
+### Where the page comes from
 
-Eine Showcase ist **Daten, kein HTML**: eine geordnete Liste von Blöcken. Es gibt kein HTML, kein CSS und kein JavaScript vom Autor.
-Alles wird von denselben React-Komponenten gezeichnet (`packages/showcase-ui`), Texte sind immer Text, Links nur `https`.
-
-### Wo die Seite herkommt
-
-| Quelle | Wie |
+| Source | How |
 |---|---|
-| Repository des Mods | `showcase.json` im Wurzelordner (Standard-Branch) oder der Schlüssel `showcase` in `plugin.json`. Der Hub liest sie beim Import und bei jeder Quellenprüfung neu. |
-| Entwickler-Portal | Reiter **Showcase** im Projekt: Blockliste mit Hinzufügen, Entfernen, Verschieben und Live-Vorschau (derselbe Renderer wie im Launcher). Speichern ersetzt die Repo-Fassung, der Hub liest sie dann nicht mehr neu ein. |
-| Katalog (Beispiele) | `packages/catalog/showcases/*.json`, eingetragen in `SHOWCASES` in `packages/catalog/mods_seed.py` (`build_catalog.py` schreibt sie nach `catalog.json`). Heute: TM Vibrant Shaders, 100 TMX Bingo Plugin, ESWC Autosave. Der Hub findet die passende Vorlage über Katalog-ID, Name oder das Repository (`apps/server/src/services/catalog-seeds.ts`). Katalog-Projekte bekommen sie beim Katalog-Import gleich als Seite (`showcase_from = 'catalog'`); ein `showcase.json` im Repository ersetzt sie. |
+| Mod repository | `showcase.json` in the root folder (default branch) or the key `showcase` in `plugin.json`. The hub reads it again on import and on every source check. |
+| Developer portal | The **Showcase** tab in the project: a block list with add, remove, reorder and a live preview (the same renderer as in the launcher). Saving replaces the repository copy; the hub then no longer re-reads it. |
+| Catalog (examples) | `packages/catalog/showcases/*.json`, registered in `SHOWCASES` in `packages/catalog/mods_seed.py` (`build_catalog.py` writes them to `catalog.json`). Today: TM Vibrant Shaders, 100 TMX Bingo Plugin, ESWC Autosave. The hub finds the matching template by catalog ID, name or repository (`apps/server/src/services/catalog-seeds.ts`). Catalog projects get it as their page right at catalog import (`showcase_from = 'catalog'`); a `showcase.json` in the repository replaces it. |
 
-Im Portal:
+In the portal:
 
-- Der Reiter **Showcase** ist immer da, auch für Besucher eines noch nicht übernommenen Katalog-Projekts (dann nur zum Ansehen, mit Hinweis „Projekt übernehmen, um sie zu ändern“).
-- Ohne Seite erklärt er in zwei Sätzen, was eine Showcase ist, und bietet **Start from template** (Kopf, drei Features, die Bilder des Projekts, Kompatibilität, neueste Änderungen, Install-Knopf; noch nicht gespeichert), **Copy from catalog** (wenn es eine Vorlage gibt) und **Use showcase.json** (wenn ein GitHub-Repository verbunden ist). API: `POST /v1/projects/<slug>/showcase/adopt` mit `{"from":"catalog"}` oder `{"from":"repo"}`.
-- Beim Import aus einem Link wählt die Autorin zwischen der Seite aus dem Repository, der Katalog-Vorlage und keiner.
-- Die öffentliche Projektseite im Portal (`/p/<slug>`) zeigt die Showcase über der Beschreibung.
-- **Remove page** entfernt die Seite dauerhaft; ein `showcase.json` im Repository kommt erst über „Use showcase.json“ zurück.
+- The **Showcase** tab is always there, also for visitors of a catalog project that has not been claimed yet (then it is view-only, with the note "Claim the project to change it").
+- Without a page, it explains in two sentences what a showcase is and offers **Start from template** (header, three features, the project's images, compatibility, latest changes, install button; not saved yet), **Copy from catalog** (if there is a template) and **Use showcase.json** (if a GitHub repository is connected). API: `POST /v1/projects/<slug>/showcase/adopt` with `{"from":"catalog"}` or `{"from":"repo"}`.
+- When importing from a link, the author chooses between the page from the repository, the catalog template, or none.
+- The public project page in the portal (`/p/<slug>`) shows the showcase above the description.
+- **Remove page** removes the page permanently; a `showcase.json` in the repository only comes back via "Use showcase.json".
 
-Bilder dürfen in `showcase.json` als Pfad im Repository stehen (`docs/images/a.png`); der Hub macht daraus `https://raw.githubusercontent.com/<owner>/<repo>/HEAD/docs/images/a.png`.
+In `showcase.json`, images may be given as a path in the repository (`docs/images/a.png`); the hub turns that into `https://raw.githubusercontent.com/<owner>/<repo>/HEAD/docs/images/a.png`.
 
 ### Format
 
@@ -37,71 +33,57 @@ Bilder dürfen in `showcase.json` als Pfad im Repository stehen (`docs/images/a.
   "version": 1,
   "theme": { "accent": "orange" },
   "blocks": [
-    { "type": "hero", "title": "Mein Mod", "tagline": "Ein Satz dazu.", "image": "docs/images/hero.jpg", "badges": ["TMNF", "Open source"] },
-    { "type": "features", "items": [{ "icon": "sun", "title": "Licht", "text": "Sonne und Schatten." }] },
-    { "type": "hotkeys", "rows": [{ "keys": "F8", "action": "Menü" }] },
-    { "type": "cta", "buttons": [{ "kind": "install", "label": "Installieren" }] }
+    { "type": "hero", "title": "My Mod", "tagline": "One sentence about it.", "image": "docs/images/hero.jpg", "badges": ["TMNF", "Open source"] },
+    { "type": "features", "items": [{ "icon": "sun", "title": "Light", "text": "Sun and shadows." }] },
+    { "type": "hotkeys", "rows": [{ "keys": "F8", "action": "Menu" }] },
+    { "type": "cta", "buttons": [{ "kind": "install", "label": "Install" }] }
   ]
 }
 ```
 
-`theme.accent`: `blue`, `cyan`, `green`, `lime`, `amber`, `orange`, `red`, `pink`, `violet`, `slate`. Jede Farbe hat eine helle und eine dunkle Fassung; die Seite folgt dem Thema des Launchers beziehungsweise der Webseite.
+`theme.accent`: `blue`, `cyan`, `green`, `lime`, `amber`, `orange`, `red`, `pink`, `violet`, `slate`. Each colour has a light and a dark variant; the page follows the theme of the launcher or the website.
 
-`icon` (optional, seit 2026-11-12): Projekt-Icon, quadratisch, PNG oder WebP, höchstens 512 KB, `https` auf `raw.githubusercontent.com` oder als GitHub-Release-Anhang (ein Pfad im Repository wie `docs/logo/logo-256.png` geht auch). Ohne `icon` nimmt der Hub `docs/logo/logo-256.png` oder `docs/logo/logo-512.png` aus dem Repository, falls vorhanden. Ältere Dateien ohne `icon` bleiben gültig; ältere Launcher ignorieren das Feld.
+`icon` (optional, since 2026-11-12): project icon, square, PNG or WebP, at most 512 KB, `https` on `raw.githubusercontent.com` or as a GitHub release attachment (a repository path such as `docs/logo/logo-256.png` works too). Without `icon`, the hub uses `docs/logo/logo-256.png` or `docs/logo/logo-512.png` from the repository, if present. Older files without `icon` stay valid; older launchers ignore the field.
 
-**Was der Hub daraus übernimmt (übernommene Projekte):** Beim Übernehmen per GitHub, bei jeder Prüfung der GitHub-Quelle (nur wenn sich `showcase.json` geändert hat) und mit „Refresh from GitHub“ im Portal: Name = `hero.title`, Kurzbeschreibung = `hero.tagline`, Banner = `hero.image`, Galerie = Bilder des ersten `gallery`-Blocks, Spiele = `compat`-Zeilen mit `works` oder `partial`, Icon = `icon` bzw. `docs/logo/`. Das Repository gewinnt gegen die Katalogdaten. Code: `apps/server/src/services/repo-sync.ts`.
+**What the hub takes from it (claimed projects):** on claiming via GitHub, on every check of the GitHub source (only if `showcase.json` changed) and with "Refresh from GitHub" in the portal: name = `hero.title`, summary = `hero.tagline`, banner = `hero.image`, gallery = images of the first `gallery` block, games = `compat` rows with `works` or `partial`, icon = `icon` or `docs/logo/`. The repository wins over the catalog data. Code: `apps/server/src/services/repo-sync.ts`.
 
-| Block (`type`) | Felder | Grenzen |
+| Block (`type`) | Fields | Limits |
 |---|---|---|
-| `hero` | `title`, `tagline`, `image`, `video`, `badges` | Titel 60, Tagline 140, bis zu 3 Badges je 24 Zeichen. Höchstens ein Hero. |
-| `features` | `title`, `items[]` mit `icon`, `title`, `text` | bis 9 Einträge, Titel 40, Text 140 Zeichen. `icon` aus einer festen Lucide-Liste (siehe Schema, z. B. `sun`, `droplets`, `camera`, `film`, `palette`). |
-| `gallery` | `title`, `images[]` mit `url`, `caption`, `alt` | bis 12 Bilder, Beschriftung 120 |
-| `compare` | `before`, `after` je mit `url`, `label`; `caption` | zwei Bilder mit Schieberegler, Label 24 |
+| `hero` | `title`, `tagline`, `image`, `video`, `badges` | Title 60, tagline 140, up to 3 badges of 24 characters each. At most one hero. |
+| `features` | `title`, `items[]` with `icon`, `title`, `text` | Up to 9 items, title 40, text 140 characters. `icon` from a fixed Lucide list (see the schema, e.g. `sun`, `droplets`, `camera`, `film`, `palette`). |
+| `gallery` | `title`, `images[]` with `url`, `caption`, `alt` | Up to 12 images, caption 120 |
+| `compare` | `before`, `after`, each with `url`, `label`; `caption` | Two images with a slider, label 24 |
 | `video` | `url`, `caption`, `poster` | YouTube, Vimeo, Streamable |
-| `text` | `title`, `markdown` | 4000 Zeichen, begrenztes Markdown (unten) |
-| `compat` | `rows[]` mit `game`, `status`, `note` | bis 14 Zeilen; `game` wie im Hub (`tmnf`, `tmuf`, `eswc`, `tm2-stadium`, ...), `status`: `works`, `partial`, `planned`, `no` |
-| `hotkeys` | `rows[]` mit `keys`, `action` | bis 20 Zeilen, `keys` wie `Ctrl+F5` (24), `action` 80 |
-| `changelog` | `count` (1 bis 3) | holt die Notizen der neuesten Versionen; ohne Notizen entfällt der Block |
-| `faq` | `items[]` mit `q`, `a` | bis 12, Frage 120, Antwort 600 |
-| `cta` | `text`, `buttons[]` mit `kind`, `label`, `url`, `style` | bis 3 Knöpfe, Label 30. `install` startet die Installation, `companion` öffnet den Companion-Link des Mods (siehe `related-links.md`) oder die eigene `url`, `link` braucht eine `url`. |
+| `text` | `title`, `markdown` | 4000 characters, limited Markdown (below) |
+| `compat` | `rows[]` with `game`, `status`, `note` | Up to 14 rows; `game` as in the hub (`tmnf`, `tmuf`, `eswc`, `tm2-stadium`, ...), `status`: `works`, `partial`, `planned`, `no` |
+| `hotkeys` | `rows[]` with `keys`, `action` | Up to 20 rows, `keys` such as `Ctrl+F5` (24), `action` 80 |
+| `changelog` | `count` (1 to 3) | Fetches the notes of the latest versions; without notes the block is dropped |
+| `faq` | `items[]` with `q`, `a` | Up to 12, question 120, answer 600 |
+| `cta` | `text`, `buttons[]` with `kind`, `label`, `url`, `style` | Up to 3 buttons, label 30. `install` starts the installation, `companion` opens the mod's companion link (see `related-links.md`) or its own `url`, `link` needs a `url`. |
 
-Insgesamt höchstens **30 Blöcke** und 60 000 Zeichen.
+In total at most **30 blocks** and 60,000 characters.
 
-### Bilder und Videos
+### Images and videos
 
-- Bilder: `https`, Endung `.png`, `.jpg`, `.jpeg`, `.webp` oder `.gif`, ohne Query und ohne Zugangsdaten. Erlaubte Hosts: der Speicher des Hubs (Bild im Portal hochladen oder aus den Projektbildern wählen), `raw.githubusercontent.com`, GitHub-Release-Anhänge (`github.com/<owner>/<repo>/releases/download/...`) und `i.imgur.com`.
-- Empfohlen: höchstens 5 MB und 3840 Pixel an der langen Kante. Der Hub prüft Bilder von anderen Hosts mit einer HEAD-Anfrage; was kein Bild ist oder über 5 MB liegt, wird weggelassen.
-- Videos: `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/embed/` (auch Shorts), `vimeo.com/<id>`, `streamable.com/<id>`. Eingebettet wird datensparsam (`youtube-nocookie.com`, Vimeo mit `dnt=1`) und erst **nach einem Klick**. Vorher gibt es keine Anfrage an die Videoseite, auch kein Vorschaubild; wer eines will, gibt ein `poster` aus der Bilderliste an.
+- Images: `https`, extension `.png`, `.jpg`, `.jpeg`, `.webp` or `.gif`, no query and no credentials. Allowed hosts: the hub's storage (upload an image in the portal or pick one from the project images), `raw.githubusercontent.com`, GitHub release attachments (`github.com/<owner>/<repo>/releases/download/...`) and `i.imgur.com`.
+- Recommended: at most 5 MB and 3840 pixels on the long edge. The hub checks images from other hosts with a HEAD request; anything that is not an image or is over 5 MB is left out.
+- Videos: `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/embed/` (Shorts too), `vimeo.com/<id>`, `streamable.com/<id>`. Embeds are privacy-friendly (`youtube-nocookie.com`, Vimeo with `dnt=1`) and load only **after a click**. Before that there is no request to the video site, not even for a thumbnail; if you want one, give a `poster` from the image list.
 
 ### Markdown in `text`
 
-Überschriften (`#` bis `####`, im Block als Zwischenüberschriften), Absätze, Listen (`-` und `1.`), `**fett**`, `*kursiv*`, `` `Code` ``, Codeblöcke mit drei Backticks und `[Links](https://...)`.
-Alles andere bleibt einfacher Text: rohes HTML, Bilder, Tabellen, Zitate. Links, die nicht `https` sind, verlieren den Link und behalten den Text.
+Headings (`#` to `####`, rendered as subheadings inside the block), paragraphs, lists (`-` and `1.`), `**bold**`, `*italic*`, `` `code` ``, code blocks with three backticks and `[links](https://...)`.
+Everything else stays plain text: raw HTML, images, tables, quotes. Links that are not `https` lose the link and keep the text.
 
-### Prüfung
+### Validation
 
-Dieselbe Prüfung (`packages/shared/src/showcase.ts`, `validateShowcase`) läuft im Hub-Server, im Portal (live beim Tippen) und im Launcher.
-Das Portal und `PUT /v1/projects/:slug/showcase` lehnen eine Seite mit Fehlern ab (400 mit der Liste `details.issues`, Pfad und Meldung je Fehler).
-Beim Import aus dem Repository und im Launcher wird nachsichtig geprüft: Was falsch ist, fällt weg, der Rest bleibt. Unbekannte Felder zählen als Fehler (Tippfehler sollen auffallen).
-`showcase.schema.json` (`packages/shared`) ist das JSON Schema für Editor-Hinweise; maßgeblich ist der Validator.
+The same check (`packages/shared/src/showcase.ts`, `validateShowcase`) runs in the hub server, in the portal (live while typing) and in the launcher.
+The portal and `PUT /v1/projects/:slug/showcase` reject a page with errors (400 with the list `details.issues`, path and message per error).
+On import from the repository and in the launcher the check is lenient: what is wrong is dropped, the rest stays. Unknown fields count as errors (typos should be noticed).
+`showcase.schema.json` (`packages/shared`) is the JSON Schema for editor hints; the validator is authoritative.
 
-### Technik
+### Implementation
 
-- Schema und Validator: `packages/shared/src/showcase.ts`, `showcase-md.ts`, `showcase.schema.json`.
-- Renderer: `packages/showcase-ui` (React; im Launcher, in der Portal-Vorschau und für die Webseite als statisches Markup mit `react-dom/server`, plus ein kleines Skript für Schieberegler und Video-Klick).
-- Hub: Spalten `projects.showcase` und `projects.showcase_from` (`repo` oder `portal`), Feld `showcase` in der Projektantwort und im signierten Index.
-- Launcher: im Tauri-Fenster erlaubt die CSP `frame-src` nur für `youtube-nocookie.com`, `player.vimeo.com` und `streamable.com`.
-
-## English (short)
-
-Every mod author can design a page for their mod; the launcher shows it above the usual sections of the mod page, the website renders the same data statically. No showcase means the page looks as before.
-
-A showcase is data, not HTML: an ordered list of up to 30 blocks (`hero`, `features`, `gallery`, `compare`, `video`, `text`, `compat`, `hotkeys`, `changelog`, `faq`, `cta`) and an accent colour from a fixed palette (light and dark safe). No HTML, CSS or scripts from authors; text is always text, links are https only.
-
-Where it comes from: `showcase.json` in the repository root (or a `showcase` key in `plugin.json`), read at import and at every source check; or the **Showcase** tab of the dev portal (block list with add, remove, reorder and a live preview with the launcher's renderer; saving there replaces the repository copy); or the catalog's seed showcases (`packages/catalog/showcases`), which catalog projects get at import and every project can take over with "Copy from catalog" (`POST /v1/projects/<slug>/showcase/adopt`). An empty Showcase tab offers a one-click starter template. Pictures may be repository paths (`docs/images/a.png`), the hub does the rest.
-
-Optional top-level `icon` (square PNG/WebP, max 512 KB, on GitHub); fallback `docs/logo/logo-256.png` or `logo-512.png`. For claimed projects the hub takes name (hero title), summary (tagline), banner, gallery, games (compat) and icon from the repository on claim, on source checks when showcase.json changed, and on "Refresh from GitHub".
-
-Pictures: https, `.png .jpg .webp .gif`, on the hub storage, `raw.githubusercontent.com`, GitHub release assets or `i.imgur.com`; up to 5 MB, 3840 px. Videos: YouTube, Vimeo or Streamable; loaded only after a click (privacy-friendly embeds, no thumbnail request).
-
-Validation is one function (`validateShowcase` in `packages/shared/src/showcase.ts`) used by the server (strict, HTTP 400 with the list of problems), the portal (live) and the launcher (lenient: drops what is wrong). The JSON Schema for editors is `packages/shared/showcase.schema.json`. Examples: `packages/catalog/showcases/`.
+- Schema and validator: `packages/shared/src/showcase.ts`, `showcase-md.ts`, `showcase.schema.json`.
+- Renderer: `packages/showcase-ui` (React; in the launcher, in the portal preview and, for the website, as static markup via `react-dom/server`, plus a small script for the slider and the video click).
+- Hub: columns `projects.showcase` and `projects.showcase_from` (`repo`, `portal` or `catalog`), field `showcase` in the project response and in the signed index.
+- Launcher: in the Tauri window the CSP allows `frame-src` only for `youtube-nocookie.com`, `player.vimeo.com` and `streamable.com`.
