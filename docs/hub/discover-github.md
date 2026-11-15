@@ -77,5 +77,5 @@ Table `discovered`: the public metadata GitHub returns for a repository (full na
 language, stars, forks, licence, last push, whether it is a fork or archived) plus the hub's own state, score and the admin who decided.
 No README text, no e-mail addresses, no contributor lists. The owner login is part of the repository address and is the same
 public name the hub already shows for unclaimed projects from other public sources; the privacy policy names GitHub among the
-sources of unclaimed projects ("Nicht übernommene Projekte aus öffentlichen Quellen"), so it needed no change. The owner can ask
-for removal like for every unclaimed project (Ignore, or Admin > remove project).
+sources of unclaimed projects ("Nicht übernommene Projekte aus öffentlichen Quellen"), so it needed no change. Removal on request works
+like for every unclaimed project (Ignore, or Admin > remove project).
