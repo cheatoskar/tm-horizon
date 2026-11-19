@@ -1,0 +1,12 @@
+{
+  "pages.title": "Seiten",
+  "pages.preset.play": "Spielen",
+  "pages.preset.modding": "Modding",
+  "pages.preset.all": "Alles",
+  "pages.allTip": "Alle Seiten.",
+  "pages.always": "Immer sichtbar.",
+  "statsdirs.title": "Statistik-Ordner",
+  "statsdirs.add": "Hinzufügen",
+  "statsdirs.addTip": "Ordner mit deinen Replays hinzufügen.",
+  "statsdirs.missingTip": "Nicht gefunden. Wird übersprungen, bis er wieder da ist."
+}

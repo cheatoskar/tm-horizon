@@ -121,7 +121,7 @@ export function GameCommunity({ g }: { g: GameView }) {
   const list = communitiesFile.communities
     .filter((c) => c.active !== false && c.alive !== false && c.invite && (c.games ? c.games.includes(g.id) : re && re.test([c.name, c.guildName ?? '', c.section].join(' '))))
     .filter((c, i, all) => all.findIndex((x) => (x.invite ?? x.url) === (c.invite ?? c.url)) === i)
-    .sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || (b.members ?? 0) - (a.members ?? 0))
+    .sort((a, b) => (b.members ?? 0) - (a.members ?? 0) || a.name.localeCompare(b.name))
     .slice(0, 5);
   return (
     <section className="panel">

@@ -4,6 +4,9 @@
 /** A search for the map table set by another page (the .Gbx dialog's "Statistics"); read once. */
 export const statsIntent = { q: '' };
 
+/** Game families of the Statistics page (stats::FAMILIES) with their short names. */
+export const FAMILY_NAME: Record<string, string> = { forever: 'TMNF / TMUF', maniaplanet: 'ManiaPlanet', tm2020: 'Trackmania', 'tmn-eswc': 'Nations ESWC', 'tm-sunrise': 'Sunrise', 'tm-original': 'Original' };
+
 /** TM Horizon's image proxy (the hub's /ext-img/; apps/web/deploy/ext-img.conf, packages/shared/src/extimg.ts). */
 export const EXT_IMG = 'https://hub.tm-horizon.com/ext-img/';
 

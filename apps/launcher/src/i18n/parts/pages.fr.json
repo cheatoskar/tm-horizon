@@ -1,0 +1,12 @@
+{
+  "pages.title": "Pages",
+  "pages.preset.play": "Jouer",
+  "pages.preset.modding": "Modding",
+  "pages.preset.all": "Tout",
+  "pages.allTip": "Toutes les pages.",
+  "pages.always": "Toujours affichée.",
+  "statsdirs.title": "Dossiers des statistiques",
+  "statsdirs.add": "Ajouter",
+  "statsdirs.addTip": "Ajouter un dossier avec vos replays.",
+  "statsdirs.missingTip": "Introuvable. Ignoré jusqu'à son retour."
+}

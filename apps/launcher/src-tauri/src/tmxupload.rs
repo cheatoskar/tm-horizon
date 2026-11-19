@@ -559,13 +559,21 @@ pub fn scan_new(dirs: &[PathBuf], since_ms: u64, now: u64, seen: &mut HashSet<St
                 continue;
             }
             let size = std::fs::metadata(&e.path).map(|m| m.len()).unwrap_or(0);
-            if seen.insert(format!("{}|{m}|{size}", crate::fsx::norm(&e.path))) {
+            if seen.insert(seen_key(&e.path, m, size)) {
                 out.push(e.path);
             }
         }
     }
     out
 }
+
+fn seen_key(path: &Path, mtime_ms: u64, size: u64) -> String {
+    format!("{}|{mtime_ms}|{size}", crate::fsx::norm(path))
+}
+
+/// How long a replay that cannot be read yet is tried again (the game may still hold the file).
+const UNREADABLE_RETRY_MS: u64 = 120_000;
+const NOT_READABLE: &str = "Replay not readable";
 
 /// REPLAY_SAVED lines of a Horizon Host log: `... event: replay saved by <source>: <path>`.
 pub fn parse_host_events(text: &str) -> Vec<(String, String)> {
@@ -802,7 +810,7 @@ impl Service {
 
     /// Queues a replay file (folder, host or manual). Skips with a history line when it can't go.
     pub fn enqueue_file(&self, game: &str, path: &Path, source: &str, time_hint: Option<i64>) -> Result<(), String> {
-        let bytes = crate::fsx::read_bytes_prefix(path, MAX_REPLAY + 1).ok_or("Replay not readable")?;
+        let bytes = crate::fsx::read_bytes_prefix(path, MAX_REPLAY + 1).ok_or(NOT_READABLE)?;
         let file_name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| "replay.Replay.Gbx".into());
         self.enqueue_bytes(game, &file_name, bytes, source, time_hint)
     }
@@ -813,8 +821,18 @@ impl Service {
         if bytes.len() > MAX_REPLAY {
             return Err("Replay too large".into());
         }
+        let skip_unlisted = source != "manual" && unlisted_own_run(site, &bytes, &live_lookup);
         let mut i = self.inner.lock().unwrap();
         let job = make_job(game, site, file_name, display_name(file_name), time_hint, source, bytes, ModRef::None);
+        if skip_unlisted {
+            if i.cfg.done.iter().any(|d| *d == job.sha) {
+                return Ok(());
+            }
+            i.cfg.mark_job_done(&job);
+            i.cfg.add_history(history_of(&job, "skipped", NOT_ON_TMX, None, now_ms()));
+            self.save(&i);
+            return Ok(());
+        }
         admit(&mut i, job, source == "manual", now_ms())?;
         self.save(&i);
         Ok(())
@@ -822,6 +840,32 @@ impl Service {
 }
 
 impl Service {
+    /// A replay found in a folder could not be read just now. scan_new has already marked it as seen, which
+    /// would drop it for good (and silently): forget that for two minutes so the next scan tries again.
+    /// After that it is noted in the history instead of vanishing.
+    pub fn unreadable(&self, game: &str, path: &Path, source: &str, now: u64) {
+        let mut i = self.inner.lock().unwrap();
+        let m = crate::fsx::mtime(path).and_then(|m| m.duration_since(UNIX_EPOCH).ok()).map(|d| d.as_millis() as u64).unwrap_or(0);
+        if m + UNREADABLE_RETRY_MS > now {
+            let size = std::fs::metadata(path).map(|m| m.len()).unwrap_or(0);
+            i.seen.remove(&seen_key(path, m, size));
+            return;
+        }
+        let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        i.cfg.add_history(HistoryEntry {
+            at: now,
+            game: game.into(),
+            site: site_of_game(game).unwrap_or("").into(),
+            map: display_name(&name),
+            time_ms: None,
+            source: source.into(),
+            result: "skipped".into(),
+            detail: "The replay file could not be read".into(),
+            link: None,
+        });
+        self.save(&i);
+    }
+
     /// One pass over the Forever replay folder (`<documents>\TrackMania\Tracks\Replays`) for
     /// TMNF / TMUF players without the 100% TMX mod. Rules: tmxfolder.rs. Returns how many replays
     /// were queued.
@@ -839,7 +883,10 @@ impl Service {
         self.inner.lock().unwrap().seen = seen;
         let mut queued = 0;
         for p in found {
-            let Some(bytes) = crate::fsx::read_bytes_prefix(&p, MAX_REPLAY + 1) else { continue };
+            let Some(bytes) = crate::fsx::read_bytes_prefix(&p, MAX_REPLAY + 1) else {
+                self.unreadable(if tmnf_on { "tmnf" } else { "tmuf" }, &p, "folder", now);
+                continue;
+            };
             let name = p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
             let autosave = crate::tmxfolder::is_autosave(&p);
             let mut mine: BTreeSet<String> = self.inner.lock().unwrap().cfg.logins.iter().cloned().collect();
@@ -904,22 +951,45 @@ pub fn make_job(game: &str, site: &str, file_name: &str, map: String, time_ms: O
     }
 }
 
-/// Rules before a job is queued: not handled before (manual uploads may repeat), the header must
-/// not say "not validable". Skips go to the history. Err only for manual uploads (shown to the user).
+/// Rules before a job is queued: not handled before (manual uploads may repeat). A header that says
+/// validable="0" is NOT a reason to skip: the Original, Sunrise and ESWC autosaves all carry it, also for plain
+/// solo runs, and TMX accepts them. TMX decides; its refusal text lands in the history.
 pub fn admit(i: &mut Inner, job: Job, manual: bool, now: u64) -> Result<Option<u64>, String> {
     if !manual && (i.cfg.done.iter().any(|d| *d == job.sha) || run_key(&job.bytes).is_some_and(|k| i.cfg.done.iter().any(|d| *d == k))) {
         return Ok(None);
     }
-    if replay_meta(&job.bytes).validable == Some(false) {
-        let why = "TMX would refuse it: the replay is not validable (several ghosts or not a full run)";
-        if manual {
-            return Err(why.into());
-        }
-        i.cfg.mark_job_done(&job);
-        i.cfg.add_history(history_of(&job, "skipped", why, None, now));
-        return Ok(None);
-    }
+    let _ = manual;
     Ok(i.queue.push(job, now))
+}
+
+/// The replay's driver is the map's author (compared by login).
+fn is_own_map_run(bytes: &[u8]) -> bool {
+    crate::gbx::replay_head(bytes).is_some_and(|h| match (h.login.as_deref(), h.author.as_deref()) {
+        (Some(l), Some(a)) => !l.is_empty() && l.eq_ignore_ascii_case(a),
+        _ => false,
+    })
+}
+
+const NOT_ON_TMX: &str = "Run on your own map, which is not on TMX (validation or test drive)";
+
+/// A run the player drove on their own map whose uid TMX does not know (validation or test drive of an
+/// unpublished map). Only then it is skipped: the exchange answers `/api/tracks?uid=` with an empty list.
+/// Own maps that are on TMX, other people's maps, other exchanges and a failed lookup all upload as usual
+/// (TMX still refuses what it cannot take). Does network: call it without the state lock.
+fn unlisted_own_run(host: &str, bytes: &[u8], lookup: &dyn Fn(&str) -> Result<serde_json::Value, String>) -> bool {
+    if !matches!(host, "tmnf.exchange" | "tmuf.exchange") || !is_own_map_run(bytes) {
+        return false;
+    }
+    let Some(uid) = crate::gbx::replay_head(bytes).and_then(|h| h.uid).filter(|u| !u.is_empty()) else { return false };
+    let q: String = url::form_urlencoded::byte_serialize(uid.as_bytes()).collect();
+    match lookup(&format!("https://{host}/api/tracks?uid={q}&fields=TrackId&count=1")) {
+        Ok(v) => v["Results"].as_array().is_some_and(|r| r.is_empty()),
+        Err(_) => false,
+    }
+}
+
+fn live_lookup(url: &str) -> Result<serde_json::Value, String> {
+    crate::hosting::tmx::polite(|| crate::net::get_json(url))
 }
 
 pub fn status_of(i: &Inner, now: u64) -> Status {
@@ -1020,6 +1090,11 @@ pub fn step(svc: &Service, up: &dyn Uploader) -> (bool, Option<Tell>) {
 /// Handles one job the mod offered. Returns a result to post at once (skips), if any.
 pub fn take_mod_job(svc: &Service, port: u16, job: ModJob, bytes: Result<Vec<u8>, String>) -> Option<Tell> {
     let now = now_ms();
+    // The exchange lookup for runs on the player's own map happens before the state lock is taken.
+    let unlisted = match (site_host(&job.site), bytes.as_ref()) {
+        (Some(h), Ok(b)) if job.verified => unlisted_own_run(h, b, &live_lookup),
+        _ => false,
+    };
     let mut i = svc.inner.lock().unwrap();
     if i.pulled.contains(&job.id) {
         return None;
@@ -1053,6 +1128,12 @@ pub fn take_mod_job(svc: &Service, port: u16, job: ModJob, bytes: Result<Vec<u8>
     let name = if job.file_name.is_empty() { "replay.Replay.Gbx".to_string() } else { job.file_name.clone() };
     let map = if job.map_name.is_empty() { display_name(&name) } else { job.map_name.clone() };
     let j = make_job(game, host, &name, map, Some(job.time_ms).filter(|t| *t > 0), "mod", bytes, ModRef::Bridge { port, id: job.id.clone(), told: false });
+    if unlisted {
+        i.cfg.mark_job_done(&j);
+        i.cfg.add_history(history_of(&j, "skipped", NOT_ON_TMX, None, now));
+        svc.save(&i);
+        return Some((port, job.id.clone(), false, NOT_ON_TMX.into()));
+    }
     let before = i.cfg.history.len();
     let r = admit(&mut i, j, false, now);
     svc.save(&i);
@@ -1424,8 +1505,10 @@ pub mod app {
         }
         let mut any = false;
         for (game, p, src) in found {
-            if svc.enqueue_file(&game, &p, src, None).is_ok() {
-                any = true;
+            match svc.enqueue_file(&game, &p, src, None) {
+                Ok(()) => any = true,
+                Err(e) if e == NOT_READABLE && src == "folder" => svc.unreadable(&game, &p, src, now),
+                Err(_) => {}
             }
         }
         if any {
@@ -1811,17 +1894,48 @@ mod tests {
     }
 
     #[test]
-    fn not_validable_and_duplicates_are_skipped() {
+    fn not_validable_goes_to_tmx_and_duplicates_are_skipped() {
         let (_t, s) = svc();
         let mut i = s.inner.lock().unwrap();
+        // validable="0" is on every Original/Sunrise/ESWC autosave and TMX takes them: queued, not skipped
         let j = make_job("tmn-eswc", "nations.tm-exchange.com", "lan.Replay.Gbx", "lan".into(), None, "folder", replay_bytes("x", false), ModRef::None);
-        assert_eq!(admit(&mut i, j.clone(), false, 0), Ok(None));
-        assert_eq!(i.cfg.history[0].result, "skipped");
-        assert!(admit(&mut i, j, true, 0).is_err(), "manual: told why");
+        assert!(admit(&mut i, j.clone(), false, 0).unwrap().is_some());
+        assert!(i.cfg.history.is_empty());
+        assert!(admit(&mut i, j, false, 0).unwrap().is_none(), "the same file is not queued twice");
+        let (_t2, s2) = svc();
+        let mut i2 = s2.inner.lock().unwrap();
+        let m = make_job("tmn-eswc", "nations.tm-exchange.com", "m.Replay.Gbx", "m".into(), None, "manual", replay_bytes("m", false), ModRef::None);
+        assert!(admit(&mut i2, m, true, 0).unwrap().is_some(), "manual too");
         let ok = make_job("tmn-eswc", "nations.tm-exchange.com", "a.Replay.Gbx", "a".into(), None, "folder", replay_bytes("y", true), ModRef::None);
-        i.cfg.mark_done(&ok.sha);
-        assert_eq!(admit(&mut i, ok.clone(), false, 0), Ok(None), "already handled");
-        assert!(admit(&mut i, ok, true, 0).unwrap().is_some(), "manual upload may repeat");
+        let (_t3, s3) = svc();
+        let mut i3 = s3.inner.lock().unwrap();
+        i3.cfg.mark_done(&ok.sha);
+        assert_eq!(admit(&mut i3, ok.clone(), false, 0), Ok(None), "already handled");
+        assert!(admit(&mut i3, ok, true, 0).unwrap().is_some(), "manual upload may repeat");
+    }
+
+    #[test]
+    fn own_map_runs_are_skipped_only_when_tmx_does_not_know_the_map() {
+        use serde_json::json;
+        // The sample map's author is "JensTas": a run driven by that login is on the driver's own map.
+        let own = crate::gbx::tests::replay_sample("JensTas", "Jens");
+        let other = crate::gbx::tests::replay_sample("someoneelse", "X");
+        let empty = |_: &str| Ok(json!({"More": false, "Results": []}));
+        let known = |_: &str| Ok(json!({"More": false, "Results": [{"TrackId": 1}]}));
+        let broken = |_: &str| Err("status code 503".to_string());
+        let asked = std::cell::RefCell::new(String::new());
+        let spy = |u: &str| {
+            *asked.borrow_mut() = u.to_string();
+            Ok(json!({"Results": []}))
+        };
+        assert!(unlisted_own_run("tmnf.exchange", &own, &empty), "own map, unknown to TMX: validation run");
+        assert_eq!(*asked.borrow(), "");
+        assert!(unlisted_own_run("tmuf.exchange", &own, &spy));
+        assert_eq!(*asked.borrow(), "https://tmuf.exchange/api/tracks?uid=7GK45NEyMOif7S9jicImvQNz7gf&fields=TrackId&count=1");
+        assert!(!unlisted_own_run("tmnf.exchange", &own, &known), "own map that is on TMX uploads");
+        assert!(!unlisted_own_run("tmnf.exchange", &own, &broken), "lookup failed: upload, TMX decides");
+        assert!(!unlisted_own_run("tmnf.exchange", &other, &empty), "someone else's map is never looked up");
+        assert!(!unlisted_own_run("nations.tm-exchange.com", &own, &empty), "other exchanges: unchanged");
     }
 
     #[test]
@@ -1973,6 +2087,33 @@ mod tests {
         assert!(scan_new(&dirs, since, later, &mut seen).is_empty(), "only once");
         let log = "12:00:01.123 [info] host: event: map loaded\n12:00:31.500 [info] host: event: replay saved by eswc-autosave: C:\\Games\\TMNESWC\\GameData\\Tracks\\Replays\\A01 TMX.Replay.Gbx\r\nevent: replay saved by game: D:\\r.Replay.Gbx\n";
         assert_eq!(parse_host_events(log), vec![("eswc-autosave".to_string(), "C:\\Games\\TMNESWC\\GameData\\Tracks\\Replays\\A01 TMX.Replay.Gbx".to_string()), ("game".to_string(), "D:\\r.Replay.Gbx".to_string())]);
+    }
+
+    #[test]
+    fn unreadable_replay_is_tried_again_then_noted() {
+        let (_t, s) = svc();
+        let t = tempfile::tempdir().unwrap();
+        let dirs = watch_dirs(t.path());
+        std::fs::create_dir_all(&dirs[0]).unwrap();
+        let since = now_ms().saturating_sub(1000);
+        let f = dirs[0].join("Kiemmas_A01.Replay.Gbx");
+        std::fs::write(&f, "x").unwrap();
+        let later = now_ms() + 3000;
+        let mut seen = HashSet::new();
+        assert_eq!(scan_new(&dirs, since, later, &mut seen), vec![f.clone()]);
+        s.inner.lock().unwrap().seen = seen;
+        // not readable right now: forgotten, so the next scan finds it again
+        s.unreadable("tmo", &f, "folder", later);
+        let mut seen = std::mem::take(&mut s.inner.lock().unwrap().seen);
+        assert_eq!(scan_new(&dirs, since, later, &mut seen), vec![f.clone()], "tried again");
+        assert!(s.inner.lock().unwrap().cfg.history.is_empty(), "no noise while it is still fresh");
+        // two minutes later and still unreadable: a history line, and it stays seen
+        s.inner.lock().unwrap().seen = seen;
+        s.unreadable("tmo", &f, "folder", now_ms() + 10 * 60_000);
+        assert_eq!(s.inner.lock().unwrap().cfg.history.len(), 1);
+        assert_eq!(s.inner.lock().unwrap().cfg.history[0].result, "skipped");
+        let mut seen = std::mem::take(&mut s.inner.lock().unwrap().seen);
+        assert!(scan_new(&dirs, since, later, &mut seen).is_empty(), "not tried forever");
     }
 
     #[test]

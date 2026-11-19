@@ -876,7 +876,27 @@ img { display: block; }
 /* ---------- Play while starting ---------- */
 .btn.play.launching { cursor: progress; opacity: 1; filter: saturate(0.85); }
 .btn.play.launching.running { cursor: default; background: rgba(var(--tint), 0.1); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line-2); }
-.btn.play.launching:not(.running)::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 4px; height: 2px; border-radius: 2px; background: currentColor; opacity: 0.5; animation: pulse 1s infinite; }
+.btn.play.launching { overflow: hidden; }
+.btn.play.launching:not(.running) { filter: none; }
+.btn.play.launching:not(.running)::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; pointer-events: none; background: rgba(0, 0, 0, 0.22); }
+.btn.play.launching:not(.running)::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; pointer-events: none;
+  background: rgba(255, 255, 255, 0.75); transform-origin: left center; transform: scaleX(0);
+  animation: play-load 9s forwards; }
+/* A loading bar that feels real: fast start, short hangs at about a quarter, half and three quarters, then a slow creep that never reaches the end by itself. */
+@keyframes play-load {
+  0% { transform: scaleX(0); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  7% { transform: scaleX(0.24); }
+  13% { transform: scaleX(0.25); animation-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1); }
+  27% { transform: scaleX(0.52); }
+  36% { transform: scaleX(0.53); animation-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1); }
+  50% { transform: scaleX(0.77); }
+  60% { transform: scaleX(0.78); animation-timing-function: ease-out; }
+  78% { transform: scaleX(0.9); }
+  100% { transform: scaleX(0.96); }
+}
+@media (prefers-reduced-motion: reduce) { .btn.play.launching:not(.running)::after { animation: none; transform: scaleX(0.6); } }
+/* The game is open: the bar is simply full and still. */
+.btn.play.launching.running::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; pointer-events: none; background: currentColor; opacity: 0.45; }
 .btn.play { position: relative; }
 .skeleton-btn { width: 96px; opacity: 0.35; animation: pulse 1.2s infinite; pointer-events: none; }
 .pill.checking { display: inline-flex; align-items: center; gap: 4px; }

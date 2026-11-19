@@ -930,6 +930,8 @@ pub struct SettingsPatch {
     pub default_game: Option<String>,
     pub play_from_home: Option<bool>,
     pub setup_done: Option<bool>,
+    /// Sidebar pages to hide (the whole list; Home, Library and Mods are dropped).
+    pub hidden_pages: Option<Vec<String>>,
 }
 
 #[tauri::command]
@@ -998,6 +1000,9 @@ pub async fn save_settings(app: tauri::AppHandle, patch: SettingsPatch) -> Resul
             }
             if let Some(v) = patch.setup_done {
                 s.setup_done = Some(v);
+            }
+            if let Some(v) = patch.hidden_pages {
+                s.hidden_pages = crate::settings::clean_hidden_pages(&v);
             }
         })
     })

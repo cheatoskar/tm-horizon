@@ -1,7 +1,8 @@
 // First-run setup (also from Settings > Setup): found games, language and look, then per game what
 // to set up (TMLoader, recommended mods, Horizon Host, TMX upload, Discord status), a review with
 // every file list that needs one, and the run with progress. Skip works on every step; nothing is
-// written before "Apply". Everything it installs shows up in the game's History with Undo.
+// installed before "Apply" (language, look and sidebar pages apply at once, like in Settings).
+// Everything it installs shows up in the game's History with Undo.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { AlertTriangle, Check, ChevronLeft, ChevronRight, Circle, Loader2, Minus, Moon, Sun, X } from 'lucide-react';
@@ -10,6 +11,8 @@ import { LANGS, useI18n } from '../i18n';
 import { ACCENTS, go, useHubState, type Look } from '../state';
 import type { GameView } from '../data/types';
 import { UnitedHint } from './Classics';
+import { PagesChooser } from './PagesChooser';
+import { presetHidden } from '../data/navPages';
 import { GameArt } from './common';
 import '../styles-wizard.css';
 
@@ -70,6 +73,16 @@ export function SetupWizard({ onClose }: { onClose: () => void }) {
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
   const skipWait = useRef<() => void>(() => {});
+  // Sidebar pages: a fresh install starts with the small Play set once the look step is shown (Skip
+  // before it keeps every page); a wizard opened again from Settings shows the current choice.
+  const [freshPages] = useState(() => isNative && backend.info?.().settings.setupDone === false);
+  const pagesDone = useRef(false);
+  useEffect(() => {
+    if (step !== 1 || !freshPages || pagesDone.current) return;
+    pagesDone.current = true;
+    hub.setHiddenPages(presetHidden('play'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
   const dialog = useRef<HTMLDivElement>(null);
 
   // What can be offered: Horizon Host sources and the TMX upload games.
@@ -301,6 +314,10 @@ export function SetupWizard({ onClose }: { onClose: () => void }) {
                       title={t('accent.' + a)} aria-label={t('accent.' + a)} onClick={() => hub.setLook({ accent: a })} />
                   ))}
                 </div>
+              </div>
+              <div className="wiz-field">
+                <b>{t('pages.title')}</b>
+                <PagesChooser />
               </div>
             </div>
           )}

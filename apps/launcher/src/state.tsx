@@ -6,6 +6,7 @@ import { hubInstallLink, onHubIndexChange } from './data/hubIndex';
 import { applyGameAccent, clearGameAccent } from './ui/accent';
 import { buildGames, buildMods, buildProfiles, profileGameKey, tmloaderCommand } from './data/model';
 import type { GameView, ModIndex, Profile, Snapshot } from './data/types';
+import { cleanHidden, parseHidden } from './data/navPages';
 
 export type Route = { page: string; arg?: string };
 
@@ -69,6 +70,11 @@ const loadLook = (): Look => {
     modsView: modsView === 'list' ? 'list' : 'tiles',
   };
 };
+/** Sidebar pages the player hid (data/navPages.ts): settings.json in the app, localStorage in the preview. */
+const loadHiddenPages = (): string[] => {
+  const s = backend.info?.().settings;
+  return s ? cleanHidden(s.hiddenPages ?? []) : parseHidden(loadPref('tmhub.hiddenPages'));
+};
 const loadMode = (): HubMode => { try { return localStorage.getItem('tmhub.mode') === 'tas' ? 'tas' : 'play'; } catch { return 'play'; } };
 
 /** TMLoader profile name to start with, or null for "No mods" / sample profiles. */
@@ -97,6 +103,14 @@ function useHub() {
     setLookState((l) => ({ ...l, ...patch }));
     if (isNative && backend.saveSettings) backend.saveSettings(patch).catch(() => {});
     else try { Object.entries(patch).forEach(([k, v]) => localStorage.setItem('tmhub.' + k, String(v))); } catch { /* no storage */ }
+  }, []);
+  const [hiddenPages, setHiddenState] = useState<string[]>(loadHiddenPages);
+  /** Applied at once; saved in the background (only the sidebar entries change, never the routes). */
+  const setHiddenPages = useCallback((list: readonly string[]) => {
+    const clean = cleanHidden(list);
+    setHiddenState(clean);
+    if (isNative && backend.saveSettings) backend.saveSettings({ hiddenPages: clean }).catch(() => {});
+    else savePref('tmhub.hiddenPages', JSON.stringify(clean));
   }, []);
   const setMode = useCallback((m: HubMode) => {
     setModeState(m);
@@ -433,7 +447,7 @@ function useHub() {
 
   return {
     snapshot, index, games, mods, profiles, setProfiles, route, selectedGame, setSelectedGame,
-    activeProfile, setActiveProfile, selectProfile, mode, setMode, look, setLook, toasts, toast, dismiss, profilesFor, profileFor, game, commandFor, play,
+    activeProfile, setActiveProfile, selectProfile, mode, setMode, look, setLook, hiddenPages, setHiddenPages, toasts, toast, dismiss, profilesFor, profileFor, game, commandFor, play,
     updateProfile, toggleMod, modPending, launching, confirm, setConfirm, dialog, setDialog, downloads, setDownloads, webUrl, webLoading, pendingWeb, setPendingWeb,
     busy, setBusy, driveScan, setDriveScan, hubVersion, instances, reloadInstances,
   };
