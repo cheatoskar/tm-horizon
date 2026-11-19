@@ -1,9 +1,9 @@
 [
   {
     "invite": "HRShWnzpK3",
-    "name": "100% TMX / TM Horizon",
+    "name": "100% TMX Project",
     "games": ["tmnf", "tmuf", "tmn-eswc", "tm-sunrise", "tm-original"],
-    "featured": true,
+    "featured": false,
     "icon": "/community/100-tmx.png"
   }
 ]

@@ -17,6 +17,8 @@ import { TmxUploadPanel } from '../ui/TmxUpload';
 import { ClientBridgeSettings } from '../ui/ClientBridge';
 import { BackupPanel } from '../ui/Backup';
 import { GbxAssocSetting } from '../ui/GbxOpen';
+import { PagesChooser } from '../ui/PagesChooser';
+import { StatsFolders } from '../ui/StatsFolders';
 
 const ISSUES = 'https://github.com/cheatoskar/tm-horizon/issues';
 
@@ -127,6 +129,13 @@ export function Settings({ focus }: { focus?: string }) {
           </section>
         </div>
 
+        <div className="settings-block">
+          <h2>{t('pages.title')}</h2>
+          <section className="panel">
+            <PagesChooser />
+          </section>
+        </div>
+
         {isNative && (
           <div className="settings-block">
             <h2>{t('wiz.title')}</h2>
@@ -191,6 +200,13 @@ export function Settings({ focus }: { focus?: string }) {
             {ds && <p className="dim small ellip">{ds.running ? t('settings.scanning', { n: ds.dirs ?? 0, dir: ds.dir ?? '' }) : ds.result}</p>}
           </section>
         </div>
+
+        {isNative && (
+          <div className="settings-block">
+            <h2>{t('statsdirs.title')}</h2>
+            <StatsFolders />
+          </div>
+        )}
 
         {isNative && info && (
           <div className="settings-block">

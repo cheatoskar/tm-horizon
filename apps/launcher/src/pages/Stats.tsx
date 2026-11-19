@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { ArrowDown, ArrowUp, BarChart3, Info, Loader2, RefreshCw, Table2 } from 'lucide-react';
-import { copyChoices, firstDesc, shownBest, statsIntent, tableRows, tmxPage, tmxThumbDirect, tmxThumbProxy, type SortKey } from '../data/statsView.ts';
+import { copyChoices, FAMILY_NAME, firstDesc, shownBest, statsIntent, tableRows, tmxPage, tmxThumbDirect, tmxThumbProxy, type SortKey } from '../data/statsView.ts';
 import { isNative } from '../data/backend';
 import { tp, useI18n } from '../i18n';
 import { stripTm } from '../data/tmformat.ts';
@@ -48,7 +48,6 @@ function MapName({ name }: { name: string }) {
   return <span className="st-map" title={stripTm(name)}><TmRich text={name} safe /></span>;
 }
 
-const FAMILY_NAME: Record<string, string> = { forever: 'TMNF / TMUF', maniaplanet: 'ManiaPlanet', tm2020: 'Trackmania', 'tmn-eswc': 'Nations ESWC', 'tm-sunrise': 'Sunrise', 'tm-original': 'Original' };
 /** The game whose cover stands for a family (the most played one where several share it). */
 const FAMILY_COVER: Record<string, string> = { forever: 'tmnf', maniaplanet: 'tm2-stadium', tm2020: 'tm2020', 'tmn-eswc': 'tmn-eswc', 'tm-sunrise': 'tm-sunrise', 'tm-original': 'tm-original' };
 

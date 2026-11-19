@@ -73,6 +73,36 @@ pub fn folders_of(copies: &[crate::copies::GameCopy]) -> Vec<Folders> {
         .collect()
 }
 
+/// Adds the player's extra replay folders (Settings > Statistics, per family) to the family's main copy,
+/// so the copy filter of another copy or instance leaves them out like that copy's own folders. A
+/// folder that does not exist (unplugged drive, renamed) is skipped silently; one that lies inside a
+/// folder already read (or was listed twice) is not read again. Without a main copy of the family
+/// the folders form an entry of their own (no copy id: only in the "all copies" view).
+/// They are listed like every replay folder (`walk_cached`, depth `MAX_DEPTH`, header cache by path).
+pub fn add_extra_replays(folders: &mut Vec<Folders>, copies: &[crate::copies::GameCopy], extra: &BTreeMap<String, Vec<String>>) {
+    for fam in FAMILIES {
+        let Some(list) = extra.get(fam) else { continue };
+        let mut have: Vec<PathBuf> = folders.iter().flat_map(|f| f.replays.iter().cloned()).collect();
+        let mut add = vec![];
+        for raw in list {
+            let p = PathBuf::from(raw.trim());
+            if raw.trim().is_empty() || !fsx::is_dir(&p) || have.iter().any(|h| fsx::is_inside(&p, h)) {
+                continue;
+            }
+            have.push(p.clone());
+            add.push(p);
+        }
+        if add.is_empty() {
+            continue;
+        }
+        let main = copies.iter().find(|c| c.family == fam && c.main).map(|c| c.id.as_str());
+        match folders.iter_mut().find(|f| f.family == fam && main.is_some_and(|id| f.copy == id)) {
+            Some(f) => f.replays.extend(add),
+            None => folders.push(Folders { family: fam, replays: add, maps: vec![], copy: String::new() }),
+        }
+    }
+}
+
 /// The copies of `docs` and one install per legacy game (`install`; tests and tools).
 pub fn copies_for(docs: Option<&Path>, install: &dyn Fn(&str) -> Option<PathBuf>) -> Vec<crate::copies::GameCopy> {
     let list: Vec<crate::copies::Install> = ["tmn-eswc", "tm-sunrise", "tm-original"]
@@ -1186,6 +1216,7 @@ pub mod cmd {
     fn input<'a>(st: &'a AppState, only: Option<String>) -> Input<'a> {
         let copies = crate::copies::all(st);
         let mut folders = folders_of(&copies);
+        add_extra_replays(&mut folders, &copies, &st.settings().stats_replay_folders);
         let only = only.filter(|id| copies.iter().any(|c| &c.id == id));
         if let Some(id) = &only {
             folders.retain(|f| &f.copy == id);
@@ -1312,6 +1343,58 @@ pub mod cmd {
         })
         .await
         .map_err(|e| e.to_string())
+    }
+
+    /// One extra replay folder for Settings: `missing` when it is not there right now (it is skipped).
+    #[derive(Debug, Clone, Serialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct ExtraFolder {
+        pub family: String,
+        pub path: String,
+        pub missing: bool,
+    }
+
+    fn extra_list(st: &AppState) -> Vec<ExtraFolder> {
+        let s = st.settings();
+        s.stats_replay_folders
+            .iter()
+            .flat_map(|(f, list)| list.iter().map(move |p| ExtraFolder { family: f.clone(), path: p.clone(), missing: !fsx::is_dir(Path::new(p)) }))
+            .collect()
+    }
+
+    #[tauri::command(async)]
+    pub fn stats_extra_folders(app: AppHandle) -> Vec<ExtraFolder> {
+        extra_list(&app.state::<AppState>())
+    }
+
+    /// "Add" in Settings: the folder picker, then the folder joins the family's list (the next
+    /// Statistics visit reads it). Cancelled or already listed: the list unchanged.
+    #[tauri::command]
+    pub async fn stats_extra_folder_add(app: AppHandle, family: String) -> Result<Vec<ExtraFolder>, String> {
+        crate::bg::run(move || -> Result<Vec<ExtraFolder>, String> {
+            use tauri_plugin_dialog::DialogExt;
+            if !FAMILIES.contains(&family.as_str()) {
+                return Err(format!("Unknown game family {family}"));
+            }
+            let Some(fp) = app.dialog().file().set_title("Replay folder").blocking_pick_folder() else { return Ok(extra_list(&app.state::<AppState>())) };
+            let dir = fp.into_path().map_err(|e| e.to_string())?;
+            if fsx::blocked(&dir) {
+                return Err("This folder is the protected original ESWC and is not supported.".into());
+            }
+            let st = app.state::<AppState>();
+            st.update_settings(|s| {
+                s.add_replay_folder(&family, &dir);
+            })?;
+            Ok(extra_list(&st))
+        })
+        .await
+    }
+
+    #[tauri::command(async)]
+    pub fn stats_extra_folder_remove(app: AppHandle, family: String, path: String) -> Result<Vec<ExtraFolder>, String> {
+        let st = app.state::<AppState>();
+        st.update_settings(|s| s.remove_replay_folder(&family, Path::new(&path)))?;
+        Ok(extra_list(&st))
     }
 }
 
@@ -1765,5 +1848,72 @@ mod tests {
         let rep = build(Input { folders: folders(Some(docs.path()), &|_| None), copies: vec![], only: None, cache_dir: cache.path(), playtime: Default::default(), sessions: vec![], host_dir: None, now_ms: 1_800_000_000_000 });
         let a = rep.maps.iter().find(|m| m.uid == "uidA01").unwrap();
         assert_eq!((a.clean_runs, a.clean_best_ms), (1, Some(45000)), "the sample run has 0 respawns");
+    }
+
+    #[test]
+    fn extra_replay_folders_join_the_main_copy() {
+        let docs = tempfile::tempdir().unwrap();
+        let games = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let elsewhere = tempfile::tempdir().unwrap();
+        let tm = docs.path().join("TrackMania").join("Tracks").join("Replays");
+        put(&tm.join("Autosaves").join("me_A01.Replay.Gbx"), &replay_sample_run("me", "Me", "Stadium", "uidA01", 45000));
+        // Moved Autosaves, nested one level deeper (read recursively), plus a copy of the A01 run (counted once).
+        let moved = elsewhere.path().join("old autosaves");
+        put(&moved.join("2025").join("me_A02.Replay.Gbx"), &replay_sample_run("me", "Me", "Stadium", "uidA02", 52000));
+        put(&moved.join("me_A01.Replay.Gbx"), &replay_sample_run("me", "Me", "Stadium", "uidA01", 45000));
+        // An ESWC copy that is not the main one, and an instance-like second copy: their filters never see the extra folder.
+        let eswc = games.path().join("ESWC");
+        std::fs::create_dir_all(eswc.join("GameData").join("Tracks").join("Replays")).unwrap();
+        let list = vec![crate::copies::Install { game: "tmn-eswc".into(), dir: eswc.clone(), label: "ESWC".into(), instance: Some("i1".into()), user_dir: None, selected: false }];
+        let copies = crate::copies::build(Some(docs.path()), &list, &|_| None);
+        let main_id = copies.iter().find(|c| c.family == "forever" && c.main).unwrap().id.clone();
+        let eswc_id = copies.iter().find(|c| c.family == "tmn-eswc").unwrap().id.clone();
+
+        let mut extra: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        extra.insert(
+            "forever".into(),
+            vec![
+                moved.to_string_lossy().into_owned(),
+                moved.to_string_lossy().into_owned(),                                  // listed twice
+                tm.join("Autosaves").to_string_lossy().into_owned(),                   // inside a folder already read
+                elsewhere.path().join("gone").to_string_lossy().into_owned(),          // missing: skipped silently
+            ],
+        );
+        extra.insert("tmn-eswc".into(), vec![elsewhere.path().join("also gone").to_string_lossy().into_owned()]);
+        let mut f = folders_of(&copies);
+        let before = f.len();
+        add_extra_replays(&mut f, &copies, &extra);
+        assert_eq!(f.len(), before, "no new entry: the extra folder joins the main copy");
+        let main = f.iter().find(|x| x.copy == main_id).unwrap();
+        assert_eq!(main.replays, vec![tm.clone(), moved.clone()]);
+        assert!(f.iter().filter(|x| x.family == "tmn-eswc").all(|x| x.replays.len() == 1), "a missing folder adds nothing");
+
+        let input = |only: Option<String>| {
+            let mut f = folders_of(&copies);
+            add_extra_replays(&mut f, &copies, &extra);
+            if let Some(id) = &only {
+                f.retain(|x| &x.copy == id);
+            }
+            Input { folders: f, copies: copies.clone(), only, cache_dir: cache.path(), playtime: Default::default(), sessions: vec![], host_dir: None, now_ms: 1_800_000_000_000 }
+        };
+        forget_listings();
+        let all = build(input(None));
+        assert_eq!((all.files, all.duplicates), (2, 1), "A01 once, A02 from the extra folder");
+        assert!(all.maps.iter().any(|m| m.uid == "uidA02"));
+        // The header cache keeps the extra folder's files (they are part of the listing).
+        let c = HeadCache::load(cache.path());
+        assert!(c.files.keys().any(|k| k.contains("me_a02")), "cached by path like every replay");
+        let only_main = build(input(Some(main_id)));
+        assert!(only_main.maps.iter().any(|m| m.uid == "uidA02"), "main copy filter includes the extra folder");
+        let only_eswc = build(input(Some(eswc_id)));
+        assert!(only_eswc.maps.iter().all(|m| m.uid != "uidA02"), "another copy's filter leaves it out");
+
+        // No main copy of the family: an entry of its own, only in the "all copies" view.
+        let mut f = vec![];
+        add_extra_replays(&mut f, &[], &extra);
+        assert_eq!(f.len(), 1);
+        // The moved folder and the Autosaves folder (no copy reads it here); still no duplicate, no missing one.
+        assert_eq!((f[0].family, f[0].copy.as_str(), f[0].replays.len()), ("forever", "", 2));
     }
 }

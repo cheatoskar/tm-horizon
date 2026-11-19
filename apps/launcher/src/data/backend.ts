@@ -127,6 +127,10 @@ export interface NativeSettings {
   selectedInstall?: Record<string, string>;
   /** false on a fresh install until the setup wizard was finished or skipped; null = from before 0.4. */
   setupDone?: boolean | null;
+  /** Sidebar pages the player hid (data/navPages.ts); missing = all shown. */
+  hiddenPages?: string[];
+  /** Extra Statistics replay folders per game family. */
+  statsReplayFolders?: Record<string, string[]>;
 }
 
 export interface ReportFile { id: string; path: string; label: string; size: number; binary: boolean; include: boolean; preview: string }
@@ -345,7 +349,7 @@ export interface HubBackend {
     setupDownload?(game: string): Promise<{ path: string; url: string; version: string; size: number; sha256: string }>;
     setupRun?(game: string, path: string): Promise<void>;
   };
-  saveSettings?(patch: Partial<Pick<NativeSettings, 'hubUrl' | 'updateUrl' | 'eswcUseLauncher' | 'useLauncher' | 'protocolAsked' | 'discordPresence' | 'discordTas' | 'coverDownloads' | 'language' | 'theme' | 'accent' | 'density' | 'modsView' | 'defaultGame' | 'playFromHome' | 'setupDone'>>): Promise<NativeSettings>;
+  saveSettings?(patch: Partial<Pick<NativeSettings, 'hubUrl' | 'updateUrl' | 'eswcUseLauncher' | 'useLauncher' | 'protocolAsked' | 'discordPresence' | 'discordTas' | 'coverDownloads' | 'language' | 'theme' | 'accent' | 'density' | 'modsView' | 'defaultGame' | 'playFromHome' | 'setupDone' | 'hiddenPages'>>): Promise<NativeSettings>;
   /** Which install folder of a game Play starts (null = the first one). */
   setSelectedInstall?(game: string, dir: string | null): Promise<void>;
   protocol?: { register(): Promise<ActionResult>; unregister(): Promise<ActionResult> };

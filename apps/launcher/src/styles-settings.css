@@ -114,3 +114,16 @@
 .tmxup-table th:nth-child(3), .tmxup-table td:nth-child(3) { width: 120px; }
 .tmxup-table th:nth-child(4), .tmxup-table td:nth-child(4) { width: 84px; }
 .tmxup-table th:nth-child(5), .tmxup-table td:nth-child(5) { width: 64px; }
+
+/* Pages chooser (Settings > Pages, setup wizard): presets, then one checkbox per page. */
+.pages-chooser { display: flex; flex-direction: column; gap: 12px; width: 100%; min-width: 0; }
+.page-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 14px; }
+.page-pick { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 4px 0; cursor: pointer; color: var(--fg-2); }
+.page-pick input { width: 16px; height: 16px; accent-color: var(--acc); flex: none; margin: 0; }
+.page-pick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.page-pick.fixed { cursor: default; opacity: 0.6; }
+
+/* Settings > Statistics: extra replay folders per game family. */
+.stats-dirs li { align-items: flex-start; }
+.stats-dir { display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: 4px; }
+.stats-dir .mono { min-width: 0; }

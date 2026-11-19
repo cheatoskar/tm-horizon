@@ -1,0 +1,12 @@
+{
+  "pages.title": "Pages",
+  "pages.preset.play": "Play",
+  "pages.preset.modding": "Modding",
+  "pages.preset.all": "Everything",
+  "pages.allTip": "Every page.",
+  "pages.always": "Always shown.",
+  "statsdirs.title": "Statistics folders",
+  "statsdirs.add": "Add",
+  "statsdirs.addTip": "Add a folder with your replays.",
+  "statsdirs.missingTip": "Not found. Skipped until it is back."
+}

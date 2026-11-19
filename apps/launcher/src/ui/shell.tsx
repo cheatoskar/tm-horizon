@@ -8,6 +8,7 @@ import { toBody } from './Modal';
 import { embeddedOpen } from './webLayer';
 import { openSection, rememberSection } from '../data/navHistory';
 import { resetModsView } from '../pages/Mods';
+import { navShows } from '../data/navPages';
 
 /** Width of a rail label (12.5px semibold + padding), measured once per text. */
 const widths = new Map<string, number>();
@@ -22,7 +23,7 @@ function labelWidth(text: string): number {
   return w;
 }
 
-const NAV = [
+export const NAV = [
   { page: 'home', icon: Home, label: 'nav.home' },
   { page: 'news', icon: Newspaper, label: 'nav.news' },
   { page: 'library', icon: LayoutGrid, label: 'nav.library' },
@@ -87,7 +88,7 @@ export function TitleBar() {
 }
 
 export function Sidebar() {
-  const { route, mode } = useHubState();
+  const { route, mode, hiddenPages } = useHubState();
   const t = useT();
   const active = route.page === 'game' ? 'library' : route.page === 'tashome' ? 'home' : route.page === 'tas' ? 'maps' : route.page === 'clips' ? 'media' : route.page === 'map' ? 'maps' : route.page === 'skinlib' ? 'skins' : route.page;
   // The hover label floats at the app root (fixed position), so no page content can cover it.
@@ -116,7 +117,8 @@ export function Sidebar() {
   );
   return (
     <nav className="rail">
-      {(mode === 'tas' ? NAV_TAS : NAV).map(({ page, icon, label }) => item(page, icon, label))}
+      {/* Hidden pages (Settings > Pages) lose only their entry; an open hidden page keeps it until you leave. */}
+      {(mode === 'tas' ? NAV_TAS : NAV).filter((n) => navShows(n.page, hiddenPages, active)).map(({ page, icon, label }) => item(page, icon, label))}
       <div className="grow" />
       {item('settings', Settings, 'nav.settings')}
       {tip && toBody(<span className="rail-tip-float" role="tooltip" style={{ left: tip.x, top: tip.y }}>{tip.label}</span>)}

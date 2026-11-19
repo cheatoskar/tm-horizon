@@ -40,9 +40,18 @@ replay folder / Horizon Host log       ─┼─> queue ─> hidden webview on h
      (where Horizon Host's ESWC Autosave plugin and the old ESWC Autosave save), plus the host's
      `REPLAY_SAVED` events from its newest log (`<game>\horizon\logs\*.log`, line
      `event: replay saved by <source>: <path>`). Only files written after the switch was turned on, at least
-     2 s old (finished writing). Replays whose header says `validable="0"` (several ghosts of a network race)
-     are skipped with a reason; the autosave plugin's single-ghost "… TMX.Replay.Gbx" copy is the one that goes.
+     2 s old (finished writing). `validable="0"` in the header is no reason to skip: every Original, Sunrise and
+     ESWC autosave carries it, also for plain solo runs, and TMX accepts them (checked against 98 autosaves of an
+     Original player, 33 of which TMX took when uploaded by hand). TMX decides, its refusal text lands in the
+     history. The autosave file and the "… TMX.Replay.Gbx" or "Map(00'20''90)" copy of one run are the same run
+     (map uid and time) and upload once. A replay that cannot be read when it is found is tried again for two
+     minutes, then noted in the history.
    - **"Upload replay…"**: any .Replay.Gbx, sent to the chosen game's exchange.
+  - **Validation runs are skipped** (automatic sources, tmnf/tmuf.exchange): the replay carries no validation
+    flag, so a run whose driver login is the map's author login is looked up first
+    (`/api/tracks?uid=<map uid>`). Only when TMX does not know the map it is skipped ("Run on your own map,
+    which is not on TMX"). Own maps that are on TMX, other people's maps and a failed lookup upload as
+    usual. "Upload replay…" never looks up.
 2. **Queue rules**: one upload at a time, at least 2 s between uploads, the same replay (SHA-256) never
    twice (a list of handled replays is kept). Transient errors (network, timeout, 429, 5xx) are retried
    after 10 s, 30 s, 2 min, 5 min, 15 min, then the job fails. TMX's refusals (e.g. "not faster than your

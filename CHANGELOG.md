@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.5.4 "Launcher Preview" (2026-11-19)
+
+Windows. The experimental Linux build stays at 0.5.3 for now. Built with `TMHUB_RELEASE_PREVIEW=1`. Release text:
+`docs/release/notes-0.5.4.md`.
+
+- Play button: a loading bar at the bottom of the button, 0 to 100 % with short hangs; full and still as soon as the
+  game is open.
+- Pages: choose which pages the sidebar shows, in the first-run wizard (presets Play, Modding, Everything) and later
+  in Settings > Pages. Home, Library and Mods always stay. Links and tiles still open hidden pages.
+- Statistics: extra replay folders per game (Settings > Statistics folders), so autosaves moved to other folders are
+  still counted.
+- Communities: the 100% TMX Project Discord has its right name; own entries are no longer pinned, the list is sorted
+  by size and then by name.
+- TMX replay upload: a replay whose header says `validable="0"` is no longer skipped. Every Original, Sunrise and ESWC
+  autosave carries it and TMX accepts them; before, about two thirds of a session's runs were skipped with "TMX would
+  refuse it". A replay file that cannot be read when it is found is tried again for two minutes and then noted in
+  the history (it used to be dropped without a trace).
+- TMX replay upload: a run on the player's own map is skipped only when TMX does not know the map (a validation or
+  test drive); own maps that are on TMX still upload.
+- Developer docs are English only.
+
 ## 0.5.3 "Launcher Preview" (2026-11-14)
 
 Windows, plus Linux experimental (AppImage built on Ubuntu 22.04, Arch package), built with

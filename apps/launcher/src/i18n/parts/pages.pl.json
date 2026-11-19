@@ -1,0 +1,12 @@
+{
+  "pages.title": "Strony",
+  "pages.preset.play": "Gra",
+  "pages.preset.modding": "Modding",
+  "pages.preset.all": "Wszystko",
+  "pages.allTip": "Wszystkie strony.",
+  "pages.always": "Zawsze widoczna.",
+  "statsdirs.title": "Foldery statystyk",
+  "statsdirs.add": "Dodaj",
+  "statsdirs.addTip": "Dodaj folder ze swoimi powtórkami.",
+  "statsdirs.missingTip": "Nie znaleziono. Pomijany, dopóki nie wróci."
+}

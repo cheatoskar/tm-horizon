@@ -75,6 +75,19 @@ pub struct Settings {
     pub consoles: crate::consoles::ConsoleSettings,
     /// "Recommended for your game" items the player closed ("<game>:<item>").
     pub suggestions_dismissed: Vec<String>,
+    /// Sidebar pages the player hid (Settings > Pages, setup wizard). Only the sidebar entry goes: links
+    /// and buttons still open the page. Never Home, Library or Mods (`clean_hidden_pages`).
+    pub hidden_pages: Vec<String>,
+    /// Extra replay folders for Statistics per game family (`stats::FAMILIES`), e.g. moved Autosaves.
+    pub stats_replay_folders: BTreeMap<String, Vec<String>>,
+}
+
+/// Sidebar pages that can be hidden (Home, Library and Mods always stay).
+pub const OPTIONAL_PAGES: [&str; 8] = ["news", "maps", "skins", "media", "stats", "profiles", "servers", "community"];
+
+/// Known optional pages only, each once, in sidebar order.
+pub fn clean_hidden_pages(v: &[String]) -> Vec<String> {
+    OPTIONAL_PAGES.iter().filter(|p| v.iter().any(|x| x == *p)).map(|p| p.to_string()).collect()
 }
 
 impl Default for Settings {
@@ -109,6 +122,8 @@ impl Default for Settings {
             setup_done: None,
             consoles: Default::default(),
             suggestions_dismissed: vec![],
+            hidden_pages: vec![],
+            stats_replay_folders: BTreeMap::new(),
         }
     }
 }
@@ -128,6 +143,30 @@ impl Settings {
             "tmn-eswc" => self.eswc_use_launcher = on,
             g => {
                 self.use_launcher.insert(g.to_string(), on);
+            }
+        }
+    }
+
+    /// Adds an extra Statistics replay folder for a family; false for an unknown family or a folder
+    /// that is already in the list (same path after normalising).
+    pub fn add_replay_folder(&mut self, family: &str, dir: &Path) -> bool {
+        if !crate::stats::FAMILIES.contains(&family) {
+            return false;
+        }
+        let list = self.stats_replay_folders.entry(family.to_string()).or_default();
+        if list.iter().any(|x| crate::fsx::norm(Path::new(x)) == crate::fsx::norm(dir)) {
+            return false;
+        }
+        list.push(dir.to_string_lossy().into_owned());
+        true
+    }
+
+    /// Removes an extra Statistics replay folder (an emptied family is dropped from the map).
+    pub fn remove_replay_folder(&mut self, family: &str, dir: &Path) {
+        if let Some(list) = self.stats_replay_folders.get_mut(family) {
+            list.retain(|x| crate::fsx::norm(Path::new(x)) != crate::fsx::norm(dir));
+            if list.is_empty() {
+                self.stats_replay_folders.remove(family);
             }
         }
     }
@@ -186,5 +225,33 @@ mod tests {
         assert_eq!(load(&p), Settings::default());
         let kept: Vec<_> = std::fs::read_dir(t.path()).unwrap().map(|e| e.unwrap().file_name().to_string_lossy().into_owned()).filter(|n| n.starts_with("settings.broken-")).collect();
         assert_eq!(kept.len(), 1);
+    }
+
+    #[test]
+    fn hidden_pages_and_replay_folders_round_trip() {
+        let t = tempfile::tempdir().unwrap();
+        let p = file_in(t.path());
+        // A settings.json from 0.5.3 (no new fields) loads with every page shown and no extra folders.
+        std::fs::write(&p, r#"{"hubUrl":"https://x/","theme":"midnight","setupDone":true,"suggestionsDismissed":["tmnf:x"]}"#).unwrap();
+        let old = load(&p);
+        assert_eq!(old.theme, "midnight");
+        assert!(old.hidden_pages.is_empty());
+        assert!(old.stats_replay_folders.is_empty());
+        let mut s = old.clone();
+        s.hidden_pages = clean_hidden_pages(&["servers".into(), "home".into(), "news".into(), "news".into(), "nope".into(), "mods".into(), "library".into()]);
+        assert_eq!(s.hidden_pages, vec!["news".to_string(), "servers".to_string()], "home, library, mods and unknown pages never hidden");
+        assert!(s.add_replay_folder("forever", Path::new(r"D:\TM\Autosaves old")));
+        assert!(!s.add_replay_folder("forever", Path::new(r"d:\tm\autosaves old")), "same folder twice");
+        assert!(!s.add_replay_folder("nope", Path::new(r"D:\X")), "unknown family");
+        assert!(s.add_replay_folder("tmn-eswc", Path::new(r"E:\ESWC replays")));
+        save(&p, &s).unwrap();
+        let back = load(&p);
+        assert_eq!(back, s);
+        let text = std::fs::read_to_string(&p).unwrap();
+        assert!(text.contains("\"hiddenPages\"") && text.contains("\"statsReplayFolders\""), "camelCase keys");
+        let mut r = back;
+        r.remove_replay_folder("tmn-eswc", Path::new(r"e:\eswc replays"));
+        assert!(!r.stats_replay_folders.contains_key("tmn-eswc"));
+        assert_eq!(r.stats_replay_folders["forever"].len(), 1);
     }
 }
