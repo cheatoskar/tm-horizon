@@ -46,10 +46,15 @@ export interface IngestInput {
 /** Browser of a file name ("TMX-Downloader-2.7.1-firefox.zip" -> "firefox"), or null. */
 export const browserLabel = (name: string): string | null => /chrome|chromium/i.test(name) ? 'chrome' : /firefox|mozilla/i.test(name) ? 'firefox' : /edge/i.test(name) ? 'edge' : /opera/i.test(name) ? 'opera' : null;
 
-/** All files of a version: the main one and the extra ones (browser add-ons), with their download links. */
+/** Game id of a per-game release file name ("eswc-autosave-1.4.0-Original.zip" -> "tmo"), or null. */
+export const gameLabel = (name: string): string | null =>
+  /eswc/i.test(name) ? 'eswc' : /original|\btmo\b/i.test(name) ? 'tmo' : /sunrise|\btms\b/i.test(name) ? 'tms' : null;
+
+/** All files of a version: the main one and the extra ones (browser add-ons or per-game zips), with their download links. */
 export function filesOf(ctx: Ctx, v: Pick<VersionsTable, 'id' | 'file_name' | 'file_size' | 'file_sha256' | 'extra_files' | 'installs'>, label?: string | null) {
   const extras = parseJson<ExtraFile[]>(v.extra_files ?? null, []);
-  const main = { name: v.file_name, size: v.file_size, sha256: v.file_sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${v.file_name}`, ...(extras.length && (label ?? browserLabel(v.file_name)) ? { label: (label ?? browserLabel(v.file_name))! } : {}) };
+  const mainLabel = extras.length ? (label ?? browserLabel(v.file_name) ?? gameLabel(v.file_name)) : null;
+  const main = { name: v.file_name, size: v.file_size, sha256: v.file_sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${v.file_name}`, ...(mainLabel ? { label: mainLabel } : {}) };
   return [main, ...extras.map((x) => ({ name: x.name, size: x.size, sha256: x.sha256, url: `${ctx.cfg.HUB_PUBLIC_URL}dl/${v.id}/${x.name}`, ...(x.label ? { label: x.label } : {}) }))];
 }
 
@@ -131,15 +136,17 @@ export async function ingestVersion(ctx: Ctx, input: IngestInput): Promise<Versi
     signature, vt: ctx.vt, vtUpload: ctx.cfg.VT_UPLOAD, maxUpload: ctx.cfg.MAX_UPLOAD_MB * 1048576,
   });
   if (file.wrapped) report.findings.unshift({ severity: 'info', code: 'meta.wrapped', message: 'Wrapped into the TMLoader layout by the hub' });
-  // Extra files (browser add-ons): the same checks each; the worst verdict counts for the whole version.
+  // Extra files (browser add-ons or per-game packs): the same checks each; the worst verdict counts for the whole version.
   const extras: { name: string; data: Buffer; label: string | null; hash: string }[] = [];
-  for (const x of (browser ? input.extraFiles ?? [] : []).slice(0, 4)) {
+  for (const x of (input.extraFiles ?? []).slice(0, 8)) {
     if (x.data.length > ctx.cfg.MAX_UPLOAD_MB * 1048576) throw new HttpError(413, 'too_large', `Files up to ${ctx.cfg.MAX_UPLOAD_MB} MB`);
     const name = storageName(x.name);
     if (name === fileName || extras.some((e) => e.name === name)) continue;
+    const xInstalls = browser ? {} : (x.label && types[x.label as GameId] ? { [x.label]: types[x.label as GameId] } : types);
     const r = await runChecks({
-      fileName: name, data: x.data, installs: {}, projectType: p.type, strip: 0, version, newProject: !published, uploaderId: input.uploaderId, origin: input.origin,
+      fileName: name, data: x.data, installs: xInstalls, projectType: p.type, strip: 0, version, newProject: !published, uploaderId: input.uploaderId, origin: input.origin,
       previous: null, ownerChangedRecently: !!p.owner_changed_at && Date.now() - Date.parse(p.owner_changed_at) < 14 * 86400_000,
+      allowDinput8: dinput8Allowed(p, input.origin),
       signature: null, vt: ctx.vt, vtUpload: ctx.cfg.VT_UPLOAD, maxUpload: ctx.cfg.MAX_UPLOAD_MB * 1048576,
     });
     for (const f of r.findings) report.findings.push({ ...f, message: `${name}: ${f.message}` });

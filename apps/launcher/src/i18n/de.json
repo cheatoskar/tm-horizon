@@ -461,7 +461,7 @@
   "report.button": "Melden",
   "report.tip": "Logs und Absturzberichte für eine Fehlermeldung sammeln. Es wird nichts hochgeladen.",
   "report.title": "Problem melden: {game}",
-  "report.intro": "Logs der Mods in diesem Profil, die neuesten Absturzlogs und eine kurze Systemübersicht. Benutzername, PC-Name und E-Mail-Adressen werden entfernt. Es wird nichts hochgeladen: Das Ergebnis ist eine Zip-Datei, die manuell weitergegeben wird.",
+  "report.intro": "Logs der Mods in diesem Profil, Horizon-Client-Logs und Plugins aller Installationen, Launcher-Logs, der TMX-Upload-Verlauf, die neuesten Absturzlogs und eine kurze Systemübersicht. Schlüssel und Tokens werden entfernt. Benutzername, PC-Name und E-Mail-Adressen werden entfernt. Es wird nichts hochgeladen: Das Ergebnis ist eine Zip-Datei, die manuell weitergegeben wird.",
   "report.collecting": "Wird gesammelt",
   "report.system": "System",
   "report.binary": "binär",

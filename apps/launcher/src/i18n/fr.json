@@ -461,7 +461,7 @@
   "report.button": "Signaler",
   "report.tip": "Rassemble les journaux et rapports de plantage pour un rapport de bug. Rien n'est envoyé.",
   "report.title": "Signaler un problème : {game}",
-  "report.intro": "Journaux des mods de ce profil, derniers journaux de plantage et un court résumé du système. Le nom d'utilisateur, le nom du PC et les adresses e-mail sont supprimés. Rien n'est envoyé : vous obtenez un zip à envoyer vous-même.",
+  "report.intro": "Journaux des mods de ce profil, journaux et plugins de Horizon Client de chaque installation, journaux du lanceur, historique d'envoi TMX, derniers journaux de plantage et un court résumé du système. Les clés et jetons sont supprimés. Le nom d'utilisateur, le nom du PC et les adresses e-mail sont supprimés. Rien n'est envoyé : vous obtenez un zip à envoyer vous-même.",
   "report.collecting": "Collecte en cours",
   "report.system": "Système",
   "report.binary": "binaire",

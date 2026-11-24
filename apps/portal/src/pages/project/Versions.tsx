@@ -172,7 +172,7 @@ function SourceState({ p, s, canEdit, reload }: { p: HubProject; s: HubSource | 
           <span className="lbl">Release {s.needsChoice.tag} has several files</span>
           <span className="hint">Pick the one to install. The hub remembers it for later releases.</span>
           <RadioCards name={`vasset-${s.id}`} ariaLabel={`Files in release ${s.needsChoice.tag}`} columns={1} value={asset || null} onChange={setAsset}
-            options={[...(p.type === 'browser-extension' ? [{ value: '[all]', label: 'All of them (one per browser)' }] : []), ...s.needsChoice.assets.map((a) => ({ value: a, label: a }))]} />
+            options={[...(s.needsChoice.assets.length > 1 ? [{ value: '[all]', label: p.type === 'browser-extension' ? 'All of them (one per browser)' : 'All of them (one per game)' }] : []), ...s.needsChoice.assets.map((a) => ({ value: a, label: a }))]} />
           <div style={{ marginTop: 'var(--tm-s-2)' }}>
             <button className="btn sm primary" disabled={busy || !asset || !canEdit} onClick={() => void run(async () => { await api.chooseAsset(s.id, s.needsChoice!.tag, asset); reload(); })}>Use this file</button>
           </div>

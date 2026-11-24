@@ -461,7 +461,7 @@
   "report.button": "Report",
   "report.tip": "Collect logs and crash reports for a bug report. Nothing is uploaded.",
   "report.title": "Report a problem: {game}",
-  "report.intro": "Logs of the mods in this profile, the newest crash logs and a short system summary. Your user name, the PC name and e-mail addresses are removed. Nothing is uploaded: you get a zip and send it yourself.",
+  "report.intro": "Logs of the mods in this profile, the Horizon Client logs and plugins of every install, launcher logs, the TMX upload history, the newest crash logs and a short system summary. Keys and tokens are removed. Your user name, the PC name and e-mail addresses are removed. Nothing is uploaded: you get a zip and send it yourself.",
   "report.collecting": "Collecting",
   "report.system": "System",
   "report.binary": "binary",

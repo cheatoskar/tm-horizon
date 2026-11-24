@@ -110,7 +110,9 @@ export function CatalogInstallDialog({ entry, spec, onClose }: { entry: Pick<Cat
     setBusy(true);
     setErr(null);
     setFailedApply(false);
-    try { setPlan(await api.prepare(spec, entry.id, target, targetDir)); } catch (e) { setErr(String(e)); setPlan(null); }
+    const gf = spec.filesByGame?.[game];
+    const effective = gf ? { ...spec, download: { url: gf.url }, sha256: gf.sha256 } : spec;
+    try { setPlan(await api.prepare(effective, entry.id, target, targetDir)); } catch (e) { setErr(String(e)); setPlan(null); }
     setBusy(false);
   };
   const apply = async () => {
@@ -169,7 +171,7 @@ export function CatalogInstallDialog({ entry, spec, onClose }: { entry: Pick<Cat
               {copies.map((c) => (
                 <button key={c.dir} className={'btn sm ' + (c.dir === copyDir ? 'primary' : 'ghost')} disabled={busy || !!c.hostInstalled}
                   title={c.hostInstalled ? t('catinst.inClientTip') : c.dir} onClick={() => setCopyDir(c.dir)}>
-                  {c.label || c.dir.split(/[\\/]/).pop()}{c.hostInstalled && <span className="dim small"> · {t('catinst.inClient')}</span>}
+                  {(c.kind === 'install' ? c.dir.split(/[\\/]/).pop() : c.label) || c.label || c.dir}{c.hostInstalled && <span className="dim small"> · {t('catinst.inClient')}</span>}
                 </button>
               ))}
             </div>

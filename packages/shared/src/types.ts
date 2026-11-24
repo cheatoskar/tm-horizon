@@ -409,6 +409,8 @@ export interface InstallSpec {
   note?: string;
   /** Known SHA-256 of the download; the installer refuses another file (hub copies always set it). */
   sha256?: string;
+  /** Per-game file overrides when a version ships one file per game (e.g. ESWC, Original, Sunrise). */
+  filesByGame?: Record<string, { url: string; sha256: string }>;
   /** Version of the download when the source knows it (hub copies); recorded instead of "latest". */
   version?: string;
   /** Files never installed into a StarForce game (signed hub index; set on versions with the hub-allowed dinput8.dll). */

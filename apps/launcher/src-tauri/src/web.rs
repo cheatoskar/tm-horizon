@@ -224,6 +224,25 @@ pub fn home_url(mode: &str, game: &str, site: &str) -> Option<String> {
     }
 }
 
+/// An exchange's sign-in return (`https://<exchange>/login?token=...`) -> that exchange's home page.
+/// The view sometimes stays on that page with the site's loader although the session is set
+/// (a reload always got through); after LOGIN_RETURN_WAIT the view goes home instead.
+pub fn login_return_home(u: &Url) -> Option<Url> {
+    let host = u.host_str()?.to_ascii_lowercase();
+    if u.scheme() != "https" || !maps::exchange_host(&host) {
+        return None;
+    }
+    let path = u.path().trim_end_matches('/').to_ascii_lowercase();
+    // The load starts at the OpenID return (POST /signin-oidc) and is redirected to /login?token=...
+    let sign_in = path == "/signin-oidc" || (path == "/login" && u.query_pairs().any(|(k, v)| k == "token" && !v.is_empty()));
+    if !sign_in {
+        return None;
+    }
+    Url::parse(&format!("https://{host}/")).ok()
+}
+
+const LOGIN_RETURN_WAIT: std::time::Duration = std::time::Duration::from_secs(5);
+
 pub fn allowed_host(mode: &str, host: &str) -> bool {
     maps::exchange_host(host)
         || skins::park_host(host)
@@ -362,6 +381,20 @@ fn builder<R: Runtime>(app: &AppHandle<R>, url: Url) -> WebviewBuilder<R> {
         .on_page_load(move |_w, p| {
             let url = p.url().to_string();
             *a3.state::<AppState>().web_page.lock().unwrap() = url.clone();
+            if matches!(p.event(), PageLoadEvent::Started) {
+                if let Some(home) = login_return_home(p.url()) {
+                    let a = a3.clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(LOGIN_RETURN_WAIT);
+                        // Still on the sign-in return (by the view's own URL: redirects fire no new load event)?
+                        if let Some(w) = a.get_webview(LABEL) {
+                            if w.url().ok().is_some_and(|now| login_return_home(&now).is_some()) {
+                                let _ = w.navigate(home);
+                            }
+                        }
+                    });
+                }
+            }
             if matches!(p.event(), PageLoadEvent::Finished) {
                 let host = p.url().host_str().unwrap_or("").to_ascii_lowercase();
                 let host = host.strip_prefix("www.").unwrap_or(&host).to_string();
@@ -811,14 +844,31 @@ pub fn classify_error(msg: &str) -> WebCheck {
     check_of(reason, None)
 }
 
-/// Quick check (about 6 s at most) whether the page can be reached. https and listed hosts only.
+/// Sign-in pages a TMX login passes through (account.mania.exchange hands off to ManiaPlanet or to
+/// Ubisoft via api.trackmania.com). The view shows them; the check neither probes nor blocks them.
+fn login_host(host: &str) -> bool {
+    ["maniaplanet.com", "trackmania.com", "ubisoft.com", "ubi.com"].iter().any(|d| host_is(host, d))
+}
+
+/// The address the reachability check asks: only the site's root. Never the page itself: its query
+/// can hold a one-time sign-in token (`<exchange>/login?token=...`), and a second request with it from
+/// outside the view spends or races that token, so the sign-in in the view never finishes.
+pub fn probe_url(u: &Url) -> Option<String> {
+    Some(format!("https://{}/", u.host_str()?))
+}
+
+/// Quick check (about 6 s at most) whether the page's site can be reached. https and listed hosts only.
 pub fn check(mode: &str, url: &str) -> WebCheck {
     let Ok(u) = Url::parse(url) else { return check_of("other", None) };
     let Some(h) = u.host_str() else { return check_of("other", None) };
+    if u.scheme() == "https" && login_host(h) {
+        return check_of("ok", None);
+    }
     if u.scheme() != "https" || !allowed_host(mode, h) {
         return check_of("other", None);
     }
-    match net::probe(u.as_str(), 6) {
+    let Some(root) = probe_url(&u) else { return check_of("other", None) };
+    match net::probe(&root, 6) {
         Ok(s) => classify_status(s),
         Err(e) => classify_error(&e),
     }
@@ -842,8 +892,26 @@ mod tests {
     }
 
     #[test]
+    fn a_stuck_sign_in_return_goes_home() {
+        let u = |s: &str| Url::parse(s).unwrap();
+        assert_eq!(login_return_home(&u("https://tmuf.exchange/login?token=abc")).map(|x| x.to_string()).as_deref(), Some("https://tmuf.exchange/"));
+        assert_eq!(login_return_home(&u("https://tmnf.exchange/login/?token=abc&r=1")).map(|x| x.to_string()).as_deref(), Some("https://tmnf.exchange/"));
+        assert_eq!(login_return_home(&u("https://nations.tm-exchange.com/signin-oidc")).map(|x| x.to_string()).as_deref(), Some("https://nations.tm-exchange.com/"));
+        assert!(login_return_home(&u("https://tmuf.exchange/login")).is_none(), "no token");
+        assert!(login_return_home(&u("https://tmuf.exchange/trackshow/1?token=abc")).is_none(), "other page");
+        assert!(login_return_home(&u("https://example.com/login?token=abc")).is_none(), "not an exchange");
+    }
+
+    #[test]
     fn check_refuses_foreign_or_plain() {
         assert_eq!(check("maps", "http://tmnf.exchange/").reason, "other");
+        // Sign-in hops: shown, never probed, never "not reachable".
+        assert_eq!(check("maps", "https://v4.live.maniaplanet.com/login").reason, "ok");
+        assert_eq!(check("maps", "https://api.trackmania.com/login").reason, "ok");
+        assert_eq!(check("maps", "https://evilmaniaplanet.com/").reason, "other");
+        // The probe never carries the page's query (one-time login tokens).
+        let u = Url::parse("https://tmnf.exchange/login?token=abc#x").unwrap();
+        assert_eq!(probe_url(&u).as_deref(), Some("https://tmnf.exchange/"));
         assert_eq!(check("maps", "https://example.com/").reason, "other");
         assert_eq!(check("maps", "not a url").reason, "other");
     }

@@ -608,8 +608,7 @@ pub(crate) fn open_map_in(app: &AppHandle, st: &AppState, game_id: String, profi
         // ESWC, Sunrise and Original: a running game with Horizon Client opens the map itself (bridge
         // event play_map); never a second copy of the game. Not running: the game starts and, when Horizon
         // Client is in its folder, gets the map as soon as the client is connected (up to 60 s); otherwise the
-        // map waits under Downloaded (Original is never started for a map). Forever keeps /file and TMLoader
-        // (no game-memory writes).
+        // map waits under Downloaded. Forever keeps /file and TMLoader (no game-memory writes).
         let mut after_start: Option<(&str, String, String)> = None;
         if let Some(code) = match game_id.as_str() { "tmn-eswc" => Some("tmn"), "tm-sunrise" => Some("tms"), "tm-original" => Some("tmo"), _ => None } {
             let tracks = Path::new(&install.path).join("GameData").join("Tracks");
@@ -623,8 +622,8 @@ pub(crate) fn open_map_in(app: &AppHandle, st: &AppState, game_id: String, profi
             }
             let exe = install.exe.as_deref().and_then(|e| Path::new(e).file_name()).map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
             let running = !exe.is_empty() && platform::running_process_names().iter().any(|p| p.eq_ignore_ascii_case(&exe));
-            if code == "tmo" || running {
-                return ok(if running { "Saved. The game is running: open the map under Downloaded." } else { "Saved. Open the map in the game under Downloaded." }, None);
+            if running {
+                return ok("Saved. The game is running: open the map under Downloaded.", None);
             }
             let host = crate::horizonhost::read_record(&Path::new(&install.path).join(crate::horizonhost::format::HOST_DIR)).is_some();
             if let (true, Some(rel)) = (host, rel.filter(|r| crate::clientbridge::play_map_path_ok(r))) {

@@ -176,6 +176,9 @@ pub struct ReportInput {
     /// ESWC/Sunrise/Original folders with Horizon Host (every install and instance of the game,
     /// so a test copy added by hand is in the report too).
     pub horizon_dirs: Vec<PathBuf>,
+    /// The launcher's data folder (timings.log, logs) and config folder (tmx-upload.json).
+    pub launcher_data: Option<PathBuf>,
+    pub launcher_config: Option<PathBuf>,
 }
 
 fn is_binary(head: &[u8]) -> bool {
@@ -252,8 +255,69 @@ pub fn candidates(input: &ReportInput) -> Vec<(PathBuf, String, String)> {
     if forever {
         out.extend(crate::horizonhost::report_logs(None, input.tmloader_root.as_deref()));
     }
+    if let Some(d) = &input.launcher_data {
+        let t = d.join("timings.log");
+        if fsx::is_file(&t) {
+            out.push((t, "logs/Launcher".into(), "Launcher timings log".into()));
+        }
+        for p in newest(&d.join("logs"), |n| n.ends_with(".log"), 4) {
+            out.push((p, "logs/Launcher".into(), "Launcher setup log".into()));
+        }
+    }
+    if let Some(c) = &input.launcher_config {
+        let t = c.join("tmx-upload.json");
+        if fsx::is_file(&t) {
+            out.push((t, "logs/Launcher".into(), "TMX upload history".into()));
+        }
+    }
     out.retain(|(p, _, _)| !fsx::blocked(p));
     out
+}
+
+// ------------------------------------------------------------------ secrets in JSON
+
+const REMOVED: &str = "<removed>";
+
+/// Keys whose value must not leave the PC (tokens, pairing keys such as `bridge.key` or `modKey`,
+/// cookies, passwords, sessions) plus the player's TMX logins.
+fn secret_key(k: &str) -> bool {
+    let k = k.to_ascii_lowercase();
+    ["token", "cookie", "password", "passwd", "secret", "session", "auth", "login"].iter().any(|w| k.contains(w)) || k.ends_with("key")
+}
+
+fn strip_secrets(v: &mut serde_json::Value) {
+    match v {
+        serde_json::Value::Object(m) => {
+            for (k, val) in m.iter_mut() {
+                if secret_key(k) {
+                    *val = serde_json::Value::String(REMOVED.into());
+                } else {
+                    strip_secrets(val);
+                }
+            }
+        }
+        serde_json::Value::Array(a) => a.iter_mut().for_each(strip_secrets),
+        _ => {}
+    }
+}
+
+/// JSON text with the values of secret keys replaced by `<removed>`. Text that is not valid JSON
+/// (cut off) is dropped completely: better a note than a leaked key.
+pub fn redact_json(text: &str) -> String {
+    match serde_json::from_str::<serde_json::Value>(text) {
+        Ok(mut v) => {
+            strip_secrets(&mut v);
+            serde_json::to_string_pretty(&v).unwrap_or_else(|_| REMOVED.into())
+        }
+        Err(_) => "<not valid JSON, left out>".into(),
+    }
+}
+
+/// Redacts a text file for the zip: JSON files lose their secrets first, then the usual
+/// user name / machine / e-mail redaction.
+fn redact_file(r: &Redactor, src: &Path, text: &str) -> String {
+    let json = src.extension().is_some_and(|e| e.eq_ignore_ascii_case("json"));
+    if json { r.redact(&redact_json(text)) } else { r.redact(text) }
 }
 
 fn sanitize(s: &str) -> String {
@@ -323,7 +387,7 @@ pub fn collect(input: &ReportInput, r: &Redactor) -> Report {
             String::new()
         } else {
             let t = read_tail(&src, MAX_FILE).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default();
-            let red = r.redact(&t);
+            let red = redact_file(r, &src, &t);
             let mut p: String = red.chars().take(PREVIEW).collect();
             if p.len() < red.len() {
                 p.push_str("\n…");
@@ -351,7 +415,7 @@ pub fn save(report: &Report, selected: &[String], r: &Redactor, dir: &Path) -> R
     let mut list = String::from("Files in this report (paths redacted):\n");
     for f in report.files.iter().filter(|f| selected.contains(&f.id)) {
         let Some(bytes) = read_tail(&f.source, MAX_FILE) else { continue };
-        let data = if f.binary { bytes } else { r.redact(&String::from_utf8_lossy(&bytes)).into_bytes() };
+        let data = if f.binary { bytes } else { redact_file(r, &f.source, &String::from_utf8_lossy(&bytes)).into_bytes() };
         zip.start_file(f.id.as_str(), opts).map_err(|e| e.to_string())?;
         zip.write_all(&data).map_err(|e| e.to_string())?;
         list.push_str(&format!("  {}  <- {}{}\n", f.id, f.path, if f.binary { " (binary, not redacted)" } else { "" }));
@@ -381,6 +445,65 @@ mod tests {
         assert!(!o.to_lowercase().contains("oskar"));
         let fwd = red().redact("/c/Users/Oskar/x and C:/Users/OSKAR/y");
         assert_eq!(fwd, "/c/Users/%USER%/x and C:/Users/%USER%/y");
+    }
+
+    #[test]
+    fn json_secrets_are_removed() {
+        let t = r#"{"bridge.key":"abc123","plugin.x.enabled":1,"modKey":"k","history":[{"map":"A01","detail":"refused"}],
+            "nested":{"sessionId":"s","Cookie":"c","apiToken":"t","password":"p","keyboard":"WASD"},"logins":["me"]}"#;
+        let o = redact_json(t);
+        for s in ["abc123", "\"k\"", "\"s\"", "\"c\"", "\"t\"", "\"p\"", "\"me\""] {
+            assert!(!o.contains(s), "{s} in {o}");
+        }
+        assert!(o.contains("<removed>") && o.contains("A01") && o.contains("WASD") && o.contains("plugin.x.enabled"), "{o}");
+        assert!(!redact_json(r#"{"bridge.key":"abc"#).contains("abc"), "cut-off JSON is dropped");
+        let p = Path::new("tmx-upload.json");
+        assert!(!redact_file(&red(), p, t).contains("abc123"));
+    }
+
+    #[test]
+    fn collects_horizon_installs_launcher_files_and_redacts_json() {
+        let t = tempfile::tempdir().unwrap();
+        let game = t.path().join("ESWC");
+        let h = game.join("horizon");
+        std::fs::create_dir_all(h.join("logs")).unwrap();
+        std::fs::create_dir_all(h.join("plugins").join("wr")).unwrap();
+        std::fs::create_dir_all(h.join("crash")).unwrap();
+        std::fs::create_dir_all(h.join("settings")).unwrap();
+        std::fs::write(h.join("logs").join("host.log"), "log").unwrap();
+        std::fs::write(h.join("settings").join("host.json"), r#"{"bridge.key":"SECRET","a":1}"#).unwrap();
+        std::fs::write(h.join("plugins").join("wr").join("plugin.json"), r#"{"id":"wr","version":"0.1.0"}"#).unwrap();
+        std::fs::write(h.join("crash").join("c.dmp"), [0u8, 1]).unwrap();
+        std::fs::write(game.join("game.dmp"), [0u8, 2]).unwrap();
+        let data = t.path().join("data");
+        let cfg = t.path().join("cfg");
+        std::fs::create_dir_all(&data).unwrap();
+        std::fs::create_dir_all(&cfg).unwrap();
+        std::fs::write(data.join("timings.log"), "1 x 2").unwrap();
+        std::fs::write(cfg.join("tmx-upload.json"), r#"{"modKey":"SECRET","history":[{"detail":"TMX refused"}]}"#).unwrap();
+        let input = ReportInput {
+            game_id: "tmn-eswc".into(),
+            horizon_dirs: vec![game],
+            launcher_data: Some(data),
+            launcher_config: Some(cfg),
+            ..Default::default()
+        };
+        let rep = collect(&input, &red());
+        let ids: Vec<&str> = rep.files.iter().map(|f| f.id.as_str()).collect();
+        for want in ["logs/Horizon/ESWC/host.log", "logs/Horizon/ESWC/host.json", "logs/Horizon/ESWC/plugins/wr/plugin.json", "logs/Launcher/timings.log", "logs/Launcher/tmx-upload.json"] {
+            assert!(ids.contains(&want), "{want} missing in {ids:?}");
+        }
+        assert_eq!(ids.iter().filter(|i| i.starts_with("crash/Horizon/ESWC/")).count(), 2, "{ids:?}");
+        let up = rep.files.iter().find(|f| f.id.ends_with("tmx-upload.json")).unwrap();
+        assert!(!up.preview.contains("SECRET") && up.preview.contains("TMX refused"));
+        let sel: Vec<String> = rep.files.iter().map(|f| f.id.clone()).collect();
+        let zp = save(&rep, &sel, &red(), &t.path().join("out")).unwrap();
+        let mut z = zip::ZipArchive::new(std::fs::File::open(&zp).unwrap()).unwrap();
+        for n in ["logs/Horizon/ESWC/host.json", "logs/Launcher/tmx-upload.json"] {
+            let mut s = String::new();
+            std::io::Read::read_to_string(&mut z.by_name(n).unwrap(), &mut s).unwrap();
+            assert!(!s.contains("SECRET") && s.contains("<removed>"), "{n}: {s}");
+        }
     }
 
     #[test]
