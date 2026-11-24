@@ -8,7 +8,7 @@ It also installs and updates the other TM Horizon projects: [Horizon Client](htt
 
 Built-in mod library: TMLoader mods, Openplanet and tools for every game, installed and updated in one click; modular and open to new mods.
 
-Version 0.5.4 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
+Version 0.5.5 is the **Launcher Preview** for Windows, with an experimental Linux build: expect rough edges and tell me what breaks in the [issues](https://github.com/cheatoskar/tm-horizon/issues). Licence: AGPL-3.0 ([LICENSE](LICENSE)).
 
 > [!NOTE]
 > TM Horizon is a community project: bug reports, ideas, fixes and new features are welcome as [issues](https://github.com/cheatoskar/tm-horizon/issues), [discussions](https://github.com/cheatoskar/tm-horizon/discussions) and pull requests. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -25,10 +25,10 @@ Six projects, built to work together. TM Horizon installs and updates the others
 
 | Project | What it is | Games | How to get it | Repo |
 |---|---|---|---|---|
-| **TM Horizon** (this repo) | Launcher for every TrackMania game on Windows: library, mods, maps, servers, statistics. Installs and updates Horizon Client, Legacy Essentials and TM Vibrant Shaders. | All, from TrackMania (2003) to Trackmania (2020) | Installer from the releases (0.5.4, Launcher Preview) | [cheatoskar/tm-horizon](https://github.com/cheatoskar/tm-horizon) |
-| **Horizon Client** | In-game menu and mod loader with modules: Legacy Essentials, TMX Browser, TMX Upload, WR Hunter, Input Display, Horizon Performance, Horizon Scripts. | ESWC, Sunrise, Original; TMNF and TMUF through TMLoader (experimental) | TM Horizon (game page), or a zip per game (0.3.2) | [cheatoskar/horizon-client](https://github.com/cheatoskar/horizon-client) |
+| **TM Horizon** (this repo) | Launcher for every TrackMania game on Windows: library, mods, maps, servers, statistics. Installs and updates Horizon Client, Legacy Essentials and TM Vibrant Shaders. | All, from TrackMania (2003) to Trackmania (2020) | Installer from the releases (0.5.5, Launcher Preview) | [cheatoskar/tm-horizon](https://github.com/cheatoskar/tm-horizon) |
+| **Horizon Client** | In-game menu and mod loader with modules: Legacy Essentials, TMX Browser, TMX Upload, WR Hunter, Input Display, Horizon Performance, Horizon Scripts. | ESWC, Sunrise, Original; TMNF and TMUF through TMLoader (experimental) | TM Horizon (game page), or a zip per game (0.3.3) | [cheatoskar/horizon-client](https://github.com/cheatoskar/horizon-client) |
 | **Legacy Essentials** | Autosave, controller fix, login fix and game settings. A standalone `dinput8.dll` mod with its own menu (`Ctrl+F2`). The same features are the "Legacy Essentials" group in Horizon Client. | ESWC, Sunrise, Original | A zip per game (1.3.1); TM Horizon installs it on ESWC | [cheatoskar/legacy-essentials](https://github.com/cheatoskar/legacy-essentials) |
-| **Legacy Randomizer** | Random Map Challenge with maps from TMX, inside the game. A Horizon Client module. | ESWC, Sunrise, Original (solo) | A zip with Horizon Client, or the plugin alone (0.3.1) | [cheatoskar/legacy-randomizer](https://github.com/cheatoskar/legacy-randomizer) |
+| **Legacy Randomizer** | Random Map Challenge with maps from TMX, inside the game. A Horizon Client module. | ESWC, Sunrise, Original (solo) | A zip with Horizon Client, or the plugin alone (0.3.4) | [cheatoskar/legacy-randomizer](https://github.com/cheatoskar/legacy-randomizer) |
 | **TM Vibrant Shaders** | Lighting, weather, skies, photos, clips and video export. Standalone, or as four Horizon Client modules. | TMNF, TMUF, TM2; ESWC, Sunrise, Original experimental | Setup or ModLoader server (1.6.1), Horizon modules zip (2.0.1); TM Horizon installs it on TMNF, TMUF and ESWC | [cheatoskar/TM-Vibrant-Shaders](https://github.com/cheatoskar/TM-Vibrant-Shaders) |
 | ***For developers*** | | | | |
 | **trackmania-internals** | Notes for mod developers: addresses, structures, file formats and physics of the games. | TMNF, TMUF, ESWC, Sunrise, Original, ManiaPlanet | Read it on GitHub | [cheatoskar/trackmania-internals](https://github.com/cheatoskar/trackmania-internals) |
@@ -42,7 +42,7 @@ TMNF/TMUF = TrackMania Nations/United Forever, ESWC = TrackMania Nations ESWC, T
 
 ## Install (Windows)
 
-1. Download `TM-Horizon_0.5.4_x64-setup.exe` from the [latest release](https://github.com/cheatoskar/tm-horizon/releases/latest) and run it. It installs for your user only, no admin needed. `SHA256SUMS` in the release has the checksums if you want to check the download.
+1. Download `TM-Horizon_0.5.5_x64-setup.exe` from the [latest release](https://github.com/cheatoskar/tm-horizon/releases/latest) and run it. It installs for your user only, no admin needed. `SHA256SUMS` in the release has the checksums if you want to check the download.
 2. The installer is not code-signed (a certificate costs money), so SmartScreen shows "Windows protected your PC". Click "More info", then "Run anyway".
 3. TM Horizon looks for your games (Steam, Ubisoft Connect, Epic, the folders you add, a drive scan). A game it does not find can be added with "Add folder" in the library.
 
@@ -68,7 +68,7 @@ chmod +x TM-Horizon_0.5.3_linux-x86_64-experimental.AppImage
 Status and known gaps:
 
 - Needs an x86_64 distribution with glibc 2.35 or newer (Ubuntu 22.04 and newer, Fedora, current Arch). It was started in WSL (Arch) and in an Ubuntu 22.04 userland; SteamOS should qualify but is untested.
-- Built from the 0.5.3 code. 0.5.4 is Windows only for now; the Linux build is still 0.5.3.
+- Built from the 0.5.3 code. 0.5.4 and 0.5.5 are Windows only for now; the Linux build is still 0.5.3.
 - Updates: the AppImage updates itself through the app (Settings > Updates), signed with the same key as the Windows build. The Arch package updates through pacman (download the new package).
 - Not read yet: Trackmania (2020) from Epic/Heroic, Openplanet folders inside a prefix. The embedded TMX/ManiaPark view may misbehave on Wayland.
 - Arch Linux: `tm-horizon-0.5.3-1-x86_64-experimental.pkg.tar.zst` from the same release (`sudo pacman -U <file>`), built from the same code. PKGBUILDs: [packaging/arch/](packaging/arch/).
@@ -123,7 +123,7 @@ The left bar has these pages: Home, News, Library, Mods, Maps, Skins & mods, Med
 | Steam fix, Highlands, skid marks | ✓ | – | – | – | – | – | – | – |
 | TAS tools | ✓ (TMInterface, ForeverTAS) | – | – | – | – | placeholder ("Tick") | – | – |
 
-"By hand" and "its own setup": the project works in that game, but TM Horizon 0.5.4 does not install it there yet; use the project's release.
+"By hand" and "its own setup": the project works in that game, but TM Horizon 0.5.5 does not install it there yet; use the project's release.
 
 ---
 

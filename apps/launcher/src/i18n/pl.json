@@ -473,7 +473,7 @@
   "report.button": "Zgłoś",
   "report.tip": "Zbiera logi i raporty awarii do zgłoszenia błędu. Nic nie jest wysyłane.",
   "report.title": "Zgłoś problem: {game}",
-  "report.intro": "Logi modów z tego profilu, najnowsze logi awarii i krótkie podsumowanie systemu. Nazwa użytkownika, nazwa komputera i adresy e-mail są usuwane. Nic nie jest wysyłane: dostajesz plik zip i wysyłasz go samodzielnie.",
+  "report.intro": "Logi modów z tego profilu, logi i wtyczki Horizon Client ze wszystkich instalacji, logi launchera, historia wysyłania na TMX, najnowsze logi awarii i krótkie podsumowanie systemu. Klucze i tokeny są usuwane. Nazwa użytkownika, nazwa komputera i adresy e-mail są usuwane. Nic nie jest wysyłane: dostajesz plik zip i wysyłasz go samodzielnie.",
   "report.collecting": "Zbieranie",
   "report.system": "System",
   "report.binary": "binarny",

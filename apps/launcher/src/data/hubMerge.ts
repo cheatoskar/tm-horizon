@@ -34,6 +34,13 @@ export function specOf(pl: HubIndexPayload, v: HubIndexVersion): InstallSpec | n
   if (first.kind === 'files') spec.base = first.base ?? 'game';
   if (first.strip) spec.strip = first.strip;
   if (first.include?.length) spec.include = first.include;
+  const byGame: Record<string, { url: string; sha256: string }> = {};
+  for (const f of v.files ?? []) {
+    const fSha = f.sha256?.toLowerCase();
+    const fUrl = abs(f.url, pl.hub);
+    if (f.label && fSha && SHA.test(fSha) && !isRevokedSha(pl, fSha) && fUrl) byGame[titleOf(f.label)] = { url: fUrl, sha256: fSha };
+  }
+  if (Object.keys(byGame).length) spec.filesByGame = byGame;
   // The author's own loader (dinput8.dll, allowed by the hub): the files that must never go into a StarForce game.
   const sfb = (v as HubIndexVersion & { starForceBlocked?: unknown }).starForceBlocked;
   if (Array.isArray(sfb) && sfb.length) spec.starForceBlocked = sfb.filter((x): x is string => typeof x === 'string').slice(0, 20);

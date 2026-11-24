@@ -59,16 +59,25 @@ fn report_input(st: &AppState, game_id: &str, game_name: &str, profile: Option<&
         launcher_version: env!("CARGO_PKG_VERSION").into(),
         os: platform::os_summary(),
         gpus: platform::gpus(),
-        horizon_dirs: if crate::horizonhost::is_legacy(game_id) {
-            crate::horizoncmds::installs_of(st, game_id)
-                .into_iter()
-                .map(|i| PathBuf::from(i.path))
-                .chain(crate::instances::list(&st.data_dir).into_iter().filter(|i| i.game == game_id).map(|i| PathBuf::from(i.path)))
-                .filter(|d| fsx::is_dir(&d.join(crate::horizonhost::format::HOST_DIR)))
-                .collect()
-        } else {
-            vec![]
+        // Every Horizon install of ESWC, Sunrise and Original (not only the game that was picked), so one
+        // zip is enough for a bug report.
+        horizon_dirs: {
+            let mut dirs: Vec<PathBuf> = Vec::new();
+            for g in ["tmn-eswc", "tm-sunrise", "tm-original"] {
+                let all = crate::horizoncmds::installs_of(st, g)
+                    .into_iter()
+                    .map(|i| PathBuf::from(i.path))
+                    .chain(crate::instances::list(&st.data_dir).into_iter().filter(|i| i.game == g).map(|i| PathBuf::from(i.path)));
+                for d in all {
+                    if fsx::is_dir(&d.join(crate::horizonhost::format::HOST_DIR)) && !dirs.contains(&d) {
+                        dirs.push(d);
+                    }
+                }
+            }
+            dirs
         },
+        launcher_data: Some(st.data_dir.clone()),
+        launcher_config: st.settings_path.parent().map(PathBuf::from),
     }
 }
 

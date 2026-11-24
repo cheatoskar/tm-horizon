@@ -7,7 +7,7 @@ import type { Ctx } from '../ctx.ts';
 import type { ProjectsTable, SourcesTable } from '../db/db.ts';
 import { addMinutes, compareVersions, newId, nowIso, parseJson } from '../util.ts';
 import { downloadAsset, getReleases, githubDownloadTotal, globMatch, patternFromName, pickAsset, type GhRelease } from './github.ts';
-import { browserLabel, ingestVersion, versionMetaSchema } from '../services/versions.ts';
+import { browserLabel, gameLabel, ingestVersion, versionMetaSchema } from '../services/versions.ts';
 import { refreshRepoShowcase } from '../services/showcase.ts';
 import { syncFromRepo } from '../services/repo-sync.ts';
 import { needsInstall } from '../services/projects.ts';
@@ -65,6 +65,29 @@ export async function refreshGithubDownloads(ctx: Ctx, p: ProjectsTable, repo: s
 
 export interface CheckResult { imported: string[]; skipped: string[]; needsChoice: { tag: string; assets: string[] } | null; unchanged: boolean; error: string | null }
 
+async function ingestAllAssets(
+  ctx: Ctx, s: SourcesTable, p: ProjectsTable, rel: GhRelease, version: string,
+  files: GhRelease['assets'], labelOf: (name: string) => string | null, res: CheckResult,
+): Promise<'imported' | 'skipped'> {
+  const [main, ...rest] = files;
+  try {
+    await ingestVersion(ctx, {
+      project: p, fileName: main!.name, data: await downloadAsset(ctx, main!.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), origin: `github:${s.target}@${rel.tag}`, uploaderId: null,
+      meta: { version, channel: rel.prerelease ? 'beta' : 'stable', changelog: rel.body ?? '' },
+      extraFiles: await Promise.all(rest.map(async (a) => ({ name: a.name, data: await downloadAsset(ctx, a.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), label: labelOf(a.name) }))),
+    });
+  } catch (e) {
+    await markSeen(ctx, s.id, rel.tag, 'failed');
+    res.skipped.push(`${rel.tag} (${(e as Error).message})`);
+    return 'skipped';
+  }
+  if (s.asset_pattern !== ALL_ASSETS) await ctx.db.updateTable('sources').set({ asset_pattern: ALL_ASSETS }).where('id', '=', s.id).execute();
+  await markSeen(ctx, s.id, rel.tag, 'imported');
+  await ctx.db.updateTable('sources').set((eb) => ({ imported: eb('imported', '+', 1), needs_choice: null })).where('id', '=', s.id).execute();
+  res.imported.push(version);
+  return 'imported';
+}
+
 async function importGithubRelease(ctx: Ctx, s: SourcesTable, p: ProjectsTable, rel: GhRelease, res: CheckResult): Promise<'imported' | 'choice' | 'skipped'> {
   // A setup step, not an error: the project page says "Setup needed" (HubSource.setupNeeded); releases wait unseen.
   if (needsInstall(p)) { res.skipped.push(`${rel.tag} (setup needed: games and install type)`); return 'choice'; }
@@ -75,28 +98,17 @@ async function importGithubRelease(ctx: Ctx, s: SourcesTable, p: ProjectsTable, 
     return 'skipped';
   }
   const { asset, candidates } = pickAsset(rel.assets, s.asset_pattern === ALL_ASSETS ? null : s.asset_pattern);
-  // Browser add-on with one file per browser: all of them go into the one version (chosen as "[all]", or
-  // automatically when every file names a browser).
+  // Browser add-on with one file per browser, or mod with one file per game: all of them go into the one version.
   const perBrowser = candidates.filter((a) => browserLabel(a.name));
   if (p.type === 'browser-extension' && candidates.length > 1 && (s.asset_pattern === ALL_ASSETS || (!asset && perBrowser.length === candidates.length))) {
     const files = s.asset_pattern === ALL_ASSETS && perBrowser.length < candidates.length ? candidates : perBrowser;
-    const [main, ...rest] = files;
-    try {
-      await ingestVersion(ctx, {
-        project: p, fileName: main!.name, data: await downloadAsset(ctx, main!.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), origin: `github:${s.target}@${rel.tag}`, uploaderId: null,
-        meta: { version, channel: rel.prerelease ? 'beta' : 'stable', changelog: rel.body ?? '' },
-        extraFiles: await Promise.all(rest.map(async (a) => ({ name: a.name, data: await downloadAsset(ctx, a.url, ctx.cfg.MAX_UPLOAD_MB * 1048576), label: browserLabel(a.name) }))),
-      });
-    } catch (e) {
-      await markSeen(ctx, s.id, rel.tag, 'failed');
-      res.skipped.push(`${rel.tag} (${(e as Error).message})`);
-      return 'skipped';
-    }
-    if (s.asset_pattern !== ALL_ASSETS) await ctx.db.updateTable('sources').set({ asset_pattern: ALL_ASSETS }).where('id', '=', s.id).execute();
-    await markSeen(ctx, s.id, rel.tag, 'imported');
-    await ctx.db.updateTable('sources').set((eb) => ({ imported: eb('imported', '+', 1), needs_choice: null })).where('id', '=', s.id).execute();
-    res.imported.push(version);
-    return 'imported';
+    return ingestAllAssets(ctx, s, p, rel, version, files, browserLabel, res);
+  }
+  const perGame = candidates.filter((a) => gameLabel(a.name));
+  const gameLabels = new Set(perGame.map((a) => gameLabel(a.name)!));
+  if (p.type !== 'browser-extension' && candidates.length > 1 && (s.asset_pattern === ALL_ASSETS || (!asset && perGame.length === candidates.length && gameLabels.size === candidates.length))) {
+    const files = s.asset_pattern === ALL_ASSETS && perGame.length < candidates.length ? candidates : perGame;
+    return ingestAllAssets(ctx, s, p, rel, version, files, gameLabel, res);
   }
   if (!asset) {
     if (!candidates.length) {
@@ -168,8 +180,7 @@ export async function checkSource(ctx: Ctx, sourceId: string, opts: { force?: bo
         // Games and install type from the repository and the release file, so releases do not wait for a form.
         if (needsInstall(p) && r.releases.length) p = await autoSetup(ctx, p, s, r.releases).catch(() => p);
         for (const rel of todo.reverse()) {
-          const out = await importGithubRelease(ctx, s, p, rel, res);
-          if (out === 'choice') break;
+          await importGithubRelease(ctx, s, p, rel, res);
         }
         hadRelease = r.releases.some((x) => x.published && Date.now() - Date.parse(x.published) < 60 * 86400_000);
         await ctx.db.updateTable('sources').set({ etag: res.needsChoice || needsInstall(p) ? null : r.etag }).where('id', '=', s.id).execute();

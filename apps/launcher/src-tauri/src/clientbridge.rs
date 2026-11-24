@@ -383,7 +383,32 @@ pub struct Live {
     pub seen: u64,
     /// Sent `caps=play_map` (Horizon Host 0.2 with the play_map event: ESWC and Sunrise).
     pub play_map: bool,
+    /// Process id of the game (newer hosts send `pid=`), for AllowSetForegroundWindow.
+    pub pid: Option<u32>,
 }
+
+/// The optional `pid` query value: a positive u32, anything else is ignored.
+pub fn parse_pid(v: Option<&String>) -> Option<u32> {
+    v.and_then(|s| s.trim().parse::<u32>().ok()).filter(|p| *p > 0)
+}
+
+/// Lets the game process bring its window to the front (Windows' foreground lock otherwise stops it).
+/// Without a known pid (older host) any process may.
+#[cfg(windows)]
+fn allow_foreground(pids: &[u32]) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{AllowSetForegroundWindow, ASFW_ANY};
+    if pids.is_empty() {
+        unsafe { AllowSetForegroundWindow(ASFW_ANY) };
+        eprintln!("[clientbridge] play_map: foreground allowed for any process (host sent no pid)");
+    } else {
+        for p in pids {
+            unsafe { AllowSetForegroundWindow(*p) };
+        }
+        eprintln!("[clientbridge] play_map: foreground allowed for pid {pids:?}");
+    }
+}
+#[cfg(not(windows))]
+fn allow_foreground(_pids: &[u32]) {}
 
 /// A game counts as connected while its long poll (20 s) came back within this time.
 pub const LIVE_MS: u64 = 45_000;
@@ -566,6 +591,10 @@ impl Bridge {
             return Err("bad map path".into());
         }
         let mut i = self.inner.lock().unwrap();
+        let now = now_ms();
+        let pids: Vec<u32> =
+            i.live.values().filter(|l| l.game == game && l.seen + LIVE_MS > now).filter_map(|l| l.pid).collect();
+        allow_foreground(&pids);
         i.next_event += 1;
         let ev = Event {
             id: i.next_event,
@@ -645,7 +674,7 @@ impl Bridge {
             let mut i = self.inner.lock().unwrap();
             let game = i.paired.iter().find(|p| p.key == r.key).map(|p| p.game.clone()).unwrap_or_default();
             let play_map = r.query.get("caps").is_some_and(|c| c.split(',').any(|x| x == "play_map"));
-            i.live.insert(r.key.clone(), Live { game, seen: now_ms(), play_map });
+            i.live.insert(r.key.clone(), Live { game, seen: now_ms(), play_map, pid: parse_pid(r.query.get("pid")) });
         }
         let Some(since) = r.query.get("since").and_then(|s| s.parse::<u64>().ok()) else {
             let last = self.inner.lock().unwrap().next_event;
@@ -1065,6 +1094,15 @@ pub mod app {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pid_query_is_parsed_defensively() {
+        assert_eq!(parse_pid(Some(&"4242".to_string())), Some(4242));
+        assert_eq!(parse_pid(Some(&"0".to_string())), None);
+        assert_eq!(parse_pid(Some(&"-5".to_string())), None);
+        assert_eq!(parse_pid(Some(&"abc".to_string())), None);
+        assert_eq!(parse_pid(None), None);
+    }
 
     #[test]
     fn play_map_paths_follow_the_host_rules() {

@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.5 "Launcher Preview" (2026-11-24)
+
+Windows. The experimental Linux build stays at 0.5.3 for now. Built with `TMHUB_RELEASE_PREVIEW=1`. Release text:
+`docs/release/notes-0.5.5.md`.
+
+- TMX replay upload: the game's own autosave of a run waits up to 20 s for the full copy of the same run (Horizon
+  Client's My Replays copy, or "Save replay"). Original and Sunrise autosaves carry no inputs (`validable="0"`,
+  EventsDuration 0) and TMX refuses many of them; the full copy carries the inputs and is accepted. Without a full
+  copy the autosave still goes after 20 s.
+- TMX replay upload: a replay uploaded by hand goes to the Exchange of the game whose install holds the file, not
+  to the site picked in the list (a Sunrise replay went to the Nations Exchange).
+- Embedded browser: signing in on an Exchange site could hang on `/login?token=...` with "Loading..." forever.
+  The browser goes to the site's home page after 5 s; the sign-in is set by then. The reachability check asks only
+  the site root, so the sign-in hops are no longer reported as "not reachable".
+- Horizon Client module list: a module switched on in the in-game menu shows as on (Horizon Client 0.3.3 loads it).
+- Mods: a release with one file per game installs the file for the picked game; install folders are labelled by
+  their folder name.
+- Original: Play on a map starts the game when it is not running (it used to only save the map under Downloaded).
+- Settings > Horizon Client: room between the port line, the games and Forget all.
+- Maps explorer: Play brings the game window to the front. The launcher now allows the game process to take the
+  foreground (Windows blocks that otherwise); hosts that send their process id get it for exactly that process.
+- Report a problem: the zip now also holds the Horizon Client logs, settings and plugin versions of every ESWC, Sunrise
+  and Original install (not only the picked game), crash files and minidumps next to them, the launcher's own logs and
+  the TMX upload history. Keys, tokens, cookies, sessions and TMX logins in JSON files are replaced by `<removed>`.
+
 ## 0.5.4 "Launcher Preview" (2026-11-19)
 
 Windows. The experimental Linux build stays at 0.5.3 for now. Built with `TMHUB_RELEASE_PREVIEW=1`. Release text:

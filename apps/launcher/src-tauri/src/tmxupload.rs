@@ -36,6 +36,8 @@ pub const HANDOVER_PORTS: [u16; 5] = [27321, 27322, 27323, 27324, 27325];
 pub const GAMES: [&str; 5] = ["tmnf", "tmuf", "tmn-eswc", "tm-original", "tm-sunrise"];
 /// At least this long between two uploads.
 pub const GAP_MS: u64 = 2_000;
+/// How long the game's autosave (no inputs, validable="0") waits for a full copy of the same run.
+pub const WEAK_HOLD_MS: u64 = 20_000;
 /// Retry delays after a transient failure (network, 5xx, 429); after the last one the job fails.
 pub const BACKOFF_S: [u64; 5] = [10, 30, 120, 300, 900];
 /// Not signed in: checked again this often (one page load on the exchange).
@@ -266,6 +268,11 @@ pub fn run_key(bytes: &[u8]) -> Option<String> {
     Some(format!("run:{}:{}", m.uid?, m.best_ms?))
 }
 
+/// The header says validable="0" (the game's autosave on Original, Sunrise and ESWC).
+fn weak_copy(bytes: &[u8]) -> bool {
+    replay_meta(bytes).validable == Some(false)
+}
+
 impl Queue {
     /// Adds a job unless the same replay is already queued. Returns its id.
     pub fn push(&mut self, mut job: Job, now: u64) -> Option<u64> {
@@ -273,7 +280,17 @@ impl Queue {
             return None;
         }
         if let Some(k) = run_key(&job.bytes) {
-            if self.jobs.iter().any(|j| run_key(&j.bytes).as_deref() == Some(k.as_str())) {
+            if let Some(e) = self.jobs.iter_mut().find(|j| run_key(&j.bytes).as_deref() == Some(k.as_str())) {
+                // The game's autosave (validable="0") and a full copy of the same run (validable="1", e.g. the
+                // one Legacy Essentials or Horizon save in My Replays) can both turn up. TMX may refuse the first
+                // and takes the second: the second goes out instead, unless the first is on its way already.
+                if e.state != "uploading" && weak_copy(&e.bytes) && !weak_copy(&job.bytes) {
+                    e.bytes = job.bytes;
+                    e.sha = job.sha;
+                    e.file_name = job.file_name;
+                    e.source = job.source;
+                    return Some(e.id);
+                }
                 return None;
             }
         }
@@ -292,7 +309,14 @@ impl Queue {
         if self.jobs.iter().any(|j| j.state == "uploading") || now < self.last_upload_ms + GAP_MS {
             return None;
         }
-        self.jobs.iter().enumerate().filter(|(_, j)| j.due_ms <= now).min_by_key(|(_, j)| (j.due_ms, j.id)).map(|(i, _)| i)
+        // A not-validable autosave waits WEAK_HOLD_MS: the mod's full copy of the same run (with the
+        // inputs, written a few seconds after the finish) replaces it in push() and goes instead.
+        self.jobs
+            .iter()
+            .enumerate()
+            .filter(|(_, j)| j.due_ms <= now && !(now < j.created_ms + WEAK_HOLD_MS && weak_copy(&j.bytes)))
+            .min_by_key(|(_, j)| (j.due_ms, j.id))
+            .map(|(i, _)| i)
     }
 
     pub fn next_id(&self) -> u64 {
@@ -543,6 +567,11 @@ impl ModClient {
 pub fn watch_dirs(install: &Path) -> Vec<PathBuf> {
     let r = install.join("GameData").join("Tracks").join("Replays");
     vec![r.join("Autosaves"), r.clone(), r.join("My Replays")]
+}
+
+/// The game whose install folder holds `path` (manual uploads: the picker may still show another game).
+pub fn game_for_path(folders: &BTreeMap<String, PathBuf>, path: &Path) -> Option<String> {
+    folders.iter().find(|(_, dir)| crate::fsx::is_inside(path, dir)).map(|(g, _)| g.clone())
 }
 
 /// New replay files in `dirs`: written after `since_ms`, not seen before, at least 2 s old (so
@@ -1059,6 +1088,7 @@ pub fn step(svc: &Service, up: &dyn Uploader) -> (bool, Option<Tell>) {
     let mod_ref = idx.map(|x| i.queue.jobs[x].mod_ref.clone());
     let sha = idx.map(|x| i.queue.jobs[x].sha.clone()).unwrap_or_default();
     let key = idx.and_then(|x| run_key(&i.queue.jobs[x].bytes));
+    let weak = idx.is_some_and(|x| weak_copy(&i.queue.jobs[x].bytes));
     let done = i.queue.apply(id, out.clone(), now);
     if let Some(ModRef::Bridge { port, id: mid, told: false }) = mod_ref {
         let msg = match (&out, &done) {
@@ -1078,7 +1108,8 @@ pub fn step(svc: &Service, up: &dyn Uploader) -> (bool, Option<Tell>) {
     if let Some(h) = done {
         crate::clientbridge::notify_upload(&h);
         i.cfg.mark_done(&sha);
-        if let Some(k) = key {
+        // A not-validable copy TMX refused leaves the run open: a full copy of it may still come and go out.
+        if let Some(k) = key.filter(|_| h.result == "ok" || !weak) {
             i.cfg.mark_done(&k);
         }
         i.cfg.add_history(h);
@@ -1537,6 +1568,11 @@ pub mod app {
         if crate::maps::gbx_kind(&path) != Some(crate::maps::GbxKind::Replay) {
             return Err("Not a .Replay.Gbx file".into());
         }
+        // A file from a known install goes to that game's exchange, whatever the picker showed.
+        let game = {
+            let i = svc.inner.lock().unwrap();
+            game_for_path(&i.folders, &p).unwrap_or(game)
+        };
         svc.enqueue_file(&game, &p, "manual", None)?;
         emit(&app);
         Ok(svc.status())
@@ -1673,6 +1709,9 @@ mod tests {
                     }
                     if n < fail_first {
                         return (503, b"busy".to_vec());
+                    }
+                    if text.contains("NOTVALID") {
+                        return (400, br#"{"detail":"This replay is not validable."}"#.to_vec());
                     }
                     if text.contains("SLOWRUN") {
                         return (400, br#"{"detail":"Your replay is not faster than your current record."}"#.to_vec());
@@ -1912,6 +1951,73 @@ mod tests {
         i3.cfg.mark_done(&ok.sha);
         assert_eq!(admit(&mut i3, ok.clone(), false, 0), Ok(None), "already handled");
         assert!(admit(&mut i3, ok, true, 0).unwrap().is_some(), "manual upload may repeat");
+    }
+
+    #[test]
+    fn a_manual_upload_goes_to_the_game_whose_install_holds_the_file() {
+        let mut f = BTreeMap::new();
+        f.insert("tm-sunrise".to_string(), PathBuf::from(r"C:\Games\TMSunrise"));
+        f.insert("tm-original".to_string(), PathBuf::from(r"C:\Games\TMO"));
+        let p = PathBuf::from(r"C:\Games\TMSunrise\GameData\Tracks\Replays\My Replays\A(01'03''51).Replay.Gbx");
+        assert_eq!(game_for_path(&f, &p).as_deref(), Some("tm-sunrise"));
+        assert_eq!(game_for_path(&f, &PathBuf::from(r"c:\games\tmo\GameData\x.Replay.Gbx")).as_deref(), Some("tm-original"));
+        assert_eq!(game_for_path(&f, &PathBuf::from(r"C:\Games\TMSunrise2\x.Replay.Gbx")), None, "a sibling folder is not inside");
+        assert_eq!(game_for_path(&f, &PathBuf::from(r"C:\Users\me\Documents\TrackMania\Tracks\Replays\x.Replay.Gbx")), None);
+    }
+
+    #[test]
+    fn a_not_validable_autosave_waits_for_the_full_copy() {
+        let mut q = Queue::default();
+        let auto = make_job("tm-sunrise", "sunrise.tm-exchange.com", "me_A.Replay.gbx", "A".into(), None, "folder", replay_bytes("NOTVALID", false), ModRef::None);
+        let id = q.push(auto, 1_000).unwrap();
+        assert_eq!(q.next_due(1_000 + WEAK_HOLD_MS - 1), None, "the autosave waits");
+        // the mod's copy turns up a few seconds later: it takes the job's place and goes at once
+        let full = make_job("tm-sunrise", "sunrise.tm-exchange.com", "A(00'25''12).Replay.Gbx", "A".into(), None, "host", replay_bytes("full", true), ModRef::None);
+        assert_eq!(q.push(full, 4_000), Some(id));
+        assert_eq!(q.next_due(4_000), Some(0), "the full copy is not held");
+        // no full copy: the autosave goes after the wait
+        let mut q2 = Queue::default();
+        let auto2 = make_job("tm-sunrise", "sunrise.tm-exchange.com", "me_A.Replay.gbx", "A".into(), None, "folder", replay_bytes("NOTVALID", false), ModRef::None);
+        q2.push(auto2, 1_000);
+        assert_eq!(q2.next_due(1_000 + WEAK_HOLD_MS), Some(0));
+    }
+
+    #[test]
+    fn a_full_copy_replaces_and_follows_a_not_validable_autosave() {
+        let ex = fake_exchange(0);
+        let up = HttpUploader { port: ex.port, signed_in: AtomicBool::new(true) };
+        // Both copies of one run in the same scan: the full one replaces the autosave in the queue.
+        let (_t, s) = svc();
+        {
+            let mut i = s.inner.lock().unwrap();
+            let auto = make_job("tm-original", "original.tm-exchange.com", "me_A.Replay.gbx", "A".into(), None, "folder", replay_bytes("NOTVALID", false), ModRef::None);
+            let full = make_job("tm-original", "original.tm-exchange.com", "A(00'25''12).Replay.Gbx", "A".into(), None, "folder", replay_bytes("full", true), ModRef::None);
+            let a = admit(&mut i, auto, false, 0).unwrap();
+            assert_eq!(admit(&mut i, full, false, 0).unwrap(), a, "same job, now with the full copy");
+            assert_eq!(i.queue.jobs.len(), 1);
+        }
+        run_until_idle(&s, &up);
+        assert_eq!(s.status().history[0].result, "ok");
+        // The other order, or the full copy turning up later: the refused autosave does not settle the run.
+        let (_t2, s2) = svc();
+        {
+            let mut i = s2.inner.lock().unwrap();
+            let auto = make_job("tm-original", "original.tm-exchange.com", "me_A.Replay.gbx", "A".into(), None, "folder", replay_bytes("NOTVALID", false), ModRef::None);
+            admit(&mut i, auto, false, 0).unwrap();
+        }
+        run_until_idle(&s2, &up);
+        assert_eq!(s2.status().history[0].result, "refused");
+        {
+            let mut i = s2.inner.lock().unwrap();
+            let full = make_job("tm-original", "original.tm-exchange.com", "A(00'25''12).Replay.Gbx", "A".into(), None, "folder", replay_bytes("full", true), ModRef::None);
+            assert!(admit(&mut i, full, false, 0).unwrap().is_some(), "the full copy is still taken");
+        }
+        run_until_idle(&s2, &up);
+        assert_eq!(s2.status().history[0].result, "ok");
+        // Once a copy went out, a later one of the same run is skipped.
+        let mut i = s2.inner.lock().unwrap();
+        let again = make_job("tm-original", "original.tm-exchange.com", "B.Replay.Gbx", "A".into(), None, "folder", replay_bytes("other", true), ModRef::None);
+        assert_eq!(admit(&mut i, again, false, 0), Ok(None));
     }
 
     #[test]

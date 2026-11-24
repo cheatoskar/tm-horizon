@@ -1587,7 +1587,8 @@ pub fn plugin_states(host_root: &Path, pkg: Option<&Package>, prefix: &str, game
                 // Off when either TM Horizon's choice or the in-game menu (settings\host.json) says off.
                 // Without a choice in TM Horizon the in-game menu's switch decides, else plugin.json's default.
                 enabled: i.is_some_and(|m| match (enabled, menu_switch(host_root, &id)) {
-                    (Some(l), menu) => l.contains(&id) && menu != Some(false),
+                    // Switched on in the menu but missing from TM Horizon's list: the host (0.3.3+) loads it.
+                    (Some(l), menu) => (l.contains(&id) || menu == Some(true)) && menu != Some(false),
                     (None, Some(menu)) => menu,
                     (None, None) => m.enabled_by_default,
                 }),
@@ -1976,13 +1977,42 @@ pub fn report_logs(install: Option<&Path>, tml_root: Option<&Path>) -> Vec<(Path
     if let Some(r) = tml_root {
         roots.extend(tml_versions(r).into_iter().map(|(_, d)| d));
     }
+    let clean = |s: &str| -> String { s.chars().map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.' { c } else { '_' }).collect() };
     for h in roots {
-        for p in log_files(&h, 3) {
-            out.push((p, "logs/Horizon".into(), "Horizon Client log".into()));
+        // One folder per install (its folder name), so reports with several installs stay apart.
+        let name = if h.file_name().is_some_and(|n| n == HOST_DIR) { h.parent().and_then(|p| p.file_name()) } else { h.file_name() };
+        let tag = name.map(|n| clean(&n.to_string_lossy())).unwrap_or_else(|| "install".into());
+        let base = format!("logs/Horizon/{tag}");
+        for p in log_files(&h, 5) {
+            out.push((p, base.clone(), "Horizon Client log".into()));
         }
         let prof = h.join(PROFILE);
         if fsx::is_file(&prof) {
-            out.push((prof, "logs/Horizon".into(), "Horizon Client profile".into()));
+            out.push((prof, base.clone(), "Horizon Client profile".into()));
+        }
+        let settings = host_settings_path(&h);
+        if fsx::is_file(&settings) {
+            out.push((settings, base.clone(), "Horizon Client settings".into()));
+        }
+        for e in fsx::list(&h.join(PLUGINS)) {
+            let pj = e.path.join(PLUGIN_JSON);
+            if e.is_dir && fsx::is_file(&pj) {
+                out.push((pj, format!("{base}/plugins/{}", clean(&e.name)), format!("Plugin {}", e.name)));
+            }
+        }
+        // Crash files the host writes (crash folder) and minidumps next to it or the game.
+        let mut dumps: Vec<(Option<std::time::SystemTime>, PathBuf)> = Vec::new();
+        for dir in [h.join("crash"), h.join("crashes"), h.clone(), h.parent().map(Path::to_path_buf).unwrap_or_default()] {
+            let in_crash_dir = dir.file_name().is_some_and(|n| n == "crash" || n == "crashes");
+            for e in fsx::list(&dir) {
+                if e.is_file && (in_crash_dir || e.name.to_lowercase().ends_with(".dmp")) && !dumps.iter().any(|(_, p)| *p == e.path) {
+                    dumps.push((e.modified, e.path));
+                }
+            }
+        }
+        dumps.sort_by(|a, b| b.0.cmp(&a.0).then(b.1.cmp(&a.1)));
+        for (_, p) in dumps.into_iter().take(3) {
+            out.push((p, format!("crash/Horizon/{tag}"), "Horizon crash file".into()));
         }
     }
     out
@@ -2331,7 +2361,8 @@ mod tests {
         assert!(game.join("horizon/plugins/eswc-autosave/plugin.json").is_file());
         assert_eq!(loader_state(&game), "other");
         assert!(latest_log(&game.join(HOST_DIR)).unwrap().text.contains("autosave loaded"));
-        assert_eq!(report_logs(Some(&game), None).len(), 2, "log + profile.json");
+        let rl = report_logs(Some(&game), None);
+        assert_eq!(rl.iter().map(|(_, _, l)| l.as_str()).collect::<Vec<_>>(), ["Horizon Client log", "Horizon Client profile", "Plugin eswc-autosave", "Plugin sample"], "{rl:?}");
 
         // Restore the backup made before the removal: Horizon is back.
         let b = list_backups(&root, &game).into_iter().find(|b| b.reason == "before removing Horizon Client").unwrap();
